@@ -663,11 +663,13 @@ const google = {
         };
         
         fetch(GAS_WEB_APP_URL, {
-          method: "POST",
-          mode: "cors", // Mengizinkan akses antar domain (GitHub ke Google)
-          headers: { "Content-Type": "text/plain;charset=utf-8" }, // Trik CORS GAS aman
-          body: JSON.stringify(bodyData)
-        })
+  method: "POST",
+  mode: "cors", // Wajib ada
+  headers: { 
+    "Content-Type": "text/plain;charset=utf-8" // JANGAN gunakan application/json
+  },
+  body: JSON.stringify(bodyData)
+})
         .then(res => res.json())
         .then(data => {
           if (this._successCallback) this._successCallback(data);
