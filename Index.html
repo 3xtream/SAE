@@ -640,6 +640,64 @@ input[type="number"]{max-width:140px}
 <!-- Speaking Lab Toast -->
 
 <script>
+
+// GANTI DENGAN URL WEB APP GOOGLE APPS SCRIPT ANDA YANG BARU DIDEPLOY
+const GAS_WEB_APP_URL = "https://script.google.com/macros/s/XXXXX_ID_DEPLOYMENT_BARU_ANDA_XXXXX/exec";
+
+// Jembatan Pengganti google.script.run secara global
+const google = {
+  script: {
+    run: {
+      _successCallback: null,
+      _failureCallback: null,
+      withSuccessHandler: function(cb) { this._successCallback = cb; return this; },
+      withFailureHandler: function(cb) { this._failureCallback = cb; return this; },
+      
+      // Mengarahkan fungsi-fungsi lama langsung ke API GAS via POST fetch
+      _execute: function(actionName, payload = {}) {
+        const bodyData = {
+          action: actionName,
+          email: window.currentUser ? window.currentUser.email : "",
+          token: window.currentUser ? window.currentUser.token : "",
+          ...payload
+        };
+        
+        fetch(GAS_WEB_APP_URL, {
+          method: "POST",
+          mode: "cors", // Mengizinkan akses antar domain (GitHub ke Google)
+          headers: { "Content-Type": "text/plain;charset=utf-8" }, // Trik CORS GAS aman
+          body: JSON.stringify(bodyData)
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (this._successCallback) this._successCallback(data);
+        })
+        .catch(err => {
+          if (this._failureCallback) this._failureCallback(err);
+          else console.error("API Error:", err);
+        });
+      },
+      
+      // Pemetaan Nama Fungsi yang Ada di Index.html Anda saat ini
+      loginUser: function(e, p) { this._execute("loginUser", { loginEmail: e, loginPassword: p }); },
+      registerUser: function(e, p, n) { this._execute("registerUser", { regEmail: e, regPassword: p, regFullName: n }); },
+      getDashboardData: function() { this._execute("getDashboardData"); },
+      saveDailyLog: function(d, p, w) { this._execute("saveDailyLog", { duration: d, passage: p, wpm: w }); },
+      getVocabBank: function() { this._execute("getVocabBank"); },
+      updateVocabProgress: function(w, m) { this._execute("updateVocabProgress", { wordId: w, isMastered: m }); },
+      getFlashcards: function() { this._execute("getFlashcards"); },
+      updatePhaseChecklistInSheet: function(p, c, i) { this._execute("updatePhaseChecklistInSheet", { phaseNum: p, checklistIndex: c, isChecked: i }); },
+      getSpeakingLabUrl: function() { this._execute("getSpeakingLabUrl"); },
+      getPremiumContent: function() {
+        // Khusus konten halaman premium, sesuaikan sukses callback untuk merender HTML string
+        const originalSuccess = this._successCallback;
+        this._successCallback = (res) => { if(originalSuccess && res.html) originalSuccess(res.html); };
+        this._execute("getPremiumContent");
+      }
+    }
+  }
+};
+
 // ==========================================
 // CORE APP
 // ==========================================
