@@ -358,40 +358,36 @@ async function navigateTo(id) {
 
 // Handler untuk mengaktifkan kembali fungsi bawaan aplikasi Anda pasca-render komponen
 function initComponentData(id) {
+  console.log(`🎬 Komponen [${id}] selesai dimuat. Memulai pengisian data...`);
+
   switch(id) {
     case 'dashboard':
-      if (typeof renderGraph === 'function' && typeof last7Logs !== 'undefined') {
-        renderGraph(last7Logs); // Me-render ulang grafik aktivitas
-      }
       if (typeof updateDashboardUI === 'function') updateDashboardUI();
+      if (typeof renderGraph === 'function' && typeof last7Logs !== 'undefined') renderGraph(last7Logs);
       break;
-    case 'tracking':
-      if (typeof setDefaultDate === 'function') setDefaultDate();
+
+    case 'flashcard': // atau 'flashcard-tab' sesuai nama file HTML Anda
+      if (typeof initFlashcards === 'function') initFlashcards();
       break;
-    case 'flashcard':
-      if (typeof updateCardUI === 'function') updateCardUI();
-      break;
-    case 'vocab-milestone':
-      if (typeof updateMilestoneUI === 'function') updateMilestoneUI();
-      break;
+
     case 'vocab-list':
       if (typeof renderVocabDOM === 'function') renderVocabDOM();
       break;
+
     case 'reading':
       if (typeof runWpmCalc === 'function') runWpmCalc();
       break;
+
+    case 'tracking':
+      if (typeof setDefaultDate === 'function') setDefaultDate();
+      break;
+
     case 'speaking-lab':
-      if (typeof initSpeakingLab === 'function') initSpeakingLab(); // Menyesuaikan logic setup iframe Anda
+      if (typeof initSpeakingLab === 'function') initSpeakingLab();
       break;
-    case 'premium':
-      if (typeof loadAndShowPremiumContent === 'function') loadAndShowPremiumContent();
-      break;
-    case 'phase1':
-    case 'phase2':
-    case 'phase3':
-    case 'phase4':
-      // Membaca ulang checklist lokal dari database state jika ada fungsi sync
-      if (typeof updateChecklistDOM === 'function') updateChecklistDOM(id);
+
+    case 'vocab-milestone':
+      if (typeof updateMilestoneUI === 'function') updateMilestoneUI();
       break;
   }
 }
