@@ -597,15 +597,12 @@ function activateApp() {
   document.getElementById('mainApp').style.display = 'block';
   document.getElementById('appTitle').textContent = `📊 Master Tracker: ${currentUser.fullName}`;
   refreshDataFromDatabase();
-  // Restore Speaking Lab URL
-  let sv = null;
-  try { sv = localStorage.getItem('splab_github_url'); } catch(e) {}
-  if (sv) {
-    const inp = document.getElementById('spLabUrl');
-    if (inp) inp.value = sv;
-    setSpUrlStatus('ok', '<i class="fa-solid fa-circle-check"></i> URL tersimpan: ' + sv);
-    document.getElementById('spIframeWrap').style.display = '';
-  }
+  
+  // Langsung sembunyikan kotak input dan tampilkan container iframe Speaking Lab
+  const setupCard = document.getElementById('spSetupCard');
+  const iframeWrap = document.getElementById('spIframeWrap');
+  if (setupCard) setupCard.style.display = 'none';
+  if (iframeWrap) iframeWrap.style.display = '';
 }
 
 function handleLogout() {
@@ -780,9 +777,12 @@ function show(id) {
   const tb = document.getElementById('btn-' + id); if (tb) tb.classList.add('active');
   if (id === 'flashcard-tab') initFlashcards();
   if (id === 'speaking-lab') {
-    const saved = localStorage.getItem('splab_github_url');
     const iframeEl = document.getElementById('spLabIframe');
-    if (saved && iframeEl && !iframeEl.src) {
+    // Langsung sembunyikan setup card saat tab diklik
+    const setupCard = document.getElementById('spSetupCard');
+    if (setupCard) setupCard.style.display = 'none';
+    
+    if (iframeEl && !iframeEl.src) {
       document.getElementById('spIframeLoader').style.display = 'flex';
       loadSpeakingLabIframe();
     }
