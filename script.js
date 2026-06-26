@@ -146,16 +146,17 @@ async function handleLogin() {
 
 // Ganti fungsi activateApp Anda menjadi seperti ini
 async function activateApp() {
+  // 1. Sembunyikan panel login, tampilkan container utama
   document.getElementById('authSection').style.display = 'none';
   document.getElementById('mainApp').style.display = 'block';
   
-  // 1. Ambil HTML Dashboard terlebih dahulu sampai selesai
-  await navigateTo('dashboard'); 
+  // 2. WAJIB TUNGGU sampai HTML Dashboard selesai dimuat total ke DOM
+  await navigateTo('dashboard');
   
-  // 2. Baru panggil fungsi penarikan data database utama Anda setelah HTML siap
-  // (Sesuaikan nama fungsi di bawah ini dengan nama fungsi penarik data database asli Anda, misal: refreshData() atau loadDashboardData())
-  if (typeof refreshDataFromDatabase === 'function') {
-    refreshDataFromDatabase(); 
+  // 3. BARU JALANKAN fungsi penarik data dari Google Sheets Anda
+  // (Ganti 'fetchDataFromSheets' dengan nama fungsi asli penembak API spreadsheet Anda)
+  if (typeof fetchDataFromSheets === 'function') {
+    fetchDataFromSheets();
   }
 }
 
