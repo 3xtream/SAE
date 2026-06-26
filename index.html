@@ -13,6 +13,7 @@
   <div class="loading-overlay" id="loading">Memproses data ke Cloud Spreadsheet...</div>
 
   <div class="container">
+    <!-- Login & Register Section (Dipastikan tersembunyi saat awal load) -->
     <div id="authSection" class="auth-wrapper" style="display:none">
       <div class="auth-toggle">
         <span id="tabLogin" class="active" onclick="switchAuth('login')">Masuk</span>
@@ -31,6 +32,7 @@
       </div>
     </div>
 
+    <!-- Main Application Wrapper -->
     <div id="mainApp" style="display:none">
       <div style="margin-bottom:1.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
         <div>
@@ -42,250 +44,29 @@
         </div>
       </div>
 
+      <!-- Navigation Bar -->
       <div class="nav">
-        <button class="nav-btn active" id="btn-dashboard" onclick="show('dashboard')">📈 Dashboard</button>
-        <button class="nav-btn" id="btn-tracking" onclick="show('tracking')">📝 Daily Tracking</button>
-        <button class="nav-btn" id="btn-flashcard-tab" onclick="show('flashcard-tab')">🃏 Flashcard Review</button>
-        <button class="nav-btn" id="btn-vocab-milestone" onclick="show('vocab-milestone')">🎯 Vocab Milestone</button>
-        <button class="nav-btn" id="btn-vocab-list" onclick="show('vocab-list')">🔤 List Vocabularies</button>
-        <button class="nav-btn" id="btn-reading" onclick="show('reading')">⚡ Reading Monitor</button>
-        <button class="nav-btn sp-navbtn" id="btn-speaking-lab" onclick="show('speaking-lab')">🎙️ Speaking Lab</button>
-        <button class="nav-btn" id="btn-theory-tab" onclick="show('theory-tab')">📖 Landasan Teori</button>
-        <button class="nav-btn" id="btn-phase1" onclick="show('phase1')">Phase 1</button>
-        <button class="nav-btn" id="btn-phase2" onclick="show('phase2')">Phase 2</button>
-        <button class="nav-btn" id="btn-phase3" onclick="show('phase3')">Phase 3</button>
-        <button class="nav-btn" id="btn-phase4" onclick="show('phase4')">Phase 4</button>
-        <button class="nav-btn" id="btn-premium-content-section" onclick="loadAndShowPremiumContent()">🔒 Premium Content</button>
+        <button class="nav-btn active" id="btn-dashboard" onclick="navigateTo('dashboard')">📈 Dashboard</button>
+        <button class="nav-btn" id="btn-tracking" onclick="navigateTo('tracking')">📝 Daily Tracking</button>
+        <button class="nav-btn" id="btn-flashcard" onclick="navigateTo('flashcard')">🃏 Flashcard Review</button>
+        <button class="nav-btn" id="btn-vocab-milestone" onclick="navigateTo('vocab-milestone')">🎯 Vocab Milestone</button>
+        <button class="nav-btn" id="btn-vocab-list" onclick="navigateTo('vocab-list')">🔤 List Vocabularies</button>
+        <button class="nav-btn" id="btn-reading" onclick="navigateTo('reading')">⚡ Reading Monitor</button>
+        <button class="nav-btn sp-navbtn" id="btn-speaking-lab" onclick="navigateTo('speaking-lab')">🎙️ Speaking Lab</button>
+        <button class="nav-btn" id="btn-theory" onclick="navigateTo('theory')">📖 Landasan Teori</button>
+        <button class="nav-btn" id="btn-phase1" onclick="navigateTo('phase1')">Phase 1</button>
+        <button class="nav-btn" id="btn-phase2" onclick="navigateTo('phase2')">Phase 2</button>
+        <button class="nav-btn" id="btn-phase3" onclick="navigateTo('phase3')">Phase 3</button>
+        <button class="nav-btn" id="btn-phase4" onclick="navigateTo('phase4')">Phase 4</button>
+        <button class="nav-btn" id="btn-premium" onclick="navigateTo('premium')">🔒 Premium Content</button>
       </div>
 
-      <div id="dashboard" class="section active">
-        <div class="section-title">Overall Progress Dashboard</div>
-        <div class="three-col" style="margin-bottom:1rem">
-          <div class="stat-box"><div class="stat-number" id="totalProgress">0%</div><div class="stat-label">Total Progress Checklist</div></div>
-          <div class="stat-box"><div class="stat-number" id="totalDays">0</div><div class="stat-label">Habit Streak (Days)</div></div>
-          <div class="stat-box"><div class="stat-number" id="vocabCount">0</div><div class="stat-label">Vocab Bank (Kata)</div></div>
-        </div>
-        <div class="card">
-          <div style="font-size:13px;font-weight:600;margin-bottom:4px;color:#333">Grafik Aktivitas Harian (7 Log Terakhir)</div>
-          <div class="graph-container" id="trackingGraph"></div>
-          <div style="display:flex;justify-content:space-between;padding:0 10px;margin-top:4px" id="graphLabels"></div>
-        </div>
-        <div class="card">
-          <div style="font-size:13px;font-weight:600;margin-bottom:12px;color:#333">Phase Progression Status</div>
-          <div class="phase-box p1-box"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-weight:600;color:var(--text-phase-1)">FASE 1: Foundation (M1-M3) — Target: 100 WPM & 300-400 Vocab</span><span style="font-size:12px;color:#666" id="phase1Progress">0%</span></div><div class="progress-bar-bg"><div class="progress-bar-fill p1-fill" id="phase1Bar" style="width:0%"></div></div></div>
-          <div class="phase-box p2-box"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-weight:600;color:var(--text-phase-2)">FASE 2: Expansion (M4-M6) — Target: 130 WPM & 800-900 Vocab</span><span style="font-size:12px;color:#666" id="phase2Progress">0%</span></div><div class="progress-bar-bg"><div class="progress-bar-fill p2-fill" id="phase2Bar" style="width:0%"></div></div></div>
-          <div class="phase-box p3-box"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-weight:600;color:var(--text-phase-3)">FASE 3: Activation (M7-M9) — Target: 160 WPM & 1200-1300 Vocab</span><span style="font-size:12px;color:#666" id="phase3Progress">0%</span></div><div class="progress-bar-bg"><div class="progress-bar-fill p3-fill" id="phase3Bar" style="width:0%"></div></div></div>
-          <div class="phase-box p4-box"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-weight:600;color:var(--text-phase-4)">FASE 4: Mastery (M10-M12) — Target: Fluency & 1800-2000 Vocab</span><span style="font-size:12px;color:#666" id="phase4Progress">0%</span></div><div class="progress-bar-bg"><div class="progress-bar-fill p4-fill" id="phase4Bar" style="width:0%"></div></div></div>
-        </div>
-      </div>
+      <!-- VIEWPORT KONTEN DINAMIS (Isi menu dimuat ke dalam kontainer ini) -->
+      <div id="content-viewport"></div>
 
-      <div id="tracking" class="section">
-        <div class="section-title">Daily Activity Input & Log</div>
-        <div class="card">
-          <div class="three-col">
-            <div class="input-group"><label class="input-label">Tanggal</label><input type="date" id="logDate"></div>
-            <div class="input-group"><label class="input-label">Durasi Input (Menit)</label><input type="number" id="inputDuration" value="20"></div>
-            <div class="input-group"><label class="input-label">Passage Dibaca</label><input type="number" id="passagesRead" value="1"></div>
-          </div>
-          <button class="btn" style="margin-top:0.5rem" onclick="logDailyActivity()">Simpan Log Harian</button>
-        </div>
-      </div>
+    </div>
+  </div>
 
-      <div id="flashcard-tab" class="section">
-        <div class="section-title">🃏 Spaced Repetition Flashcard Review</div>
-        <div style="text-align:center;color:#666;margin-bottom:1rem" id="fcTracker">Memuat kartu peninjauan...</div>
-        <div class="flashcard-wrapper">
-          <div class="flashcard" id="fCard" onclick="this.classList.toggle('flipped')">
-            <div class="card-face card-front">
-              <div class="fc-word" id="fcFrontWord">-</div>
-              <button class="btn-speak" id="btnSpeak" onclick="speakCurrentWord(event)" title="Dengarkan pelafalan">🔊</button>
-              <div class="fc-hint">Klik kartu untuk melihat arti</div>
-            </div>
-            <div class="card-face card-back">
-              <div class="fc-meaning" id="fcBackMeaning">-</div>
-              <div class="fc-hint">Klik kartu untuk melihat kata</div>
-            </div>
-          </div>
-        </div>
-        <div class="fc-controls">
-          <button class="btn" style="background:#4b5563" onclick="prevCard(event)">⬅️ Sebelumnya</button>
-          <button class="btn" style="background:#16a34a" onclick="markAsMasteredFromCard(event)">✅ Saya Sudah Hafal</button>
-          <button class="btn" style="background:#0284c7" onclick="nextCard(event)">Berikutnya ➡️</button>
-        </div>
-        <div class="speech-controls">
-          <div class="speech-row"><span class="speech-label">🔁 Auto-play saat ganti kartu</span><label class="toggle-switch"><input type="checkbox" id="autoPlayToggle"><span class="toggle-slider"></span></label></div>
-          <div class="speech-row"><span class="speech-label">🐢 Kecepatan bicara</span><div class="speed-group"><button class="speed-btn active" onclick="setSpeed(0.7,this)">Lambat</button><button class="speed-btn" onclick="setSpeed(1.0,this)">Normal</button><button class="speed-btn" onclick="setSpeed(1.3,this)">Cepat</button></div></div>
-          <div id="speechStatus" style="font-size:12px;color:#888;text-align:center;min-height:16px;margin-top:4px"></div>
-        </div>
-      </div>
-
-      <div id="vocab-milestone" class="section">
-        <div class="section-title">Vocabulary Milestone Status</div>
-        <div class="card">
-          <div class="input-group"><label class="input-label">Jumlah Kosakata Terkuasai:</label><input type="number" id="currentVocabInput" value="0" readonly style="background:#f0f0f0;font-weight:bold;color:var(--color-primary)"></div>
-          <table><thead><tr><th>Milestone Fase</th><th>Target</th><th>Status</th></tr></thead><tbody>
-            <tr><td><span class="badge b-p1">Fase 1 (M3)</span></td><td>300 - 400 Kata</td><td id="vocabP1status"><span class="badge b-no">❌ Belum</span></td></tr>
-            <tr><td><span class="badge b-p2">Fase 2 (M6)</span></td><td>800 - 900 Kata</td><td id="vocabP2status"><span class="badge b-no">❌ Belum</span></td></tr>
-            <tr><td><span class="badge b-p3">Fase 3 (M9)</span></td><td>1200 - 1300 Kata</td><td id="vocabP3status"><span class="badge b-no">❌ Belum</span></td></tr>
-            <tr><td><span class="badge b-p4">Fase 4 (M12)</span></td><td>1800 - 2000 Kata</td><td id="vocabP4status"><span class="badge b-no">❌ Belum</span></td></tr>
-          </tbody></table>
-        </div>
-      </div>
-
-      <div id="vocab-list" class="section">
-        <div class="section-title">List Vocabularies (Real-time Database Feed)</div>
-        <div class="vocab-counter-floating"><span>Progress Penyerapan Kata:</span><span id="floatingCounter">0 Kata Terkuasai</span></div>
-        <div class="card">
-          <div class="vocab-cat-title">Kategori 1 (CAT1)</div><div class="vocab-grid" id="cat1"></div>
-          <div class="vocab-cat-title">Kategori 2 (CAT2)</div><div class="vocab-grid" id="cat2"></div>
-          <div class="vocab-cat-title">Kategori 3 (CAT3)</div><div class="vocab-grid" id="cat3"></div>
-          <div class="vocab-cat-title">Kategori 4 (CAT4)</div><div class="vocab-grid" id="cat4"></div>
-          <div class="vocab-cat-title">Kategori 5 (CAT5)</div><div class="vocab-grid" id="cat5"></div>
-          <div class="vocab-cat-title">Kategori 6 (CAT6)</div><div class="vocab-grid" id="cat6"></div>
-          <div class="vocab-cat-title">Kategori 7 (CAT7)</div><div class="vocab-grid" id="cat7"></div>
-        </div>
-      </div>
-
-      <div id="reading" class="section">
-        <div class="section-title">Reading Speed & WPM Monitor</div>
-        <div class="card" style="background:#f4f7fa;border:1px solid #cbd5e1">
-          <div style="font-size:13px;font-weight:bold;color:var(--color-primary);margin-bottom:6px">🧮 Kalkulator WPM Mandiri</div>
-          <div class="three-col">
-            <div class="input-group"><label class="input-label">Jumlah Kata Teks</label><input type="number" id="calcWords" value="150" oninput="runWpmCalc()"></div>
-            <div class="input-group"><label class="input-label">Waktu Tempuh (Detik)</label><input type="number" id="calcSeconds" value="90" oninput="runWpmCalc()"></div>
-            <div class="input-group"><label class="input-label" style="color:var(--color-primary)">Hasil Kalkulasi WPM</label><div id="calcResult" style="font-size:18px;font-weight:bold;padding-top:6px;color:var(--color-primary)">100 WPM</div></div>
-          </div>
-          <button class="btn" style="font-size:11px;padding:4px 10px;margin-top:8px" onclick="applyCalcToInput()">Gunakan Hasil ini Sebagai WPM</button>
-        </div>
-        <div class="card">
-          <div class="input-group"><label class="input-label">Kecepatan Membaca Saat Ini (WPM)</label><input type="number" id="currentWpmInput" onchange="handleWpmChange()" value="0"></div>
-          <div style="margin-top:1.5rem">
-            <div style="font-size:12px;font-weight:bold;margin-bottom:10px;color:#555">VERIFIKASI TARGET MEMBACA PER FASE</div>
-            <div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>Fase 1: 100 WPM</span><span id="wpmP1status"></span></div><div style="width:100%;height:6px;background:#eee;border-radius:3px"><div id="wpmP1bar" style="width:0%;height:100%;background:var(--text-phase-1);border-radius:3px"></div></div></div>
-            <div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>Fase 2: 130 WPM</span><span id="wpmP2status"></span></div><div style="width:100%;height:6px;background:#eee;border-radius:3px"><div id="wpmP2bar" style="width:0%;height:100%;background:var(--text-phase-2);border-radius:3px"></div></div></div>
-            <div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>Fase 3: 160 WPM</span><span id="wpmP3status"></span></div><div style="width:100%;height:6px;background:#eee;border-radius:3px"><div id="wpmP3bar" style="width:0%;height:100%;background:var(--text-phase-3);border-radius:3px"></div></div></div>
-          </div>
-        </div>
-      </div>
-
-      <div id="speaking-lab" class="section">
-        <div id="spSetupCard" class="card" style="border:1.5px solid #C7D2FE;background:#FAFAFE;margin-bottom:0">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
-            <div style="width:38px;height:38px;background:#EAE9FF;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#6C63FF;font-size:18px;flex-shrink:0"><i class="fa-brands fa-github"></i></div>
-            <div>
-              <div style="font-size:15px;font-weight:700;color:#1E1B4B">GitHub Pages Setup</div>
-              <div style="font-size:12px;color:#6B7280;margin-top:1px">Masukkan URL GitHub Pages setelah deploy</div>
-            </div>
-          </div>
-          <div style="margin-bottom:12px">
-            <label style="font-size:11px;font-weight:600;color:#6B7280;text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:5px">URL Speaking Lab</label>
-            <div style="display:flex;gap:8px">
-              <input type="url" id="spLabUrl" placeholder="https://username.github.io/repo/speaking-lab.html"
-                style="flex:1;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:13px;font-family:inherit;outline:none"
-                onfocus="this.style.borderColor='#6C63FF'" onblur="this.style.borderColor='#E5E7EB'">
-              <button onclick="saveSpLabUrl()" style="padding:10px 16px;background:#6C63FF;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap">
-                <i class="fa-solid fa-floppy-disk"></i> Simpan URL
-              </button>
-            </div>
-            <div id="spUrlStatus" style="font-size:11px;color:#6B7280;margin-top:7px;display:flex;align-items:center;gap:5px">
-              <i class="fa-solid fa-circle-info"></i> Masukkan URL Speaking Lab Anda.
-            </div>
-          </div>
-        </div>
-        <div id="spIframeWrap" style="display:none;margin-top:14px;border-radius:12px;overflow:hidden;border:1.5px solid #C7D2FE;box-shadow:0 4px 20px rgba(108,99,255,.12)">
-          <div style="background:linear-gradient(135deg,#6C63FF,#4F46E5);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
-            <div>
-              <div style="font-size:15px;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px"><i class="fa-solid fa-microphone-lines"></i> Speaking Lab</div>
-              <div style="font-size:11px;color:#C7D2FE;margin-top:2px">AI-Powered · Gemini Flash · Mic aktif dari GitHub Pages</div>
-            </div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap">
-              <button onclick="loadSpeakingLabIframe()" style="padding:7px 14px;background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.4);border-radius:99px;color:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px">
-                <i class="fa-solid fa-rotate-right"></i> Refresh Sesi
-              </button>
-              <a id="spOpenTabBtn" href="#" target="_blank" style="padding:7px 14px;background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.4);border-radius:99px;color:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;text-decoration:none">
-                <i class="fa-solid fa-arrow-up-right-from-square"></i> Buka Tab Baru
-              </a>
-            </div>
-          </div>
-          <div id="spIframeLoader" style="display:none;align-items:center;justify-content:center;gap:12px;padding:48px 20px;background:#F5F3FF;color:#6C63FF;font-size:14px;font-weight:500">
-            <div style="width:22px;height:22px;border:3px solid #C7D2FE;border-top-color:#6C63FF;border-radius:50%;animation:sp-spin .7s linear infinite;flex-shrink:0"></div>
-            Memuat Speaking Lab & mengirim sesi login...
-          </div>
-          <div id="spIframeErr" style="display:none;padding:24px 20px;text-align:center;color:#991B1B;background:#FEE2E2;font-size:13px">
-            <i class="fa-solid fa-triangle-exclamation" style="font-size:20px;display:block;margin-bottom:8px"></i>
-            <span id="spIframeErrMsg">Gagal memuat Speaking Lab.</span><br>
-            <button onclick="loadSpeakingLabIframe()" style="margin-top:10px;padding:6px 14px;background:#991B1B;color:#fff;border:none;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit">Coba Lagi</button>
-          </div>
-          <iframe id="spLabIframe" style="width:100%; height: calc(100vh - 140px); border:none; display:none; overflow-y:auto;" scrolling="yes"
-            allow="microphone; speech-recognition" allowtransparency="true" title="Speaking Lab"></iframe>
-          <div style="display:flex;align-items:flex-start;gap:10px;background:#EAE9FF;padding:10px 16px;font-size:12px;color:#4F46E5;line-height:1.5">
-            <i class="fa-solid fa-shield-check" style="margin-top:1px;flex-shrink:0"></i>
-            <span>Sesi login diteruskan aman via URL fragment. Akses mikrofon berjalan dari domain GitHub Pages.</span>
-          </div>
-        </div>
-      </div>
-
-      <div id="theory-tab" class="section">
-        <div class="section-title">📖 Landasan Teori Ilmiah & Framework Metodologi</div>
-        <div class="theory-grid">
-          <div class="theory-card"><div class="theory-header"><span class="theory-icon">💡</span><div class="theory-card-title">Input Hypothesis (i+1)</div></div><p class="theory-desc">Dipelopori oleh <strong>Stephen Krashen</strong>, teori ini menyatakan bahwa manusia mengakuisisi bahasa secara alami melalui paparan <em>Comprehensible Input</em>.</p><div class="theory-callout">"We acquire language when we understand what we hear or read."</div></div>
-          <div class="theory-card"><div class="theory-header"><span class="theory-icon">🕸️</span><div class="theory-card-title">Four Strands Framework</div></div><p class="theory-desc"><strong>Prof. Paul Nation</strong> menegaskan bahwa pembelajaran bahasa yang efektif wajib menyeimbangkan empat porsi: Input, Output, Language-focused Learning, dan Fluency Development.</p><div class="theory-callout">Keseimbangan 4 aspek mempercepat pembentukan reflek bahasa.</div></div>
-          <div class="theory-card"><div class="theory-header"><span class="theory-icon">⏱️</span><div class="theory-card-title">Parameter Otomatisasi WPM</div></div><p class="theory-desc">Target kelulusan bertahap (100→130→160 WPM) memaksa otak melompat langsung menangkap makna frasa secara holistik tanpa terjebak Mental Translation Trap.</p><div class="theory-callout">Membaca cepat memotong proses menerjemahkan di dalam pikiran.</div></div>
-          <div class="theory-card"><div class="theory-header"><span class="theory-icon">🧠</span><div class="theory-card-title">Spaced Repetition System (SRS)</div></div><p class="theory-desc">Fitur Flashcard interaktif secara otomatis memfilter kosa kata yang belum dikuasai agar diulas kembali tepat sebelum memori otak melupakannya.</p><div class="theory-callout">Mengunci ingatan jangka pendek menjadi retensi permanen.</div></div>
-        </div>
-      </div>
-
-      <div id="phase1" class="section">
-        <div class="section-title">Phase 1: Foundation Checklist (Target: 100 WPM)</div>
-        <div class="card"><div class="warning-box"><strong>Kondisi Mutlak Kelulusan Fase 1:</strong> Wajib terpenuhi seluruhnya secara objektif sebelum membuka materi Fase 2.</div>
-          <ul class="checklist">
-            <li><input type="checkbox" class="p1-chk" data-idx="0" onchange="syncPhaseChecklist(1,0,this)"> Akumulasi kosakata mencapai target dasar awal (300 - 400 Kata).</li>
-            <li><input type="checkbox" class="p1-chk" data-idx="1" onchange="syncPhaseChecklist(1,1,this)"> Kecepatan membaca stabil minimal pada target kelulusan 100 WPM.</li>
-            <li><input type="checkbox" class="p1-chk" data-idx="2" onchange="syncPhaseChecklist(1,2,this)"> Durasi input harian konsisten 20-30 menit tanpa bolos.</li>
-            <li><input type="checkbox" class="p1-chk" data-idx="3" onchange="syncPhaseChecklist(1,3,this)"> Penguasaan struktur kalimat dasar subjek-predikat tanpa hambatan arti kata.</li>
-            <li><input type="checkbox" class="p1-chk" data-idx="4" onchange="syncPhaseChecklist(1,4,this)"> Pembentukan kebiasaan harian (Habit Streak) terbentuk stabil di bulan pertama.</li>
-          </ul>
-        </div>
-      </div>
-      <div id="phase2" class="section">
-        <div class="section-title">Phase 2: Expansion Checklist (Target: 130 WPM)</div>
-        <div class="card"><div class="warning-box"><strong>Kondisi Mutlak Kelulusan Fase 2:</strong></div>
-          <ul class="checklist">
-            <li><input type="checkbox" class="p2-chk" data-idx="0" onchange="syncPhaseChecklist(2,0,this)"> Akumulasi kosakata ekspansi tercapai (800 - 900 Kata).</li>
-            <li><input type="checkbox" class="p2-chk" data-idx="1" onchange="syncPhaseChecklist(2,1,this)"> Kecepatan membaca naik stabil menembus target kelulusan 130 WPM.</li>
-            <li><input type="checkbox" class="p2-chk" data-idx="2" onchange="syncPhaseChecklist(2,2,this)"> Buku bergradasi level A1+ / Graded Readers diselesaikan secara tuntas.</li>
-            <li><input type="checkbox" class="p2-chk" data-idx="3" onchange="syncPhaseChecklist(2,3,this)"> Pengenalan otomatis terhadap transisi tenses dasar (past, present, future).</li>
-            <li><input type="checkbox" class="p2-chk" data-idx="4" onchange="syncPhaseChecklist(2,4,this)"> Sesi peninjauan Flashcard mandiri dilakukan minimal 3 kali seminggu.</li>
-          </ul>
-        </div>
-      </div>
-      <div id="phase3" class="section">
-        <div class="section-title">Phase 3: Activation Checklist (Target: 160 WPM)</div>
-        <div class="card"><div class="warning-box"><strong>Kondisi Mutlak Kelulusan Fase 3:</strong></div>
-          <ul class="checklist">
-            <li><input type="checkbox" class="p3-chk" data-idx="0" onchange="syncPhaseChecklist(3,0,this)"> Akumulasi kosakata aktivasi tercapai (1200 - 1300 Kata).</li>
-            <li><input type="checkbox" class="p3-chk" data-idx="1" onchange="syncPhaseChecklist(3,1,this)"> Kecepatan membaca mencapai performa tinggi pada target kelulusan 160 WPM.</li>
-            <li><input type="checkbox" class="p3-chk" data-idx="2" onchange="syncPhaseChecklist(3,2,this)"> Protokol Reading Aloud berjalan harian untuk aktivasi otot organ wicara.</li>
-            <li><input type="checkbox" class="p3-chk" data-idx="3" onchange="syncPhaseChecklist(3,3,this)"> Mampu menangkap makna satu paragraf penuh tanpa melakukan translasi mental.</li>
-          </ul>
-        </div>
-      </div>
-      <div id="phase4" class="section">
-        <div class="section-title">Phase 4: Mastery Checklist</div>
-        <div class="card"><div class="info-box" style="background:#EAF3DE;border-left-color:#27500A;color:#27500A"><strong>Evaluasi Kelulusan Akhir Program (Mastery):</strong></div>
-          <ul class="checklist">
-            <li><input type="checkbox" class="p4-chk" data-idx="0" onchange="syncPhaseChecklist(4,0,this)"> Akumulasi kosakata tingkat mahir tercapai (1800 - 2000 Kata).</li>
-            <li><input type="checkbox" class="p4-chk" data-idx="1" onchange="syncPhaseChecklist(4,1,this)"> Sesi praktek konversasional aktif berjalan lancar.</li>
-            <li><input type="checkbox" class="p4-chk" data-idx="2" onchange="syncPhaseChecklist(4,2,this)"> Mampu memproduksi tulisan jurnal esai opini pendek secara natural.</li>
-            <li><input type="checkbox" class="p4-chk" data-idx="3" onchange="syncPhaseChecklist(4,3,this)"> Kelulusan total dari seluruh rangkaian kurikulum akselerasi 1 tahun.</li>
-          </ul>
-        </div>
-      </div>
-
-      <div id="premium-content-section" class="section">
-        <div class="section-title">🔒 Premium Member Content Area</div>
-        <div id="premium-dynamic-placeholder"></div>
-      </div>
-    </div></div><script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
