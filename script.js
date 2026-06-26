@@ -318,72 +318,29 @@ async function markAsMasteredFromCard(e) {
 //  NAVIGATION & DYNAMIC CONTENT
 // ═══════════════════════════════════════════════════════
 
-function show(id) {
-  // Amankan pengisian data: Hanya isi jika elemennya memang sudah ada di layar (tidak null)
-  switch(id) {
-    case 'dashboard':
-      if (document.getElementById('totalProgress') && typeof updateDashboardUI === 'function') {
-        updateDashboardUI();
-      }
-      if (document.getElementById('trackingGraph') && typeof renderGraph === 'function' && typeof last7Logs !== 'undefined') {
-        renderGraph(last7Logs);
-      }
-      break;
-    case 'vocab-list':
-      if (document.getElementById('cat1') && typeof renderVocabDOM === 'function') {
-        renderVocabDOM();
-      }
-      break;
-    case 'vocab-milestone':
-      if (document.getElementById('vocabP1status') && typeof updateMilestoneUI === 'function') {
-        updateMilestoneUI();
-      }
-      break;
-    case 'reading':
-      if (document.getElementById('calcResult') && typeof runWpmCalc === 'function') {
-        runWpmCalc();
-      }
-      break;
-    case 'tracking':
-      if (document.getElementById('logDate') && typeof setDefaultDate === 'function') {
-        setDefaultDate();
-      }
-      break;
-  }
-}
-
 // Ganti atau timpa fungsi navigasi/show lama dengan fungsi ini
 async function navigateTo(id) {
   const viewport = document.getElementById('content-viewport');
   if (!viewport) return;
 
-  // 1. Tampilkan loading di viewport konten
-  viewport.innerHTML = '<div style="text-align:center;padding:3rem;color:#0C447C;font-weight:500;">🔄 Memuat Konten...</div>';
+  // 1. Indikator memuat halaman di dalam area main kontainer
+  viewport.innerHTML = '<div style="text-align:center;padding:3rem;color:#6C63FF;font-weight:500;">🔄 Memuat Konten...</div>';
 
-  // 2. Perbarui kelas aktif pada tombol navigasi (Navbar)
+  // 2. Perbarui state class aktif pada tombol Navigasi Navbar
   document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-  
-  // Menangani perbedaan ID tombol (ada yang pakai -tab, ada yang pakai -section)
-  let btnId = `btn-${id}`;
-  if (id === 'flashcard') btnId = 'btn-flashcard-tab';
-  if (id === 'theory') btnId = 'btn-theory-tab';
-  if (id === 'premium') btnId = 'btn-premium-content-section';
-  
-  const activeBtn = document.getElementById(btnId);
+  const activeBtn = document.getElementById(`btn-${id}`);
   if (activeBtn) activeBtn.classList.add('active');
 
   try {
-    // 3. Ambil file HTML eksternal dari folder components
+    // 3. Tarik berkas HTML parsial dari folder components
     const response = await fetch(`components/${id}.html`);
-    if (!response.ok) throw new Error(`File components/${id}.html tidak ditemukan.`);
+    if (!response.ok) throw new Error(`Gagal memuat halaman: ${id}`);
     
     const html = await response.text();
-    viewport.innerHTML = html; // Pasang HTML ke layar
+    viewport.innerHTML = html;
 
-    // 4. Jalankan fungsi pengisi data bawaan sistem Anda setelah HTML siap
-    setTimeout(() => {
-      initComponentData(id);
-    }, 50);
+    // 4. Trigger fungsi inisialisasi data spesifik berdasarkan halaman yang dibuka
+    initComponentData(id);
 
   } catch (error) {
     viewport.innerHTML = `<div class="card" style="color:#991B1B;background:#FEE2E2;padding:1.5rem;text-align:center;">
@@ -392,40 +349,53 @@ async function navigateTo(id) {
   }
 }
 
-// Fungsi pembantu untuk memetakan data database ke elemen HTML yang baru dimuat
+// Handler untuk mengaktifkan kembali fungsi bawaan aplikasi Anda pasca-render komponen
 function initComponentData(id) {
   switch(id) {
     case 'dashboard':
+      if (typeof renderGraph === 'function' && typeof last7Logs !== 'undefined') {
+        renderGraph(last7Logs); // Me-render ulang grafik aktivitas
+      }
       if (typeof updateDashboardUI === 'function') updateDashboardUI();
-      if (typeof renderGraph === 'function' && typeof last7Logs !== 'undefined') renderGraph(last7Logs);
       break;
-    case 'vocab-list':
-      if (typeof renderVocabDOM === 'function') renderVocabDOM();
+    case 'tracking':
+      if (typeof setDefaultDate === 'function') setDefaultDate();
+      break;
+    case 'flashcard':
+      if (typeof updateCardUI === 'function') updateCardUI();
       break;
     case 'vocab-milestone':
       if (typeof updateMilestoneUI === 'function') updateMilestoneUI();
       break;
+    case 'vocab-list':
+      if (typeof renderVocabDOM === 'function') renderVocabDOM();
+      break;
     case 'reading':
       if (typeof runWpmCalc === 'function') runWpmCalc();
       break;
-    case 'tracking':
-      if (typeof setDefaultDate === 'function') setDefaultDate();
+    case 'speaking-lab':
+      if (typeof initSpeakingLab === 'function') initSpeakingLab(); // Menyesuaikan logic setup iframe Anda
+      break;
+    case 'premium':
+      if (typeof loadAndShowPremiumContent === 'function') loadAndShowPremiumContent();
+      break;
+    case 'phase1':
+    case 'phase2':
+    case 'phase3':
+    case 'phase4':
+      // Membaca ulang checklist lokal dari database state jika ada fungsi sync
+      if (typeof updateChecklistDOM === 'function') updateChecklistDOM(id);
       break;
   }
 }
 
 // Pastikan pada fungsi login sukses (activateApp) atau inisialisasi awal, 
 // panggil navigateTo('dashboard') sebagai halaman default utama.
-
-async function activateApp() {
-  // Sembunyikan form login dan tampilkan app utama
+function activateApp() {
   document.getElementById('authSection').style.display = 'none';
   document.getElementById('mainApp').style.display = 'block';
-  
-  // Muat HTML Dashboard dan biarkan setTimeout di atas yang menarik datanya secara otomatis
-  await navigateTo('dashboard');
+  navigateTo('dashboard'); // Redirect langsung ke dashboard pasca-login
 }
-
 async function loadAndShowPremiumContent() {
   show('premium-content-section');
   document.getElementById('premium-dynamic-placeholder').innerHTML = '<div style="text-align:center;padding:2rem;color:var(--color-primary);font-weight:bold">🔄 Mengunduh konten...</div>';
