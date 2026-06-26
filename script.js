@@ -390,20 +390,23 @@ function initComponentData(id) {
 }
 
 // Pastikan pada fungsi login sukses (activateApp) atau inisialisasi awal, 
-// panggil navigateTo('dashboard') sebagai halaman default utama.
-function activateApp() {
+// Amankan fungsi pemanggilan awal aplikasi
+async function activateApp() {
   document.getElementById('authSection').style.display = 'none';
   document.getElementById('mainApp').style.display = 'block';
-  navigateTo('dashboard'); // Redirect langsung ke dashboard pasca-login
-}
-async function loadAndShowPremiumContent() {
-  show('premium-content-section');
-  document.getElementById('premium-dynamic-placeholder').innerHTML = '<div style="text-align:center;padding:2rem;color:var(--color-primary);font-weight:bold">🔄 Mengunduh konten...</div>';
-  try {
-    const r = await callAPI('loadContentPage');
-    document.getElementById('premium-dynamic-placeholder').innerHTML = r.html || '<p>Konten kosong.</p>';
-  } catch(e) {
-    document.getElementById('premium-dynamic-placeholder').innerHTML = '<p style="color:#791F1F;padding:1rem">❌ ' + e.message + '</p>';
+  
+  // 1. Tunggu hingga komponen HTML Dashboard masuk ke layar
+  await navigateTo('dashboard'); 
+  
+  // 2. PANGGIL KEMBALI fungsi penarik data Google Sheets asli Anda di sini
+  // Silakan cari di script.js Anda, apa nama fungsi mengambil data Sheets Anda?
+  // Biasanya bernama: fetchData(), loadData(), refreshData(), atau initData()
+  if (typeof fetchData === 'function') {
+    fetchData(); 
+  } else if (typeof loadData === 'function') {
+    loadData();
+  } else if (typeof refreshData === 'function') {
+    refreshData();
   }
 }
 
