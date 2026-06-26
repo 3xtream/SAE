@@ -146,24 +146,24 @@ async function handleLogin() {
 
 // Ganti fungsi activateApp Anda menjadi seperti ini
 async function activateApp() {
-  // 1. Tampilkan kontainer aplikasi utama
+  console.log("🔓 Login sukses. Memulai inisialisasi aplikasi...");
+  
   document.getElementById('authSection').style.display = 'none';
   document.getElementById('mainApp').style.display = 'block';
   
-  // 2. Tunggu sampai HTML Dashboard terpasang sempurna di DOM
-  await navigateTo('dashboard');
+  // 1. Muat halaman dashboard pertama kali
+  await navigateTo('dashboard'); 
   
-  // 3. JALANKAN penarikan data dari Google Sheets Web App Anda di sini.
-  // Silakan buka kunci (uncomment) fungsi penarik data asli bawaan kode Anda di bawah ini:
-  
-  if (typeof fetchData === 'function') {
+  // 2. DETEKSI: Apakah aplikasi Anda punya fungsi penarik data utama saat start?
+  // Jalankan fungsi penarik data Sheets bawaan kode asli Anda di sini
+  if (typeof loadUserData === 'function') {
+    loadUserData();
+  } else if (typeof fetchData === 'function') {
     fetchData();
-  } else if (typeof loadData === 'function') {
-    loadData();
   } else if (typeof refreshData === 'function') {
     refreshData();
-  } else if (typeof initData === 'function') {
-    initData();
+  } else {
+    console.warn("⚠️ Perhatian: Tidak ada fungsi unduh data Sheets otomatis yang terpicu di activateApp!");
   }
 }
 
@@ -339,15 +339,14 @@ async function navigateTo(id) {
   if (activeBtn) activeBtn.classList.add('active');
 
   try {
-    // 3. Tarik berkas HTML parsial dari folder components
-    const response = await fetch(`components/${id}.html`);
-    if (!response.ok) throw new Error(`Gagal memuat halaman: ${id}`);
-    
     const html = await response.text();
     viewport.innerHTML = html;
 
-    // 4. Trigger fungsi inisialisasi data spesifik berdasarkan halaman yang dibuka
-    initComponentData(id);
+    // Tambahkan jeda 100ms di sini agar HTML benar-benar siap di layar
+    setTimeout(() => {
+      console.log(`⏱️ Jeda selesai, mengisi data untuk komponen: ${id}`);
+      initComponentData(id);
+    }, 100);
 
   } catch (error) {
     viewport.innerHTML = `<div class="card" style="color:#991B1B;background:#FEE2E2;padding:1.5rem;text-align:center;">
