@@ -349,31 +349,64 @@ async function navigateTo(id) {
 }
 
 function initComponentData(id) {
-  // Jika data database disimpan di variabel global (misal: globalData atau cacheData)
-  // Jalankan fungsi pengisi UI bawaan script.js Anda di sini
+  // Ambil data yang sudah tersimpan di cache/state global JavaScript Anda
+  // Sesuaikan pemanggilan fungsi di bawah dengan nama fungsi asli bawaan script.js Anda
+  
   switch(id) {
     case 'dashboard':
-      if (typeof updateDashboardUI === 'function') updateDashboardUI();
-      if (typeof renderGraph === 'function' && typeof last7Logs !== 'undefined') renderGraph(last7Logs);
+      // Pastikan elemen grafik ada sebelum digambar
+      if (document.getElementById('trackingGraph')) {
+        if (typeof renderGraph === 'function' && typeof last7Logs !== 'undefined') {
+          renderGraph(last7Logs);
+        }
+      }
+      if (typeof updateDashboardUI === 'function') {
+        updateDashboardUI(); 
+      }
       break;
+      
+    case 'tracking':
+      if (typeof setDefaultDate === 'function') setDefaultDate();
+      break;
+      
+    case 'flashcard-tab':
+      if (typeof updateCardUI === 'function') updateCardUI();
+      break;
+      
+    case 'vocab-milestone':
+      if (typeof updateMilestoneUI === 'function') updateMilestoneUI();
+      break;
+      
     case 'vocab-list':
       if (typeof renderVocabDOM === 'function') renderVocabDOM();
       break;
+      
     case 'reading':
-      if (typeof updateWpmUI === 'function') updateWpmUI();
+      if (typeof runWpmCalc === 'function') runWpmCalc();
       break;
-    case 'vocab-milestone':
-      if (typeof updateMilestoneUI === 'function') updateMilestoneUI();
+      
+    case 'speaking-lab':
+      if (typeof initSpeakingLab === 'function') initSpeakingLab();
       break;
   }
 }
 
 // Pastikan pada fungsi login sukses (activateApp) atau inisialisasi awal, 
 // panggil navigateTo('dashboard') sebagai halaman default utama.
-function activateApp() {
+
+async function activateApp() {
+  // 1. Sembunyikan panel login dan tampilkan wrapper aplikasi utama
   document.getElementById('authSection').style.display = 'none';
   document.getElementById('mainApp').style.display = 'block';
-  navigateTo('dashboard'); // Redirect langsung ke dashboard pasca-login
+  
+  // 2. Ambil komponen HTML dashboard sampai terpasang di layar
+  await navigateTo('dashboard');
+  
+  // 3. Baru jalankan fungsi penarikan data dari Cloud Google Sheets Anda
+  // (Ganti 'fetchDataFromSheets' dengan nama fungsi query database utama Anda)
+  if (typeof fetchDataFromSheets === 'function') {
+    fetchDataFromSheets();
+  }
 }
 
 async function loadAndShowPremiumContent() {
