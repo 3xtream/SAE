@@ -183,7 +183,6 @@ input[type="number"]{max-width:140px}
         <p class="subtitle">SLA-Based (Krashen & Paul Nation) · Google Sheets Database</p>
       </div>
       <div style="display:flex;gap:8px;align-items:center">
-        <button class="btn" style="background:#555;font-size:11px;padding:5px 10px" onclick="showApiSetup()">⚙️ Ganti API</button>
         <button class="btn" style="background:#791F1F" onclick="handleLogout()">Logout 🚪</button>
       </div>
     </div>
@@ -448,12 +447,13 @@ input[type="number"]{max-width:140px}
 
 <script>
 // ═══════════════════════════════════════════════════════
-//  KONFIGURASI — GANTI DENGAN URL GAS WEB APP ANDA
+//  KONFIGURASI — INTEGRASI LANGSUNG URL GAS WEB APP
 // ═══════════════════════════════════════════════════════
 const LS_API_KEY     = 'gas_api_url_v47';
 const LS_SESSION_KEY = 'memberSession_v47';
 
-let GAS_API_URL = localStorage.getItem(LS_API_KEY) || '';
+// MASUKKAN URL DEPLOYMENT GAS ANDA DI SINI
+let GAS_API_URL = 'https://script.google.com/macros/s/AKfycbyNd61rOZ1XwcmzsN3f5PoALkFxtuz8jr2ePCstaTeryAlT3PCt8Hogsqkn0hJf7SA4/exec'; 
 let currentUser = null;
 let flashcardList = [];
 let currentCardIndex = 0;
@@ -502,24 +502,13 @@ function showApiSetup() {
 window.addEventListener('DOMContentLoaded', () => {
   setDefaultDate();
 
-  // Sembunyikan semua section dulu — apiSetup sudah visible dari CSS
+  // Sembunyikan panel setup karena API sudah diintegrasikan langsung
+  document.getElementById('apiSetup').style.display = 'none';
   document.getElementById('authSection').style.display = 'none';
   document.getElementById('mainApp').style.display     = 'none';
 
-  // Coba baca localStorage (bisa gagal di InPrivate / file://)
-  try {
-    const saved = localStorage.getItem(LS_API_KEY);
-    if (saved) GAS_API_URL = saved;
-  } catch(e) { console.warn('localStorage tidak tersedia:', e); }
-
-  if (!GAS_API_URL) {
-    // Tampilkan panel setup URL
-    document.getElementById('apiSetup').style.display = 'block';
-  } else {
-    // Sembunyikan setup, lanjut ke app
-    document.getElementById('apiSetup').style.display = 'none';
-    startApp();
-  }
+  // Langsung jalankan aplikasi menggunakan GAS_API_URL yang ada di atas
+  startApp();
 });
 
 function startApp() {
