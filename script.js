@@ -10,6 +10,7 @@ let currentUser = null;
 let flashcardList = [];
 let currentCardIndex = 0;
 let speechRate = 0.7;
+let databaseCache = null;
 
 // ═══════════════════════════════════════════════════════
 //  API HELPER
