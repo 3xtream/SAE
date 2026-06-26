@@ -322,45 +322,28 @@ async function navigateTo(id) {
   const viewport = document.getElementById('content-viewport');
   if (!viewport) return;
 
-  // 1. Set indikator loading di area konten
-  viewport.innerHTML = '<div style="text-align:center;padding:3rem;color:#0C447C;font-weight:500;">🔄 Memuat Konten...</div>';
+  // 1. Tampilkan indikator loading sementara di layar
+  viewport.innerHTML = '<div style="text-align:center;padding:3rem;color:#0C447C;font-weight:500;">🔄 Memuat Konten & Data...</div>';
 
-  // 2. Kelola class active di Navbar
+  // 2. Atur class active pada tombol navigasi
   document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
   const activeBtn = document.getElementById(`btn-${id}`);
   if (activeBtn) activeBtn.classList.add('active');
 
   try {
-    // 3. Ambil file HTML dari folder components
+    // 3. Ambil potongan file HTML komponen
     const response = await fetch(`components/${id}.html`);
     if (!response.ok) throw new Error(`File components/${id}.html tidak ditemukan.`);
     
     const html = await response.text();
     viewport.innerHTML = html;
 
-    // 4. SINKRONISASI DATA: Jalankan fungsi bawaan script.js Anda setelah HTML siap
-    // Skrip lama Anda menggunakan penamaan berbasis ID untuk render
-    switch(id) {
-      case 'dashboard':
-        if (typeof updateDashboardUI === 'function') updateDashboardUI();
-        if (typeof renderGraph === 'function' && typeof last7Logs !== 'undefined') renderGraph(last7Logs);
-        break;
-      case 'vocab-list':
-        if (typeof renderVocabDOM === 'function') renderVocabDOM();
-        break;
-      case 'vocab-milestone':
-        if (typeof updateMilestoneUI === 'function') updateMilestoneUI();
-        break;
-      case 'reading':
-        if (typeof runWpmCalc === 'function') runWpmCalc();
-        break;
-      case 'speaking-lab':
-        if (typeof initSpeakingLab === 'function') initSpeakingLab();
-        break;
-      case 'tracking':
-        if (typeof setDefaultDate === 'function') setDefaultDate();
-        break;
-    }
+    // 4. BERI JEDA MIKRO: Biar DOM selesai dirender, lalu panggil show() asli bawaan kode Anda
+    setTimeout(() => {
+      if (typeof show === 'function') {
+        show(id); // Ini memicu fungsi penarik dan pengisi data bawaan sistem Anda
+      }
+    }, 50);
 
   } catch (error) {
     viewport.innerHTML = `<div class="card" style="color:#991B1B;background:#FEE2E2;padding:1.5rem;text-align:center;">
@@ -416,22 +399,12 @@ function initComponentData(id) {
 // panggil navigateTo('dashboard') sebagai halaman default utama.
 
 async function activateApp() {
-  // 1. Tampilkan kontainer aplikasi utama
+  // Sembunyikan form login dan tampilkan app utama
   document.getElementById('authSection').style.display = 'none';
   document.getElementById('mainApp').style.display = 'block';
   
-  // 2. Tunggu sampai komponen HTML dashboard terpasang sempurna di layar
+  // Muat HTML Dashboard dan biarkan setTimeout di atas yang menarik datanya secara otomatis
   await navigateTo('dashboard');
-  
-  // 3. Jalankan fungsi penarik data Google Sheets asli bawaan script.js Anda
-  // (Biasanya bernama fetchData(), loadData(), atau refreshData())
-  if (typeof fetchData === 'function') {
-    fetchData();
-  } else if (typeof loadData === 'function') {
-    loadData();
-  } else if (typeof refreshData === 'function') {
-    refreshData();
-  }
 }
 
 async function loadAndShowPremiumContent() {
