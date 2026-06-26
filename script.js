@@ -317,29 +317,65 @@ async function navigateTo(id) {
   const viewport = document.getElementById('content-viewport');
   if (!viewport) return;
 
-  // 1. Indikator memuat halaman di dalam area main kontainer
-  viewport.innerHTML = '<div style="text-align:center;padding:3rem;color:#6C63FF;font-weight:500;">🔄 Memuat Konten...</div>';
+  // 1. Tampilkan indikator memuat konten
+  viewport.innerHTML = '<div style="text-align:center;padding:3rem;color:#0C447C;font-weight:500;">🔄 Memuat Konten...</div>';
 
-  // 2. Perbarui state class aktif pada tombol Navigasi Navbar
+  // 2. Perbarui status aktif pada tombol navigasi
   document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
   const activeBtn = document.getElementById(`btn-${id}`);
   if (activeBtn) activeBtn.classList.add('active');
 
   try {
-    // 3. Tarik berkas HTML parsial dari folder components
+    // 3. Tarik berkas komponen berdasarkan id halaman
     const response = await fetch(`components/${id}.html`);
-    if (!response.ok) throw new Error(`Gagal memuat halaman: ${id}`);
+    if (!response.ok) throw new Error(`Gagal memuat komponen halaman: ${id}`);
     
     const html = await response.text();
     viewport.innerHTML = html;
 
-    // 4. Trigger fungsi inisialisasi data spesifik berdasarkan halaman yang dibuka
+    // 4. Jalankan fungsi inisialisasi data bawaan sistem Anda
     initComponentData(id);
 
   } catch (error) {
     viewport.innerHTML = `<div class="card" style="color:#991B1B;background:#FEE2E2;padding:1.5rem;text-align:center;">
                             ⚠️ <b>Gagal memuat menu:</b> ${error.message}
                           </div>`;
+  }
+}
+
+function initComponentData(id) {
+  switch(id) {
+    case 'dashboard':
+      if (typeof renderGraph === 'function' && typeof last7Logs !== 'undefined') renderGraph(last7Logs);
+      if (typeof updateDashboardUI === 'function') updateDashboardUI();
+      break;
+    case 'tracking':
+      if (typeof setDefaultDate === 'function') setDefaultDate();
+      break;
+    case 'flashcard-tab':
+      if (typeof updateCardUI === 'function') updateCardUI();
+      break;
+    case 'vocab-milestone':
+      if (typeof updateMilestoneUI === 'function') updateMilestoneUI();
+      break;
+    case 'vocab-list':
+      if (typeof renderVocabDOM === 'function') renderVocabDOM();
+      break;
+    case 'reading':
+      if (typeof runWpmCalc === 'function') runWpmCalc();
+      break;
+    case 'speaking-lab':
+      if (typeof initSpeakingLab === 'function') initSpeakingLab();
+      break;
+    case 'premium-content-section':
+      if (typeof loadAndShowPremiumContent === 'function') loadAndShowPremiumContent();
+      break;
+    case 'phase1':
+    case 'phase2':
+    case 'phase3':
+    case 'phase4':
+      if (typeof updateChecklistDOM === 'function') updateChecklistDOM(id);
+      break;
   }
 }
 
