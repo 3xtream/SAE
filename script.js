@@ -320,23 +320,25 @@ async function navigateTo(id) {
   const viewport = document.getElementById('content-viewport');
   if (!viewport) return;
 
-  // 1. Tampilkan indikator memuat konten
+  // Tampilkan loading lokal di area konten
   viewport.innerHTML = '<div style="text-align:center;padding:3rem;color:#0C447C;font-weight:500;">🔄 Memuat Konten...</div>';
 
-  // 2. Perbarui status aktif pada tombol navigasi
+  // Perbarui status kelas aktif tombol navigasi
   document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
   const activeBtn = document.getElementById(`btn-${id}`);
   if (activeBtn) activeBtn.classList.add('active');
 
   try {
-    // 3. Tarik berkas komponen berdasarkan id halaman
+    // 1. Ambil file komponen HTML secara asinkronus
     const response = await fetch(`components/${id}.html`);
     if (!response.ok) throw new Error(`Gagal memuat komponen halaman: ${id}`);
     
     const html = await response.text();
+    
+    // 2. Masukkan HTML ke viewport (Pastikan ini selesai 100% dahulu)
     viewport.innerHTML = html;
 
-    // 4. Jalankan fungsi inisialisasi data bawaan sistem Anda
+    // 3. SELESAI MASUK, baru panggil fungsi pengisi data
     initComponentData(id);
 
   } catch (error) {
