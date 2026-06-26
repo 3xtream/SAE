@@ -322,27 +322,32 @@ async function navigateTo(id) {
   const viewport = document.getElementById('content-viewport');
   if (!viewport) return;
 
-  // 1. Tampilkan indikator loading sementara di layar
-  viewport.innerHTML = '<div style="text-align:center;padding:3rem;color:#0C447C;font-weight:500;">🔄 Memuat Konten & Data...</div>';
+  // 1. Tampilkan loading di viewport konten
+  viewport.innerHTML = '<div style="text-align:center;padding:3rem;color:#0C447C;font-weight:500;">🔄 Memuat Konten...</div>';
 
-  // 2. Atur class active pada tombol navigasi
+  // 2. Perbarui kelas aktif pada tombol navigasi (Navbar)
   document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-  const activeBtn = document.getElementById(`btn-${id}`);
+  
+  // Menangani perbedaan ID tombol (ada yang pakai -tab, ada yang pakai -section)
+  let btnId = `btn-${id}`;
+  if (id === 'flashcard') btnId = 'btn-flashcard-tab';
+  if (id === 'theory') btnId = 'btn-theory-tab';
+  if (id === 'premium') btnId = 'btn-premium-content-section';
+  
+  const activeBtn = document.getElementById(btnId);
   if (activeBtn) activeBtn.classList.add('active');
 
   try {
-    // 3. Ambil potongan file HTML komponen
+    // 3. Ambil file HTML eksternal dari folder components
     const response = await fetch(`components/${id}.html`);
     if (!response.ok) throw new Error(`File components/${id}.html tidak ditemukan.`);
     
     const html = await response.text();
-    viewport.innerHTML = html;
+    viewport.innerHTML = html; // Pasang HTML ke layar
 
-    // 4. BERI JEDA MIKRO: Biar DOM selesai dirender, lalu panggil show() asli bawaan kode Anda
+    // 4. Jalankan fungsi pengisi data bawaan sistem Anda setelah HTML siap
     setTimeout(() => {
-      if (typeof show === 'function') {
-        show(id); // Ini memicu fungsi penarik dan pengisi data bawaan sistem Anda
-      }
+      initComponentData(id);
     }, 50);
 
   } catch (error) {
@@ -352,45 +357,24 @@ async function navigateTo(id) {
   }
 }
 
+// Fungsi pembantu untuk memetakan data database ke elemen HTML yang baru dimuat
 function initComponentData(id) {
-  // Ambil data yang sudah tersimpan di cache/state global JavaScript Anda
-  // Sesuaikan pemanggilan fungsi di bawah dengan nama fungsi asli bawaan script.js Anda
-  
   switch(id) {
     case 'dashboard':
-      // Pastikan elemen grafik ada sebelum digambar
-      if (document.getElementById('trackingGraph')) {
-        if (typeof renderGraph === 'function' && typeof last7Logs !== 'undefined') {
-          renderGraph(last7Logs);
-        }
-      }
-      if (typeof updateDashboardUI === 'function') {
-        updateDashboardUI(); 
-      }
+      if (typeof updateDashboardUI === 'function') updateDashboardUI();
+      if (typeof renderGraph === 'function' && typeof last7Logs !== 'undefined') renderGraph(last7Logs);
       break;
-      
-    case 'tracking':
-      if (typeof setDefaultDate === 'function') setDefaultDate();
-      break;
-      
-    case 'flashcard-tab':
-      if (typeof updateCardUI === 'function') updateCardUI();
-      break;
-      
-    case 'vocab-milestone':
-      if (typeof updateMilestoneUI === 'function') updateMilestoneUI();
-      break;
-      
     case 'vocab-list':
       if (typeof renderVocabDOM === 'function') renderVocabDOM();
       break;
-      
+    case 'vocab-milestone':
+      if (typeof updateMilestoneUI === 'function') updateMilestoneUI();
+      break;
     case 'reading':
       if (typeof runWpmCalc === 'function') runWpmCalc();
       break;
-      
-    case 'speaking-lab':
-      if (typeof initSpeakingLab === 'function') initSpeakingLab();
+    case 'tracking':
+      if (typeof setDefaultDate === 'function') setDefaultDate();
       break;
   }
 }
