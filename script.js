@@ -53,7 +53,7 @@ function showApiSetup() {
 window.addEventListener('DOMContentLoaded', () => {
   setDefaultDate();
 
-  // Bersihkan sisa elemen yang tidak dipakai
+  document.getElementById('apiSetup').style.display = 'none';
   document.getElementById('authSection').style.display = 'none';
   document.getElementById('mainApp').style.display     = 'none';
 
@@ -61,7 +61,6 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 function startApp() {
-  // Langsung cek session login karena URL API sudah hardcoded dan pasti ada
   let raw = null;
   try { raw = localStorage.getItem(LS_SESSION_KEY); } catch(e) {}
   if (raw) {
@@ -97,9 +96,8 @@ function switchAuth(t) {
 }
 
 function showAuthPage() {
-  document.getElementById('authSection').style.display = 'block'; 
+  document.getElementById('authSection').style.display = '';
   document.getElementById('mainApp').style.display = 'none';
-  switchAuth('login'); // Memastikan tab login yang aktif dan terbuka
 }
 
 // ═══════════════════════════════════════════════════════
