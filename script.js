@@ -1,41 +1,28 @@
-// ═══════════════════════════════════════════════════════
-//  KONFIGURASI — INTEGRASI URL GAS WEB APP MASTER v4.7
-// ═══════════════════════════════════════════════════════
 const LS_API_KEY     = 'gas_api_url_v47';
 const LS_SESSION_KEY = 'memberSession_v47';
 
-// MASUKKAN URL DEPLOYMENT GAS ANDA DI SINI
 let GAS_API_URL = 'https://script.google.com/macros/s/AKfycbyNd61rOZ1XwcmzsN3f5PoALkFxtuz8jr2ePCstaTeryAlT3PCt8Hogsqkn0hJf7SA4/exec'; 
 let currentUser = null;
-
-// GITHUB LAB TARGET
 const GITHUB_SPEAKING_LAB_URL = "https://3xtream.github.io/english/speaking-lab.html";
 
-// Custom Toast System
 function showToast(message, isError = false) {
   const toast = document.getElementById('toast');
   const icon = document.getElementById('toastIcon');
   document.getElementById('toastMessage').innerText = message;
-  
   icon.innerText = isError ? 'error_outline' : 'check_circle';
   icon.className = `material-icons-round text-base ${isError ? 'text-rose-400' : 'text-emerald-400'}`;
-  
   toast.classList.remove('opacity-0', 'translate-y-2');
   toast.classList.add('opacity-100', '-translate-y-1');
   setTimeout(() => {
     toast.classList.remove('opacity-100', '-translate-y-1');
     toast.classList.add('opacity-0', 'translate-y-2');
-  }, 3000);
+  }, 2500);
 }
 
-// Override Native Alert to Modern Toast
 window.alert = function(msg) {
   showToast(msg, msg.toLowerCase().includes('gagal') || msg.toLowerCase().includes('salah'));
 };
 
-// ═══════════════════════════════════════════════════════
-//  API INTERACTION LAYER
-// ═══════════════════════════════════════════════════════
 async function callAPI(action, params = {}) {
   if (!GAS_API_URL) throw new Error('URL API belum dikonfigurasi.');
   showLoader(true);
@@ -57,9 +44,6 @@ function showLoader(show) {
   document.getElementById('loading').style.display = show ? 'flex' : 'none';
 }
 
-// ═══════════════════════════════════════════════════════
-//  INITIALIZATION & SESSION LOCK
-// ═══════════════════════════════════════════════════════
 window.addEventListener('DOMContentLoaded', () => {
   const savedSession = localStorage.getItem(LS_SESSION_KEY);
   if (savedSession) {
@@ -87,14 +71,10 @@ function switchAuth(mode) {
   const isLogin = mode === 'login';
   document.getElementById('loginBox').style.display = isLogin ? 'block' : 'none';
   document.getElementById('registerBox').style.display = isLogin ? 'none' : 'block';
-  
   document.getElementById('tabLogin').className = isLogin ? "flex-1 text-center pb-3 text-sm font-bold text-blue-600 border-b-2 border-blue-600 transition" : "flex-1 text-center pb-3 text-sm font-medium text-slate-400 transition";
   document.getElementById('tabRegister').className = !isLogin ? "flex-1 text-center pb-3 text-sm font-bold text-emerald-600 border-b-2 border-emerald-600 transition" : "flex-1 text-center pb-3 text-sm font-medium text-slate-400 transition";
 }
 
-// ═══════════════════════════════════════════════════════
-//  AUTHENTICATION ACTIONS
-// ═══════════════════════════════════════════════════════
 async function handleLogin() {
   const email = document.getElementById('loginEmail').value;
   const password = document.getElementById('loginPassword').value;
@@ -120,9 +100,7 @@ async function handleRegister() {
   try {
     const res = await callAPI('register', { fullName, email, password });
     showToast(res.message, !res.success);
-    if (res.success) {
-      switchAuth('login');
-    }
+    if (res.success) switchAuth('login');
   } catch(e) {
     showToast('Pendaftaran Gagal: ' + e.message, true);
   }
@@ -134,15 +112,11 @@ function logout() {
   showAuth();
 }
 
-// ═══════════════════════════════════════════════════════
-//  CORE DASHBOARD MANAGEMENT
-// ═══════════════════════════════════════════════════════
 async function showDashboard() {
   document.getElementById('authSection').style.display = 'none';
   document.getElementById('mainDashboard').classList.remove('hidden');
   document.getElementById('bottomNav').style.display = 'flex';
   document.getElementById('logoutBtn').style.display = 'flex';
-  
   document.getElementById('userWelcome').innerText = currentUser.fullName;
   switchSection('dashboard');
   await refreshDashboardData();
@@ -152,16 +126,11 @@ function switchSection(target) {
   const isDash = target === 'dashboard';
   document.getElementById('mainDashboard').style.display = isDash ? 'block' : 'none';
   document.getElementById('speakingLabSection').style.display = !isDash ? 'block' : 'none';
-  
   document.getElementById('nav-dashboard').className = isDash ? "flex-col items-center space-y-1 text-blue-600 transition" : "flex-col items-center space-y-1 text-slate-400 transition";
   document.getElementById('nav-speaking-lab').className = !isDash ? "flex-col items-center space-y-1 text-blue-600 transition" : "flex-col items-center space-y-1 text-slate-400 transition";
-  
   if(!isDash) loadSpeakingLab();
 }
 
-// ═══════════════════════════════════════════════════════
-//  DATA POPULATION LAYER (TAILWIND INJECTED)
-// ═══════════════════════════════════════════════════════
 async function refreshDashboardData() {
   try {
     const res = await callAPI('getDashboardData', { email: currentUser.email });
@@ -182,7 +151,7 @@ function renderInputLogCard() {
     <div class="bg-white rounded-2xl custom-shadow border border-slate-100 p-5 space-y-4">
       <div class="flex items-center space-x-2 pb-1 border-b border-slate-50">
         <span class="material-icons-round text-blue-500 text-lg">edit_note</span>
-        <h4 class="font-bold text-sm text-slate-800 tracking-tight">Input Kinerja Kunci</h4>
+        <h4 class="font-bold text-sm text-slate-800 tracking-tight">Input Kinerja Harian</h4>
       </div>
       <form onsubmit="event.preventDefault(); submitDailyLog(this);" class="space-y-4">
         <div class="grid grid-cols-2 gap-3">
@@ -197,7 +166,7 @@ function renderInputLogCard() {
         </div>
         <div class="space-y-1">
           <label class="text-[11px] text-slate-400 font-medium">Judul Passage Bacaan</label>
-          <input type="text" name="passage" required class="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-sm font-medium focus:outline-none focus:border-blue-500" placeholder="Nama materi text...">
+          <input type="text" name="passage" required class="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-sm font-medium focus:outline-none focus:border-blue-500" placeholder="Materi text...">
         </div>
         <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold py-3 rounded-xl transition h-11 shadow-sm">
           Simpan Log Hari Ini
@@ -214,20 +183,17 @@ async function submitDailyLog(form) {
   try {
     const res = await callAPI('saveDailyLog', { email: currentUser.email, wpm, duration, passage });
     showToast(res.message, !res.success);
-    if(res.success) { refreshDashboardData(); }
+    if(res.success) refreshDashboardData();
   } catch(e) {
     showToast('Gagal menyimpan log: ' + e.message, true);
   }
 }
 
-// ═══════════════════════════════════════════════════════
-//  CHECKLIST PROCESSING ENGINE
-// ═══════════════════════════════════════════════════════
 const PHASE_LABELS = {
-  1: { title: "Phase 1: Pronunciation Checklist", class: "text-blue-600 bg-blue-50", items: ["Skor akurasi konisten di atas 80% pada tes fundamental.", "Lancar melafalkan seluruh 44 simbol fonetik IPA.", "Menyelesaikan rekaman minimal 10 klip audio mandiri.", "Mampu membedakan minimal 20 pasangan kata minimal pair."] },
-  2: { title: "Phase 2: Fluency Checklist", class: "text-emerald-600 bg-emerald-50", items: ["Mencapai target membaca konisten di atas 110 WPM.", "Menyelesaikan seluruh target tantangan shadowing teks cerita.", "Mampu berbicara tanpa jeda tidak wajar selama 1 menit penuh.", "Skor kelancaran konisten stabil di atas 85%."] },
+  1: { title: "Phase 1: Pronunciation Checklist", class: "text-blue-600 bg-blue-50", items: ["Skor akurasi konsisten di atas 80% pada tes fundamental.", "Lancar melafalkan seluruh 44 simbol fonetik IPA.", "Menyelesaikan rekaman minimal 10 klip audio mandiri.", "Mampu membedakan minimal 20 pasangan kata minimal pair."] },
+  2: { title: "Phase 2: Fluency Checklist", class: "text-emerald-600 bg-emerald-50", items: ["Mencapai target membaca konsisten di atas 110 WPM.", "Menyelesaikan seluruh target tantangan shadowing teks cerita.", "Mampu berbicara tanpa jeda tidak wajar selama 1 menit penuh.", "Skor kelancaran konsisten stabil di atas 85%."] },
   3: { title: "Phase 3: Expansion Checklist", class: "text-amber-600 bg-amber-50", items: ["Menguasai akumulasi target kosakata hingga 1200 kata aktif.", "Berhasil menyusun ringkasan lisan secara langsung tanpa teks.", "Menyelesaikan seluruh target latihan membaca pemahaman kritis.", "Mampu menangkap makna satu paragraf penuh tanpa translasi mental."] },
-  4: { title: "Phase 4: Mastery Checklist", class: "text-rose-600 bg-rose-50", items: ["Akumulasi kosakata tingkat mahir tercapai (1800 - 2000 Kata).", "Sesi praktek konversasional aktif berjalan lancar.", "Mampu memprodukai esai tulisan opini pendek natural.", "Kelulusan total dari kurikulum akselerasi 1 tahun."] }
+  4: { title: "Phase 4: Mastery Checklist", class: "text-rose-600 bg-rose-50", items: ["Akumulasi kosakata tingkat mahir tercapai (1800 - 2000 Kata).", "Sesi praktek konversasional aktif berjalan lancar.", "Mampu memproduksi tulisan jurnal esai opini pendek secara natural.", "Kelulusan total dari seluruh rangkaian kurikulum akselerasi 1 tahun."] }
 };
 
 function renderChecklists(savedStates) {
@@ -269,22 +235,19 @@ async function syncPhaseChecklist(phaseNum, checklistIndex, checkbox) {
       checklistIndex,
       isChecked
     });
-    if(res.success) { showToast('Status database berhasil di-update!'); }
+    if(res.success) showToast('Status database berhasil di-update!');
   } catch(e) {
-    checkbox.checked = !isChecked; // Revert
+    checkbox.checked = !isChecked;
     showToast('Gagal update data cloud: ' + e.message, true);
   }
 }
 
-// ═══════════════════════════════════════════════════════
-//  SPEAKING LAB INTEGRATION (IFRAME & SSO HANDOFF)
-// ═══════════════════════════════════════════════════════
 async function loadSpeakingLab() {
   document.getElementById('spIframeLoader').style.display = 'flex';
   document.getElementById('spLabIframe').style.display = 'none';
   try {
     const res = await callAPI('getSpeakingLabUrl', { email: currentUser.email, token: currentUser.token });
-    if (!res.success) { showToast(res.message || 'Gagal generate URL Lab Sesi.', true); return; }
+    if (!res.success) { showToast(res.message || 'Gagal mendapatkan URL sesi.', true); return; }
     
     document.getElementById('spOpenTabBtn').href = res.url;
     const iframe = document.getElementById('spLabIframe');
@@ -298,7 +261,7 @@ async function loadSpeakingLab() {
             { type: 'SPEAKING_LAB_SESSION', payload: { token: currentUser.token, email: currentUser.email, fullName: currentUser.fullName } }, 
             new URL(GITHUB_SPEAKING_LAB_URL).origin
           );
-        } catch(e) { console.error("Handoff Message Fail:", e); }
+        } catch(e) { console.error("Gagal postMessage:", e); }
       }, 800);
     };
     iframe.src = res.url;
