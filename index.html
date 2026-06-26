@@ -2,172 +2,265 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
+  <!-- Meta tag wajib untuk responsive mobile -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Sistem Akuisisi English 1 Tahun — Master System v4.7</title>
-  
+  <title>Member & Tracking Acquisition</title>
+  <!-- Tailwind CSS via CDN untuk styling cepat & ringan -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Google Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons+Round">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   
-  <link rel="stylesheet" href="style.css">
-
   <style>
-    body { 
-      font-family: 'Plus Jakarta Sans', sans-serif; 
-      -webkit-tap-highlight-color: transparent; 
-    }
-    .custom-shadow {
-      box-shadow: 0 4px 20px -2px rgba(148, 163, 184, 0.12), 0 2px 8px -1px rgba(148, 163, 184, 0.08);
-    }
-    .glass-effect {
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-    }
-    .fade-in {
-      animation: fadeIn 0.4s ease-out forwards;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+    /* Menghilangkan scrollbar default tapi tetap bisa scroll */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
   </style>
 </head>
-<body class="bg-[#F8FAFC] text-[#1E293B] min-h-screen flex flex-col justify-between pb-24">
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col justify-between pb-20 md:pb-0">
 
-  <div id="loading" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[9999] flex flex-col items-center justify-center text-white font-semibold text-sm gap-3" style="display: none;">
-    <svg class="animate-spin h-8 w-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 0113-7.25V4a1 1 0 112 0v3.5a1 1 0 01-1 1h-3.5a1 1 0 110-2h1.4A6.001 6.001 0 1020 12a1 1 0 112 0 8 8 0 01-20 0z"></path>
-    </svg>
-    <span>Memproses data ke Cloud Spreadsheet...</span>
-  </div>
-
-  <header class="glass-effect border-b border-slate-100 sticky top-0 z-50 px-5 py-4 flex justify-between items-center max-w-md mx-auto w-full rounded-b-2xl shadow-sm">
-    <div class="flex items-center space-x-3">
-      <div class="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center">
-        <span class="material-icons-round text-blue-600 text-xl">insights</span>
-      </div>
-      <div>
-        <h1 class="text-sm font-bold tracking-tight text-slate-900">EngAcquisition</h1>
-        <p class="text-[10px] text-slate-400 font-medium">System Version 4.7</p>
-      </div>
+  <!-- TOP APP BAR (Mobile First Header) -->
+  <header class="bg-white border-b border-gray-200 sticky top-0 z-50 px-4 py-3 flex justify-between items-center shadow-sm">
+    <div class="flex items-center space-x-2">
+      <span class="material-icons-round text-blue-600 text-3xl">analytics</span>
+      <h1 class="text-lg font-bold tracking-tight text-gray-900">EngAcquisition v4.7</h1>
     </div>
-    <button id="logoutBtn" onclick="logout()" class="text-slate-400 hover:text-red-500 w-9 h-9 rounded-xl hover:bg-slate-50 transition flex items-center justify-center" style="display: none;">
-      <span class="material-icons-round text-xl">logout</span>
+    <button id="logoutBtn" class="hidden text-gray-500 hover:text-red-500 p-2 rounded-full hover:bg-gray-100 transition">
+      <span class="material-icons-round">logout</span>
     </button>
   </header>
 
-  <main class="flex-1 max-w-md mx-auto w-full px-5 py-4">
+  <!-- MAIN CONTAINER (Scrollable Content) -->
+  <main class="flex-1 max-w-md mx-auto w-full px-4 py-6 overflow-y-auto">
     
-    <div id="authSection" class="bg-white rounded-2xl custom-shadow border border-slate-100 p-6 space-y-6 mt-2 fade-in" style="display: none;">
-      <div class="flex border-b border-slate-100 pb-1">
-        <button id="tabLogin" onclick="switchAuth('login')" class="flex-1 text-center pb-3 text-sm font-bold text-blue-600 border-b-2 border-blue-600 transition">Masuk</button>
-        <button id="tabRegister" onclick="switchAuth('register')" class="flex-1 text-center pb-3 text-sm font-medium text-slate-400 transition">Daftar Member</button>
+    <!-- 1. LOGIN SCREEN (Hidden by default if logged in) -->
+    <div id="loginScreen" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-6 mt-4">
+      <div class="text-center">
+        <h2 class="text-xl font-bold text-gray-900">Selamat Datang</h2>
+        <p class="text-sm text-gray-500 mt-1">Silakan masuk ke akun member Anda</p>
       </div>
-      
-      <form id="loginBox" class="space-y-4" onsubmit="event.preventDefault(); handleLogin();">
-  <div class="space-y-1.5">
-    <label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">Email</label>
-    <input type="email" id="loginEmail" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:border-blue-500 bg-slate-50/50 text-sm font-medium transition" placeholder="nama@email.com">
-  </div>
-  <div class="space-y-1.5">
-    <label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">Password</label>
-    <input type="password" id="loginPassword" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:border-blue-500 bg-slate-50/50 text-sm font-medium transition" placeholder="••••••••">
-  </div>
-  <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-3 rounded-xl shadow-md shadow-blue-100 transition transform active:scale-[0.98] h-11">
-    Masuk ke Dashboard
-  </button>
-</form>
-
-      <form id="registerBox" class="space-y-4" style="display: none;" onsubmit="event.preventDefault(); handleRegister();">
-        <div class="space-y-1.5">
-          <label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">Nama Lengkap</label>
-          <input type="text" id="regName" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:border-blue-500 bg-slate-50/50 text-sm font-medium transition" placeholder="Nama Anda">
+      <form id="loginForm" class="space-y-4" onsubmit="handleLogin(event)">
+        <div>
+          <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Email</label>
+          <input type="email" id="emailInput" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50 focus:bg-white text-base transition" placeholder="nama@email.com">
         </div>
-        <div class="space-y-1.5">
-          <label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">Email</label>
-          <input type="email" id="regEmail" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:border-blue-500 bg-slate-50/50 text-sm font-medium transition" placeholder="nama@email.com">
+        <div>
+          <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Password</label>
+          <input type="password" id="passwordInput" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50 focus:bg-white text-base transition" placeholder="••••••••">
         </div>
-        <div class="space-y-1.5">
-          <label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">Password Baru</label>
-          <input type="password" id="regPassword" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:border-blue-500 bg-slate-50/50 text-sm font-medium transition" placeholder="••••••••">
-        </div>
-        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold py-3 rounded-xl shadow-md transition transform active:scale-[0.98] h-11">
-          Daftar Sekarang
+        <button type="submit" id="loginSubmitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3.5 rounded-xl shadow-md transition transform active:scale-95 flex justify-center items-center">
+          <span>Masuk</span>
         </button>
       </form>
     </div>
 
-    <div id="mainDashboard" class="hidden space-y-5 fade-in">
+    <!-- 2. MAIN DASHBOARD SCREEN (Hidden before login) -->
+    <div id="dashboardScreen" class="hidden space-y-6">
       
-      <div class="bg-gradient-to-tr from-slate-900 via-indigo-950 to-slate-900 rounded-2xl p-5 text-white shadow-xl relative overflow-hidden">
-        <div class="relative z-10 space-y-4">
-          <div>
-            <p class="text-[10px] text-indigo-200 uppercase tracking-widest font-semibold opacity-80">Personal Progress Dashboard</p>
-            <h3 id="userWelcome" class="text-lg font-bold mt-0.5 tracking-tight">Loading...</h3>
-          </div>
-          <div class="grid grid-cols-2 gap-3 pt-1">
-            <div class="bg-white/5 border border-white/10 rounded-xl p-3">
-              <span class="text-[11px] text-slate-300 block font-medium">Total Vocab Mastered</span>
-              <span id="statVocabCount" class="text-lg font-bold block mt-0.5">0</span>
-            </div>
-            <div class="bg-white/5 border border-white/10 rounded-xl p-3">
-              <span class="text-[11px] text-slate-300 block font-medium">Avg Speed</span>
-              <span id="statAvgWpm" class="text-lg font-bold block mt-0.5">0 <span class="text-xs font-normal text-slate-400">WPM</span></span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div id="dashboard-section" class="space-y-4">
-         </div>
-      
-      <div id="phase1" class="section bg-white rounded-2xl custom-shadow border border-slate-100 p-5 space-y-3"></div>
-      <div id="phase2" class="section bg-white rounded-2xl custom-shadow border border-slate-100 p-5 space-y-3"></div>
-      <div id="phase3" class="section bg-white rounded-2xl custom-shadow border border-slate-100 p-5 space-y-3"></div>
-      <div id="phase4" class="section bg-white rounded-2xl custom-shadow border border-slate-100 p-5 space-y-3"></div>
-
-      <div id="premium-content-section" class="section hidden"></div>
-    </div>
-
-    <div id="speakingLabSection" class="hidden space-y-4 fade-in">
-      <div class="bg-white rounded-2xl custom-shadow border border-slate-100 p-4 flex justify-between items-center">
+      <!-- Ringkasan Progress Card -->
+      <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-5 text-white shadow-lg space-y-4">
         <div>
-          <h4 class="font-bold text-sm text-slate-800">Speaking Lab Active Session</h4>
-          <p class="text-xs text-slate-400">Terintegrasi otomatis</p>
+          <p class="text-xs text-blue-100 uppercase tracking-wider font-medium">Progress Belajar Anda</p>
+          <h3 id="userWelcome" class="text-xl font-bold mt-1">-</h3>
         </div>
-        <a id="spOpenTabBtn" target="_blank" class="bg-blue-50 text-blue-600 p-2.5 rounded-xl hover:bg-blue-100 transition flex items-center justify-center">
-          <span class="material-icons-round text-lg">open_in_new</span>
-        </a>
-      </div>
-      <div class="relative w-full h-[60vh] bg-white rounded-2xl custom-shadow border border-slate-100 overflow-hidden">
-        <div id="spIframeLoader" class="absolute inset-0 flex items-center justify-center bg-white z-10 text-xs text-slate-400 font-medium">
-           Loading secure container...
+        <div class="grid grid-cols-2 gap-4 pt-2">
+          <div class="bg-white/10 backdrop-blur-sm rounded-xl p-3">
+            <span class="text-xs text-blue-200 block">Total Vocab</span>
+            <span id="vocabCount" class="text-xl font-bold block mt-1">0</span>
+          </div>
+          <div class="bg-white/10 backdrop-blur-sm rounded-xl p-3">
+            <span class="text-xs text-blue-200 block">Avg WPM</span>
+            <span id="avgWpm" class="text-xl font-bold block mt-1">0</span>
+          </div>
         </div>
-        <iframe id="spLabIframe" class="w-full h-full border-0" style="display:none;"></iframe>
       </div>
+
+      <!-- Form Input Harian (Mobile Action Card) -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 space-y-4">
+        <h4 class="font-bold text-gray-900 flex items-center gap-2">
+          <span class="material-icons-round text-emerald-500">edit_note</span> Input Log Harian
+        </h4>
+        <form id="logForm" class="space-y-4" onsubmit="handleSaveLog(event)">
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs text-gray-500 font-medium mb-1">WPM</label>
+              <input type="number" id="wpmInput" required class="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-base" placeholder="Contoh: 120">
+            </div>
+            <div>
+              <label class="block text-xs text-gray-500 font-medium mb-1">Akurasi (%)</label>
+              <input type="number" id="accuracyInput" min="0" max="100" required class="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-base" placeholder="0-100">
+            </div>
+          </div>
+          <button type="submit" id="logSubmitBtn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-xl shadow-sm transition active:scale-95">
+            Simpan Log Hari Ini
+          </button>
+        </form>
+      </div>
+
+      <!-- Checklist Fase Belajar -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 space-y-3">
+        <h4 class="font-bold text-gray-900 flex items-center gap-2">
+          <span class="material-icons-round text-indigo-500">assignment_turned_in</span> Checklist Fase
+        </h4>
+        <div class="space-y-2" id="checklistContainer">
+          <!-- Diisi via JavaScript -->
+        </div>
+      </div>
+
     </div>
 
   </main>
 
-  <nav id="bottomNav" class="fixed bottom-0 left-0 right-0 glass-effect border-t border-slate-100 px-8 py-3 flex justify-around items-center z-50 max-w-md mx-auto rounded-t-2xl shadow-lg" style="display: none;">
-    <button id="nav-dashboard" onclick="switchSection('dashboard')" class="flex flex-col items-center space-y-1 text-blue-600 transition">
-      <span class="material-icons-round text-2xl">space_dashboard</span>
-      <span class="text-[10px] font-semibold tracking-wide">Dashboard</span>
+  <!-- BOTTOM NAVIGATION BAR (Wajib untuk Mobile UX) -->
+  <nav id="bottomNav" class="hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-2 flex justify-around items-center shadow-lg z-50 max-w-md mx-auto">
+    <button onclick="switchTab('dashboard')" class="flex flex-col items-center space-y-0.5 text-blue-600">
+      <span class="material-icons-round">dashboard</span>
+      <span class="text-[10px] font-medium">Dashboard</span>
     </button>
-    <button id="nav-speaking-lab" onclick="switchSection('speaking-lab')" class="flex flex-col items-center space-y-1 text-slate-400 hover:text-slate-600 transition">
-      <span class="material-icons-round text-2xl">mic</span>
-      <span class="text-[10px] font-semibold tracking-wide">Speaking Lab</span>
+    <button onclick="openSpeakingLab()" class="flex flex-col items-center space-y-0.5 text-gray-400 hover:text-blue-600">
+      <span class="material-icons-round">record_voice_over</span>
+      <span class="text-[10px] font-medium">Speaking Lab</span>
     </button>
   </nav>
 
-  <div id="toast" class="fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-slate-900/95 backdrop-blur-md text-white text-xs font-medium px-4 py-3 rounded-xl shadow-xl opacity-0 pointer-events-none transition-all duration-300 z-[9999] flex items-center space-x-2.5 min-w-[240px] justify-center">
+  <!-- TOAST NOTIFICATION (Pengganti alert() yang mengganggu di mobile) -->
+  <div id="toast" class="fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-sm px-4 py-2.5 rounded-full shadow-xl opacity-0 pointer-events-none transition-opacity duration-300 z-50 flex items-center space-x-2">
     <span id="toastIcon" class="material-icons-round text-base text-emerald-400">check_circle</span>
     <span id="toastMessage">Sukses</span>
   </div>
 
-  <script src="script.js"></script>
+  <!-- JAVASCRIPT: LOGIC & BACKEND CONNECTION -->
+  <script>
+    // Ganti URL ini dengan URL Web App Apps Script Anda yang sudah di-deploy
+    const WEB_APP_URL = "PROSES_URL_GAS_ANDA_DISINI"; 
+    let currentUserEmail = "";
+
+    function showToast(message, isError = false) {
+      const toast = document.getElementById('toast');
+      const icon = document.getElementById('toastIcon');
+      document.getElementById('toastMessage').innerText = message;
+      
+      icon.innerText = isError ? 'error' : 'check_circle';
+      icon.className = `material-icons-round text-base ${isError ? 'text-red-400' : 'text-emerald-400'}`;
+      
+      toast.classList.remove('opacity-0');
+      toast.classList.add('opacity-100');
+      setTimeout(() => {
+        toast.classList.remove('opacity-100');
+        toast.classList.add('opacity-0');
+      }, 3000);
+    }
+
+    function toggleLoading(buttonId, isLoading, defaultText) {
+      const btn = document.getElementById(buttonId);
+      if (isLoading) {
+        btn.disabled = true;
+        btn.innerHTML = `<svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 0113-7.25V4a1 1 0 112 0v3.5a1 1 0 01-1 1h-3.5a1 1 0 110-2h1.4A6.001 6.001 0 1020 12a1 1 0 112 0 8 8 0 01-20 0z"></path></svg>`;
+      } else {
+        btn.disabled = false;
+        btn.innerHTML = defaultText;
+      }
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      toggleLoading('loginSubmitBtn', true, '');
+      
+      const email = document.getElementById('emailInput').value;
+      const password = document.getElementById('passwordInput').value;
+
+      try {
+        // Enkripsi dasar/hash client-side disarankan di sini sebelum dikirim
+        const response = await fetch(WEB_APP_URL, {
+          method: 'POST',
+          body: new URLSearchParams({
+            action: 'login',
+            email: email,
+            password: password
+          })
+        });
+        const data = await response.json();
+
+        if (data.status === 'success') {
+          currentUserEmail = email;
+          showToast('Login berhasil!');
+          initDashboard();
+        } else {
+          showToast(data.message || 'Login gagal', true);
+        }
+      } catch (err) {
+        showToast('Koneksi gagal/Server tidak merespon', true);
+      } finally {
+        toggleLoading('loginSubmitBtn', false, 'Masuk');
+      }
+    }
+
+    function initDashboard() {
+      document.getElementById('loginScreen').classList.add('hidden');
+      document.getElementById('dashboardScreen').classList.remove('hidden');
+      document.getElementById('bottomNav').classList.remove('hidden');
+      document.getElementById('logoutBtn').classList.remove('hidden');
+      
+      // Load data simulasi awal (Ganti dengan fetch dari endpoint dashboardData jika ada)
+      document.getElementById('userWelcome').innerText = currentUserEmail.split('@')[0];
+      loadChecklistMock();
+    }
+
+    function loadChecklistMock() {
+      const container = document.getElementById('checklistContainer');
+      const phases = ['Fase 1: Pronunciation Basic', 'Fase 2: Fluency Building'];
+      container.innerHTML = phases.map((phase, i) => `
+        <label class="flex items-center space-x-3 p-3 bg-gray-50 rounded-xl border border-gray-100 active:bg-gray-100 transition">
+          <input type="checkbox" onchange="handleChecklistChange(${i}, this.checked)" class="w-5 h-5 rounded text-blue-600 focus:ring-blue-500 border-gray-300">
+          <span class="text-sm font-medium text-gray-700">${phase}</span>
+        </label>
+      `).join('');
+    }
+
+    async function handleSaveLog(e) {
+      e.preventDefault();
+      toggleLoading('logSubmitBtn', true, '');
+
+      const wpm = document.getElementById('wpmInput').value;
+      const acc = document.getElementById('accuracyInput').value;
+
+      try {
+        const response = await fetch(WEB_APP_URL, {
+          method: 'POST',
+          body: new URLSearchParams({
+            action: 'saveDailyLog',
+            email: currentUserEmail,
+            wpm: wpm,
+            accuracy: acc
+          })
+        });
+        const data = await response.json();
+        if(data.status === 'success') {
+          showToast('Log harian berhasil disimpan!');
+          document.getElementById('logForm').reset();
+        } else {
+          showToast(data.message, true);
+        }
+      } catch (err) {
+        showToast('Gagal menyimpan data', true);
+      } finally {
+        toggleLoading('logSubmitBtn', false, 'Simpan Log Hari Ini');
+      }
+    }
+
+    async function handleChecklistChange(index, isChecked) {
+      showToast(`Memperbarui checklist...`);
+      // Panggil fetch ke endpoint updatePhaseChecklistInSheet Anda di sini
+    }
+
+    function openSpeakingLab() {
+      showToast('Mengalihkan ke Speaking Lab...');
+      // Logika SSO Token Handoff Anda dimasukkan di sini
+    }
+
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      location.reload(); // Reset state aplikasi sederhana
+    });
+  </script>
 </body>
 </html>
