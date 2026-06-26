@@ -146,17 +146,24 @@ async function handleLogin() {
 
 // Ganti fungsi activateApp Anda menjadi seperti ini
 async function activateApp() {
-  // 1. Sembunyikan panel login, tampilkan container utama
   document.getElementById('authSection').style.display = 'none';
   document.getElementById('mainApp').style.display = 'block';
   
-  // 2. WAJIB TUNGGU sampai HTML Dashboard selesai dimuat total ke DOM
-  await navigateTo('dashboard');
+  // 1. Tunggu komponen HTML selesai dimuat
+  await navigateTo('dashboard'); 
   
-  // 3. BARU JALANKAN fungsi penarik data dari Google Sheets Anda
-  // (Ganti 'fetchDataFromSheets' dengan nama fungsi asli penembak API spreadsheet Anda)
-  if (typeof fetchDataFromSheets === 'function') {
-    fetchDataFromSheets();
+  // 2. Cek fungsi penarik data mana yang aktif
+  if (typeof fetchData === 'function') {
+    console.log("🟢 Sistem memanggil fungsi: fetchData()");
+    fetchData(); 
+  } else if (typeof loadData === 'function') {
+    console.log("🟢 Sistem memanggil fungsi: loadData()");
+    loadData();
+  } else if (typeof refreshData === 'function') {
+    console.log("🟢 Sistem memanggil fungsi: refreshData()");
+    refreshData();
+  } else {
+    console.warn("⚠️ Tidak ada fungsi penarik data otomatis yang cocok ditemukan di script.js!");
   }
 }
 
