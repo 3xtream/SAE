@@ -143,16 +143,19 @@ async function handleLogin() {
   finally { showLoader(false); }
 }
 
-function activateApp() {
+// Ganti fungsi activateApp Anda menjadi seperti ini
+async function activateApp() {
   document.getElementById('authSection').style.display = 'none';
   document.getElementById('mainApp').style.display = 'block';
-  document.getElementById('appTitle').textContent = `📊 Master Tracker: ${currentUser.fullName}`;
-  refreshDataFromDatabase();
   
-  const setupCard = document.getElementById('spSetupCard');
-  const iframeWrap = document.getElementById('spIframeWrap');
-  if (setupCard) setupCard.style.display = 'none';
-  if (iframeWrap) iframeWrap.style.display = '';
+  // 1. Ambil HTML Dashboard terlebih dahulu sampai selesai
+  await navigateTo('dashboard'); 
+  
+  // 2. Baru panggil fungsi penarikan data database utama Anda setelah HTML siap
+  // (Sesuaikan nama fungsi di bawah ini dengan nama fungsi penarik data database asli Anda, misal: refreshData() atau loadDashboardData())
+  if (typeof refreshDataFromDatabase === 'function') {
+    refreshDataFromDatabase(); 
+  }
 }
 
 function handleLogout() {
@@ -344,77 +347,21 @@ async function navigateTo(id) {
 }
 
 function initComponentData(id) {
+  // Jika data database disimpan di variabel global (misal: globalData atau cacheData)
+  // Jalankan fungsi pengisi UI bawaan script.js Anda di sini
   switch(id) {
     case 'dashboard':
+      if (typeof updateDashboardUI === 'function') updateDashboardUI();
       if (typeof renderGraph === 'function' && typeof last7Logs !== 'undefined') renderGraph(last7Logs);
-      if (typeof updateDashboardUI === 'function') updateDashboardUI();
-      break;
-    case 'tracking':
-      if (typeof setDefaultDate === 'function') setDefaultDate();
-      break;
-    case 'flashcard-tab':
-      if (typeof updateCardUI === 'function') updateCardUI();
-      break;
-    case 'vocab-milestone':
-      if (typeof updateMilestoneUI === 'function') updateMilestoneUI();
       break;
     case 'vocab-list':
       if (typeof renderVocabDOM === 'function') renderVocabDOM();
       break;
     case 'reading':
-      if (typeof runWpmCalc === 'function') runWpmCalc();
-      break;
-    case 'speaking-lab':
-      if (typeof initSpeakingLab === 'function') initSpeakingLab();
-      break;
-    case 'premium-content-section':
-      if (typeof loadAndShowPremiumContent === 'function') loadAndShowPremiumContent();
-      break;
-    case 'phase1':
-    case 'phase2':
-    case 'phase3':
-    case 'phase4':
-      if (typeof updateChecklistDOM === 'function') updateChecklistDOM(id);
-      break;
-  }
-}
-
-// Handler untuk mengaktifkan kembali fungsi bawaan aplikasi Anda pasca-render komponen
-function initComponentData(id) {
-  switch(id) {
-    case 'dashboard':
-      if (typeof renderGraph === 'function' && typeof last7Logs !== 'undefined') {
-        renderGraph(last7Logs); // Me-render ulang grafik aktivitas
-      }
-      if (typeof updateDashboardUI === 'function') updateDashboardUI();
-      break;
-    case 'tracking':
-      if (typeof setDefaultDate === 'function') setDefaultDate();
-      break;
-    case 'flashcard':
-      if (typeof updateCardUI === 'function') updateCardUI();
+      if (typeof updateWpmUI === 'function') updateWpmUI();
       break;
     case 'vocab-milestone':
       if (typeof updateMilestoneUI === 'function') updateMilestoneUI();
-      break;
-    case 'vocab-list':
-      if (typeof renderVocabDOM === 'function') renderVocabDOM();
-      break;
-    case 'reading':
-      if (typeof runWpmCalc === 'function') runWpmCalc();
-      break;
-    case 'speaking-lab':
-      if (typeof initSpeakingLab === 'function') initSpeakingLab(); // Menyesuaikan logic setup iframe Anda
-      break;
-    case 'premium':
-      if (typeof loadAndShowPremiumContent === 'function') loadAndShowPremiumContent();
-      break;
-    case 'phase1':
-    case 'phase2':
-    case 'phase3':
-    case 'phase4':
-      // Membaca ulang checklist lokal dari database state jika ada fungsi sync
-      if (typeof updateChecklistDOM === 'function') updateChecklistDOM(id);
       break;
   }
 }
