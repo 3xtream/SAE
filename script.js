@@ -322,26 +322,45 @@ async function navigateTo(id) {
   const viewport = document.getElementById('content-viewport');
   if (!viewport) return;
 
-  // Tampilkan loading lokal di area konten
+  // 1. Set indikator loading di area konten
   viewport.innerHTML = '<div style="text-align:center;padding:3rem;color:#0C447C;font-weight:500;">🔄 Memuat Konten...</div>';
 
-  // Perbarui status kelas aktif tombol navigasi
+  // 2. Kelola class active di Navbar
   document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
   const activeBtn = document.getElementById(`btn-${id}`);
   if (activeBtn) activeBtn.classList.add('active');
 
   try {
-    // 1. Ambil file komponen HTML secara asinkronus
+    // 3. Ambil file HTML dari folder components
     const response = await fetch(`components/${id}.html`);
-    if (!response.ok) throw new Error(`Gagal memuat komponen halaman: ${id}`);
+    if (!response.ok) throw new Error(`File components/${id}.html tidak ditemukan.`);
     
     const html = await response.text();
-    
-    // 2. Masukkan HTML ke viewport (Pastikan ini selesai 100% dahulu)
     viewport.innerHTML = html;
 
-    // 3. SELESAI MASUK, baru panggil fungsi pengisi data
-    initComponentData(id);
+    // 4. SINKRONISASI DATA: Jalankan fungsi bawaan script.js Anda setelah HTML siap
+    // Skrip lama Anda menggunakan penamaan berbasis ID untuk render
+    switch(id) {
+      case 'dashboard':
+        if (typeof updateDashboardUI === 'function') updateDashboardUI();
+        if (typeof renderGraph === 'function' && typeof last7Logs !== 'undefined') renderGraph(last7Logs);
+        break;
+      case 'vocab-list':
+        if (typeof renderVocabDOM === 'function') renderVocabDOM();
+        break;
+      case 'vocab-milestone':
+        if (typeof updateMilestoneUI === 'function') updateMilestoneUI();
+        break;
+      case 'reading':
+        if (typeof runWpmCalc === 'function') runWpmCalc();
+        break;
+      case 'speaking-lab':
+        if (typeof initSpeakingLab === 'function') initSpeakingLab();
+        break;
+      case 'tracking':
+        if (typeof setDefaultDate === 'function') setDefaultDate();
+        break;
+    }
 
   } catch (error) {
     viewport.innerHTML = `<div class="card" style="color:#991B1B;background:#FEE2E2;padding:1.5rem;text-align:center;">
@@ -397,17 +416,21 @@ function initComponentData(id) {
 // panggil navigateTo('dashboard') sebagai halaman default utama.
 
 async function activateApp() {
-  // 1. Sembunyikan panel login dan tampilkan wrapper aplikasi utama
+  // 1. Tampilkan kontainer aplikasi utama
   document.getElementById('authSection').style.display = 'none';
   document.getElementById('mainApp').style.display = 'block';
   
-  // 2. Ambil komponen HTML dashboard sampai terpasang di layar
+  // 2. Tunggu sampai komponen HTML dashboard terpasang sempurna di layar
   await navigateTo('dashboard');
   
-  // 3. Baru jalankan fungsi penarikan data dari Cloud Google Sheets Anda
-  // (Ganti 'fetchDataFromSheets' dengan nama fungsi query database utama Anda)
-  if (typeof fetchDataFromSheets === 'function') {
-    fetchDataFromSheets();
+  // 3. Jalankan fungsi penarik data Google Sheets asli bawaan script.js Anda
+  // (Biasanya bernama fetchData(), loadData(), atau refreshData())
+  if (typeof fetchData === 'function') {
+    fetchData();
+  } else if (typeof loadData === 'function') {
+    loadData();
+  } else if (typeof refreshData === 'function') {
+    refreshData();
   }
 }
 
