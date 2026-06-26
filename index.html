@@ -13,6 +13,17 @@
   <div class="loading-overlay" id="loading">Memproses data ke Cloud Spreadsheet...</div>
 
   <div class="container">
+
+    <div id="apiSetup">
+      <h4>⚙️ Setup URL Google Apps Script API</h4>
+      <p style="font-size:12px;color:#666">Paste URL deployment GAS Web App Anda (dari Apps Script → Deploy → Web App)</p>
+      <div class="api-row">
+        <input type="url" id="apiUrlInput" placeholder="https://script.google.com/macros/s/.../exec">
+        <button onclick="saveApiUrl()">Simpan &amp; Mulai</button>
+      </div>
+      <div class="api-status" id="apiUrlStatus">Belum tersimpan.</div>
+    </div>
+
     <div id="authSection" class="auth-wrapper" style="display:none">
       <div class="auth-toggle">
         <span id="tabLogin" class="active" onclick="switchAuth('login')">Masuk</span>
@@ -43,22 +54,20 @@
       </div>
 
       <div class="nav">
-  <button class="nav-btn active" id="btn-dashboard" onclick="navigateTo('dashboard')">📈 Dashboard</button>
-  <button class="nav-btn" id="btn-tracking" onclick="navigateTo('tracking')">📝 Daily Tracking</button>
-  <button class="nav-btn" id="btn-flashcard-tab" onclick="navigateTo('flashcard-tab')">🃏 Flashcard Review</button>
-  <button class="nav-btn" id="btn-vocab-milestone" onclick="navigateTo('vocab-milestone')">🎯 Vocab Milestone</button>
-  <button class="nav-btn" id="btn-vocab-list" onclick="navigateTo('vocab-list')">🔤 List Vocabularies</button>
-  <button class="nav-btn" id="btn-reading" onclick="navigateTo('reading')">⚡ Reading Monitor</button>
-  <button class="nav-btn sp-navbtn" id="btn-speaking-lab" onclick="navigateTo('speaking-lab')">🎙️ Speaking Lab</button>
-  <button class="nav-btn" id="btn-theory-tab" onclick="navigateTo('theory-tab')">📖 Landasan Teori</button>
-  <button class="nav-btn" id="btn-phase1" onclick="navigateTo('phase1')">Phase 1</button>
-  <button class="nav-btn" id="btn-phase2" onclick="navigateTo('phase2')">Phase 2</button>
-  <button class="nav-btn" id="btn-phase3" onclick="navigateTo('phase3')">Phase 3</button>
-  <button class="nav-btn" id="btn-phase4" onclick="navigateTo('phase4')">Phase 4</button>
-  <button class="nav-btn" id="btn-premium-content-section" onclick="navigateTo('premium-content-section')">🔒 Premium Content</button>
-</div>
-
-<div id="content-viewport"></div>
+        <button class="nav-btn active" id="btn-dashboard" onclick="show('dashboard')">📈 Dashboard</button>
+        <button class="nav-btn" id="btn-tracking" onclick="show('tracking')">📝 Daily Tracking</button>
+        <button class="nav-btn" id="btn-flashcard-tab" onclick="show('flashcard-tab')">🃏 Flashcard Review</button>
+        <button class="nav-btn" id="btn-vocab-milestone" onclick="show('vocab-milestone')">🎯 Vocab Milestone</button>
+        <button class="nav-btn" id="btn-vocab-list" onclick="show('vocab-list')">🔤 List Vocabularies</button>
+        <button class="nav-btn" id="btn-reading" onclick="show('reading')">⚡ Reading Monitor</button>
+        <button class="nav-btn sp-navbtn" id="btn-speaking-lab" onclick="show('speaking-lab')">🎙️ Speaking Lab</button>
+        <button class="nav-btn" id="btn-theory-tab" onclick="show('theory-tab')">📖 Landasan Teori</button>
+        <button class="nav-btn" id="btn-phase1" onclick="show('phase1')">Phase 1</button>
+        <button class="nav-btn" id="btn-phase2" onclick="show('phase2')">Phase 2</button>
+        <button class="nav-btn" id="btn-phase3" onclick="show('phase3')">Phase 3</button>
+        <button class="nav-btn" id="btn-phase4" onclick="show('phase4')">Phase 4</button>
+        <button class="nav-btn" id="btn-premium-content-section" onclick="loadAndShowPremiumContent()">🔒 Premium Content</button>
+      </div>
 
       <div id="dashboard" class="section active">
         <div class="section-title">Overall Progress Dashboard</div>
