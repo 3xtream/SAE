@@ -317,6 +317,41 @@ async function markAsMasteredFromCard(e) {
 // ═══════════════════════════════════════════════════════
 //  NAVIGATION & DYNAMIC CONTENT
 // ═══════════════════════════════════════════════════════
+
+function show(id) {
+  // Amankan pengisian data: Hanya isi jika elemennya memang sudah ada di layar (tidak null)
+  switch(id) {
+    case 'dashboard':
+      if (document.getElementById('totalProgress') && typeof updateDashboardUI === 'function') {
+        updateDashboardUI();
+      }
+      if (document.getElementById('trackingGraph') && typeof renderGraph === 'function' && typeof last7Logs !== 'undefined') {
+        renderGraph(last7Logs);
+      }
+      break;
+    case 'vocab-list':
+      if (document.getElementById('cat1') && typeof renderVocabDOM === 'function') {
+        renderVocabDOM();
+      }
+      break;
+    case 'vocab-milestone':
+      if (document.getElementById('vocabP1status') && typeof updateMilestoneUI === 'function') {
+        updateMilestoneUI();
+      }
+      break;
+    case 'reading':
+      if (document.getElementById('calcResult') && typeof runWpmCalc === 'function') {
+        runWpmCalc();
+      }
+      break;
+    case 'tracking':
+      if (document.getElementById('logDate') && typeof setDefaultDate === 'function') {
+        setDefaultDate();
+      }
+      break;
+  }
+}
+
 // Ganti atau timpa fungsi navigasi/show lama dengan fungsi ini
 async function navigateTo(id) {
   const viewport = document.getElementById('content-viewport');
