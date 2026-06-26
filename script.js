@@ -312,28 +312,83 @@ async function markAsMasteredFromCard(e) {
 // ═══════════════════════════════════════════════════════
 //  NAVIGATION & DYNAMIC CONTENT
 // ═══════════════════════════════════════════════════════
-function show(id) {
-  document.querySelectorAll('#mainApp > .section').forEach(s => { s.classList.remove('active'); s.style.display = 'none'; });
-  document.querySelectorAll('#premium-dynamic-placeholder .section').forEach(s => { s.classList.remove('active'); s.style.display = 'none'; });
-  if (id === 'preschool' || id === 'elementary' || id === 'writing') {
-    const pc = document.getElementById('premium-content-section'); if (pc) { pc.classList.add('active'); pc.style.display = 'block'; }
-    const tl = document.getElementById(id); if (tl) { tl.classList.add('active'); tl.style.display = 'block'; }
-  } else {
-    const tp = document.getElementById(id); if (tp) { tp.classList.add('active'); tp.style.display = 'block'; }
-  }
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  const tb = document.getElementById('btn-' + id); if (tb) tb.classList.add('active');
-  if (id === 'flashcard-tab') initFlashcards();
-  if (id === 'speaking-lab') {
-    const iframeEl = document.getElementById('spLabIframe');
-    const setupCard = document.getElementById('spSetupCard');
-    if (setupCard) setupCard.style.display = 'none';
+// Ganti atau timpa fungsi navigasi/show lama dengan fungsi ini
+async function navigateTo(id) {
+  const viewport = document.getElementById('content-viewport');
+  if (!viewport) return;
+
+  // 1. Indikator memuat halaman di dalam area main kontainer
+  viewport.innerHTML = '<div style="text-align:center;padding:3rem;color:#6C63FF;font-weight:500;">🔄 Memuat Konten...</div>';
+
+  // 2. Perbarui state class aktif pada tombol Navigasi Navbar
+  document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+  const activeBtn = document.getElementById(`btn-${id}`);
+  if (activeBtn) activeBtn.classList.add('active');
+
+  try {
+    // 3. Tarik berkas HTML parsial dari folder components
+    const response = await fetch(`components/${id}.html`);
+    if (!response.ok) throw new Error(`Gagal memuat halaman: ${id}`);
     
-    if (iframeEl && !iframeEl.src) {
-      document.getElementById('spIframeLoader').style.display = 'flex';
-      loadSpeakingLabIframe();
-    }
+    const html = await response.text();
+    viewport.innerHTML = html;
+
+    // 4. Trigger fungsi inisialisasi data spesifik berdasarkan halaman yang dibuka
+    initComponentData(id);
+
+  } catch (error) {
+    viewport.innerHTML = `<div class="card" style="color:#991B1B;background:#FEE2E2;padding:1.5rem;text-align:center;">
+                            ⚠️ <b>Gagal memuat menu:</b> ${error.message}
+                          </div>`;
   }
+}
+
+// Handler untuk mengaktifkan kembali fungsi bawaan aplikasi Anda pasca-render komponen
+function initComponentData(id) {
+  switch(id) {
+    case 'dashboard':
+      if (typeof renderGraph === 'function' && typeof last7Logs !== 'undefined') {
+        renderGraph(last7Logs); // Me-render ulang grafik aktivitas
+      }
+      if (typeof updateDashboardUI === 'function') updateDashboardUI();
+      break;
+    case 'tracking':
+      if (typeof setDefaultDate === 'function') setDefaultDate();
+      break;
+    case 'flashcard':
+      if (typeof updateCardUI === 'function') updateCardUI();
+      break;
+    case 'vocab-milestone':
+      if (typeof updateMilestoneUI === 'function') updateMilestoneUI();
+      break;
+    case 'vocab-list':
+      if (typeof renderVocabDOM === 'function') renderVocabDOM();
+      break;
+    case 'reading':
+      if (typeof runWpmCalc === 'function') runWpmCalc();
+      break;
+    case 'speaking-lab':
+      if (typeof initSpeakingLab === 'function') initSpeakingLab(); // Menyesuaikan logic setup iframe Anda
+      break;
+    case 'premium':
+      if (typeof loadAndShowPremiumContent === 'function') loadAndShowPremiumContent();
+      break;
+    case 'phase1':
+    case 'phase2':
+    case 'phase3':
+    case 'phase4':
+      // Membaca ulang checklist lokal dari database state jika ada fungsi sync
+      if (typeof updateChecklistDOM === 'function') updateChecklistDOM(id);
+      break;
+  }
+}
+
+// Pastikan pada fungsi login sukses (activateApp) atau inisialisasi awal, 
+// panggil navigateTo('dashboard') sebagai halaman default utama.
+function activateApp() {
+  document.getElementById('authSection').style.display = 'none';
+  document.getElementById('mainApp').style.display = 'block';
+  navigateTo('dashboard'); // Redirect langsung ke dashboard pasca-login
 }
 
 async function loadAndShowPremiumContent() {
