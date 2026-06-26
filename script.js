@@ -97,8 +97,9 @@ function switchAuth(t) {
 }
 
 function showAuthPage() {
-  document.getElementById('authSection').style.display = '';
+  document.getElementById('authSection').style.display = 'block'; 
   document.getElementById('mainApp').style.display = 'none';
+  switchAuth('login'); // Memastikan tab login yang aktif dan terbuka
 }
 
 // ═══════════════════════════════════════════════════════
