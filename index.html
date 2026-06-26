@@ -13,17 +13,6 @@
   <div class="loading-overlay" id="loading">Memproses data ke Cloud Spreadsheet...</div>
 
   <div class="container">
-
-    <div id="apiSetup">
-      <h4>⚙️ Setup URL Google Apps Script API</h4>
-      <p style="font-size:12px;color:#666">Paste URL deployment GAS Web App Anda (dari Apps Script → Deploy → Web App)</p>
-      <div class="api-row">
-        <input type="url" id="apiUrlInput" placeholder="https://script.google.com/macros/s/.../exec">
-        <button onclick="saveApiUrl()">Simpan &amp; Mulai</button>
-      </div>
-      <div class="api-status" id="apiUrlStatus">Belum tersimpan.</div>
-    </div>
-
     <div id="authSection" class="auth-wrapper" style="display:none">
       <div class="auth-toggle">
         <span id="tabLogin" class="active" onclick="switchAuth('login')">Masuk</span>
