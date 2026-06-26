@@ -77,7 +77,7 @@ function switchAuth(mode) {
 
 async function handleLogin() {
   const email = document.getElementById('loginEmail').value;
-  const password = document.getElementById('loginPassword').value;
+const password = document.getElementById('loginPassword').value;
   try {
     const res = await callAPI('login', { email, password });
     if (res.success) {
