@@ -53,7 +53,7 @@ function showApiSetup() {
 window.addEventListener('DOMContentLoaded', () => {
   setDefaultDate();
 
-  document.getElementById('apiSetup').style.display = 'none';
+  // Bersihkan sisa elemen yang tidak dipakai
   document.getElementById('authSection').style.display = 'none';
   document.getElementById('mainApp').style.display     = 'none';
 
@@ -61,6 +61,7 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 function startApp() {
+  // Langsung cek session login karena URL API sudah hardcoded dan pasti ada
   let raw = null;
   try { raw = localStorage.getItem(LS_SESSION_KEY); } catch(e) {}
   if (raw) {
