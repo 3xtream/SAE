@@ -366,7 +366,7 @@ function initComponentData(id) {
       if (typeof renderGraph === 'function' && typeof last7Logs !== 'undefined') renderGraph(last7Logs);
       break;
 
-    case 'flashcard': // atau 'flashcard-tab' sesuai nama file HTML Anda
+    case 'flashcard-tab': // atau 'flashcard-tab' sesuai nama file HTML Anda
       if (typeof initFlashcards === 'function') initFlashcards();
       break;
 
