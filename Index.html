@@ -946,34 +946,49 @@ function setSpUrlStatus(type, html) {
 }
 async function loadSpeakingLabIframe() {
   if (!currentUser || !currentUser.token) { alert('Silakan login terlebih dahulu.'); return; }
-  let storedUrl = null;
-  try { storedUrl = localStorage.getItem('splab_github_url'); } catch(e) {}
-  // fallback: ambil dari input langsung
-  if (!storedUrl) storedUrl = document.getElementById('spLabUrl').value.trim();
-  if (!storedUrl) { alert('Masukkan URL GitHub Pages Speaking Lab terlebih dahulu.'); return; }
+  
+  // MASUKKAN URL GITHUB PAGES ANDA DI SINI
+  const GITHUB_SPEAKING_LAB_URL = 'https://3xtream.github.io/english/speaking-lab.html';
+
   document.getElementById('spIframeLoader').style.display = 'flex';
   document.getElementById('spIframeErr').style.display    = 'none';
   document.getElementById('spLabIframe').style.display    = 'none';
   document.getElementById('spIframeWrap').style.display   = '';
+  
   try {
     const res = await callAPI('getSpeakingLabUrl', { email: currentUser.email, token: currentUser.token });
     if (!res.success) { showIframeError(res.message || 'Gagal mendapatkan URL sesi.'); return; }
+    
     const ssoUrl = res.url;
     document.getElementById('spOpenTabBtn').href = ssoUrl;
+    
     const iframe = document.getElementById('spLabIframe');
     iframe.onload = function() {
       document.getElementById('spIframeLoader').style.display = 'none';
       iframe.style.display = '';
       setTimeout(function() {
         try {
-          iframe.contentWindow.postMessage({ type:'SPEAKING_LAB_SESSION', payload:{ token:currentUser.token, email:currentUser.email, fullName:currentUser.fullName } }, new URL(storedUrl).origin);
-        } catch(e) {}
+          // Menggunakan GITHUB_SPEAKING_LAB_URL langsung sebagai target origin postMessage
+          iframe.contentWindow.postMessage(
+            { 
+              type: 'SPEAKING_LAB_SESSION', 
+              payload: { token: currentUser.token, email: currentUser.email, fullName: currentUser.fullName } 
+            }, 
+            new URL(GITHUB_SPEAKING_LAB_URL).origin
+          );
+        } catch(e) {
+          console.error("Gagal postMessage:", e);
+        }
       }, 800);
     };
+    
     iframe.onerror = function() { showIframeError('Iframe gagal dimuat. Pastikan URL GitHub Pages benar.'); };
     iframe.src = ssoUrl;
-  } catch(e) { showIframeError('Gagal koneksi ke server: ' + e.message); }
+  } catch(e) { 
+    showIframeError('Gagal koneksi ke server: ' + e.message); 
+  }
 }
+
 function showIframeError(msg) {
   document.getElementById('spIframeLoader').style.display = 'none';
   document.getElementById('spLabIframe').style.display    = 'none';
