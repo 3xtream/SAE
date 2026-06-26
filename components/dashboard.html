@@ -1,1 +1,18 @@
-
+<div class="section-title">Overall Progress Dashboard</div>
+<div class="three-col" style="margin-bottom:1rem">
+  <div class="stat-box"><div class="stat-number" id="totalProgress">0%</div><div class="stat-label">Total Progress Checklist</div></div>
+  <div class="stat-box"><div class="stat-number" id="totalDays">0</div><div class="stat-label">Habit Streak (Days)</div></div>
+  <div class="stat-box"><div class="stat-number" id="vocabCount">0</div><div class="stat-label">Vocab Bank (Kata)</div></div>
+</div>
+<div class="card">
+  <div style="font-size:13px;font-weight:600;margin-bottom:4px;color:#333">Grafik Aktivitas Harian (7 Log Terakhir)</div>
+  <div class="graph-container" id="trackingGraph"></div>
+  <div style="display:flex;justify-content:space-between;padding:0 10px;margin-top:4px" id="graphLabels"></div>
+</div>
+<div class="card">
+  <div style="font-size:13px;font-weight:600;margin-bottom:12px;color:#333">Phase Progression Status</div>
+  <div class="phase-box p1-box"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-weight:600;color:var(--text-phase-1)">FASE 1: Foundation (M1-M3) — Target: 100 WPM & 300-400 Vocab</span><span style="font-size:12px;color:#666" id="phase1Progress">0%</span></div><div class="progress-bar-bg"><div class="progress-bar-fill p1-fill" id="phase1Bar" style="width:0%"></div></div></div>
+  <div class="phase-box p2-box"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-weight:600;color:var(--text-phase-2)">FASE 2: Expansion (M4-M6) — Target: 130 WPM & 800-900 Vocab</span><span style="font-size:12px;color:#666" id="phase2Progress">0%</span></div><div class="progress-bar-bg"><div class="progress-bar-fill p2-fill" id="phase2Bar" style="width:0%"></div></div></div>
+  <div class="phase-box p3-box"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-weight:600;color:var(--text-phase-3)">FASE 3: Activation (M7-M9) — Target: 160 WPM & 1200-1300 Vocab</span><span style="font-size:12px;color:#666" id="phase3Progress">0%</span></div><div class="progress-bar-bg"><div class="progress-bar-fill p3-fill" id="phase3Bar" style="width:0%"></div></div></div>
+  <div class="phase-box p4-box"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-weight:600;color:var(--text-phase-4)">FASE 4: Mastery (M10-M12) — Target: Fluency & 1800-2000 Vocab</span><span style="font-size:12px;color:#666" id="phase4Progress">0%</span></div><div class="progress-bar-bg"><div class="progress-bar-fill p4-fill" id="phase4Bar" style="width:0%"></div></div></div>
+</div>
