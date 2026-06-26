@@ -10,7 +10,6 @@ let currentUser = null;
 let flashcardList = [];
 let currentCardIndex = 0;
 let speechRate = 0.7;
-let databaseCache = null;
 
 // ═══════════════════════════════════════════════════════
 //  API HELPER
@@ -54,7 +53,7 @@ function showApiSetup() {
 window.addEventListener('DOMContentLoaded', () => {
   setDefaultDate();
 
-  // Bersihkan sisa elemen yang tidak dipakai
+  document.getElementById('apiSetup').style.display = 'none';
   document.getElementById('authSection').style.display = 'none';
   document.getElementById('mainApp').style.display     = 'none';
 
@@ -62,7 +61,6 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 function startApp() {
-  // Langsung cek session login karena URL API sudah hardcoded dan pasti ada
   let raw = null;
   try { raw = localStorage.getItem(LS_SESSION_KEY); } catch(e) {}
   if (raw) {
@@ -98,9 +96,8 @@ function switchAuth(t) {
 }
 
 function showAuthPage() {
-  document.getElementById('authSection').style.display = 'block'; 
+  document.getElementById('authSection').style.display = '';
   document.getElementById('mainApp').style.display = 'none';
-  switchAuth('login'); // Memastikan tab login yang aktif dan terbuka
 }
 
 // ═══════════════════════════════════════════════════════
@@ -144,27 +141,16 @@ async function handleLogin() {
   finally { showLoader(false); }
 }
 
-// Ganti fungsi activateApp Anda menjadi seperti ini
-async function activateApp() {
-  console.log("🔓 Login sukses. Memulai inisialisasi aplikasi...");
-  
+function activateApp() {
   document.getElementById('authSection').style.display = 'none';
   document.getElementById('mainApp').style.display = 'block';
+  document.getElementById('appTitle').textContent = `📊 Master Tracker: ${currentUser.fullName}`;
+  refreshDataFromDatabase();
   
-  // 1. Muat halaman dashboard pertama kali
-  await navigateTo('dashboard'); 
-  
-  // 2. DETEKSI: Apakah aplikasi Anda punya fungsi penarik data utama saat start?
-  // Jalankan fungsi penarik data Sheets bawaan kode asli Anda di sini
-  if (typeof loadUserData === 'function') {
-    loadUserData();
-  } else if (typeof fetchData === 'function') {
-    fetchData();
-  } else if (typeof refreshData === 'function') {
-    refreshData();
-  } else {
-    console.warn("⚠️ Perhatian: Tidak ada fungsi unduh data Sheets otomatis yang terpicu di activateApp!");
-  }
+  const setupCard = document.getElementById('spSetupCard');
+  const iframeWrap = document.getElementById('spIframeWrap');
+  if (setupCard) setupCard.style.display = 'none';
+  if (iframeWrap) iframeWrap.style.display = '';
 }
 
 function handleLogout() {
@@ -324,91 +310,38 @@ async function markAsMasteredFromCard(e) {
 // ═══════════════════════════════════════════════════════
 //  NAVIGATION & DYNAMIC CONTENT
 // ═══════════════════════════════════════════════════════
+function show(id) {
+  document.querySelectorAll('#mainApp > .section').forEach(s => { s.classList.remove('active'); s.style.display = 'none'; });
+  document.querySelectorAll('#premium-dynamic-placeholder .section').forEach(s => { s.classList.remove('active'); s.style.display = 'none'; });
+  if (id === 'preschool' || id === 'elementary' || id === 'writing') {
+    const pc = document.getElementById('premium-content-section'); if (pc) { pc.classList.add('active'); pc.style.display = 'block'; }
+    const tl = document.getElementById(id); if (tl) { tl.classList.add('active'); tl.style.display = 'block'; }
+  } else {
+    const tp = document.getElementById(id); if (tp) { tp.classList.add('active'); tp.style.display = 'block'; }
+  }
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  const tb = document.getElementById('btn-' + id); if (tb) tb.classList.add('active');
+  if (id === 'flashcard-tab') initFlashcards();
+  if (id === 'speaking-lab') {
+    const iframeEl = document.getElementById('spLabIframe');
+    const setupCard = document.getElementById('spSetupCard');
+    if (setupCard) setupCard.style.display = 'none';
+    
+    if (iframeEl && !iframeEl.src) {
+      document.getElementById('spIframeLoader').style.display = 'flex';
+      loadSpeakingLabIframe();
+    }
+  }
+}
 
-// Ganti atau timpa fungsi navigasi/show lama dengan fungsi ini
-async function navigateTo(id) {
-  const viewport = document.getElementById('content-viewport');
-  if (!viewport) return;
-
-  // 1. Indikator memuat halaman di dalam area main kontainer
-  viewport.innerHTML = '<div style="text-align:center;padding:3rem;color:#6C63FF;font-weight:500;">🔄 Memuat Konten...</div>';
-
-  // 2. Perbarui state class aktif pada tombol Navigasi Navbar
-  document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-  const activeBtn = document.getElementById(`btn-${id}`);
-  if (activeBtn) activeBtn.classList.add('active');
-
+async function loadAndShowPremiumContent() {
+  show('premium-content-section');
+  document.getElementById('premium-dynamic-placeholder').innerHTML = '<div style="text-align:center;padding:2rem;color:var(--color-primary);font-weight:bold">🔄 Mengunduh konten...</div>';
   try {
-    const html = await response.text();
-    viewport.innerHTML = html;
-
-    // Tambahkan jeda 100ms di sini agar HTML benar-benar siap di layar
-    setTimeout(() => {
-      console.log(`⏱️ Jeda selesai, mengisi data untuk komponen: ${id}`);
-      initComponentData(id);
-    }, 100);
-
-  } catch (error) {
-    viewport.innerHTML = `<div class="card" style="color:#991B1B;background:#FEE2E2;padding:1.5rem;text-align:center;">
-                            ⚠️ <b>Gagal memuat menu:</b> ${error.message}
-                          </div>`;
-  }
-}
-
-// Handler untuk mengaktifkan kembali fungsi bawaan aplikasi Anda pasca-render komponen
-function initComponentData(id) {
-  console.log(`🎬 Komponen [${id}] selesai dimuat. Memulai pengisian data...`);
-
-  switch(id) {
-    case 'dashboard':
-      if (typeof updateDashboardUI === 'function') updateDashboardUI();
-      if (typeof renderGraph === 'function' && typeof last7Logs !== 'undefined') renderGraph(last7Logs);
-      break;
-
-    case 'flashcard-tab': // atau 'flashcard-tab' sesuai nama file HTML Anda
-      if (typeof initFlashcards === 'function') initFlashcards();
-      break;
-
-    case 'vocab-list':
-      if (typeof renderVocabDOM === 'function') renderVocabDOM();
-      break;
-
-    case 'reading':
-      if (typeof runWpmCalc === 'function') runWpmCalc();
-      break;
-
-    case 'tracking':
-      if (typeof setDefaultDate === 'function') setDefaultDate();
-      break;
-
-    case 'speaking-lab':
-      if (typeof initSpeakingLab === 'function') initSpeakingLab();
-      break;
-
-    case 'vocab-milestone':
-      if (typeof updateMilestoneUI === 'function') updateMilestoneUI();
-      break;
-  }
-}
-
-// Pastikan pada fungsi login sukses (activateApp) atau inisialisasi awal, 
-// Amankan fungsi pemanggilan awal aplikasi
-async function activateApp() {
-  document.getElementById('authSection').style.display = 'none';
-  document.getElementById('mainApp').style.display = 'block';
-  
-  // 1. Tunggu hingga komponen HTML Dashboard masuk ke layar
-  await navigateTo('dashboard'); 
-  
-  // 2. PANGGIL KEMBALI fungsi penarik data Google Sheets asli Anda di sini
-  // Silakan cari di script.js Anda, apa nama fungsi mengambil data Sheets Anda?
-  // Biasanya bernama: fetchData(), loadData(), refreshData(), atau initData()
-  if (typeof fetchData === 'function') {
-    fetchData(); 
-  } else if (typeof loadData === 'function') {
-    loadData();
-  } else if (typeof refreshData === 'function') {
-    refreshData();
+    const r = await callAPI('loadContentPage');
+    document.getElementById('premium-dynamic-placeholder').innerHTML = r.html || '<p>Konten kosong.</p>';
+  } catch(e) {
+    document.getElementById('premium-dynamic-placeholder').innerHTML = '<p style="color:#791F1F;padding:1rem">❌ ' + e.message + '</p>';
   }
 }
 
