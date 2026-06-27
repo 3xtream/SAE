@@ -1,17 +1,35 @@
-<!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
+<meta charset="UTF-8">
+  <!-- Meta tag wajib untuk responsive mobile -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Member & Tracking Acquisition</title>
+  <!-- Tailwind CSS via CDN untuk styling cepat & ringan -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts & Icons -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sistem Akuisisi English 1 Tahun — Master System v4.7</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons+Round">
+  
+  <style>
+    body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+    /* Menghilangkan scrollbar default tapi tetap bisa scroll */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+  </style>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="style.css">
 </head>
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col justify-between pb-20 md:pb-0">
 <body>
   <div class="loading-overlay" id="loading">Memproses data ke Cloud Spreadsheet...</div>
 
+  <!-- TOP APP BAR (Mobile First Header) -->
+  <header class="bg-white border-b border-gray-200 sticky top-0 z-50 px-4 py-3 flex justify-between items-center shadow-sm">
+    <div class="flex items-center space-x-2">
+      <span class="material-icons-round text-blue-600 text-3xl">analytics</span>
+      <h1 class="text-lg font-bold tracking-tight text-gray-900">EngAcquisition v4.7</h1>
   <div class="container">
     <div id="authSection" class="auth-wrapper" style="display:none">
       <div class="auth-toggle">
@@ -29,19 +47,51 @@
         <div class="input-group"><label class="input-label">Password</label><input type="password" id="regPassword" required></div>
         <button class="btn" style="width:100%;margin-top:1rem" onclick="handleRegister()">Daftar Sekarang</button>
       </div>
-    </div>
+</div>
+    <button id="logoutBtn" class="hidden text-gray-500 hover:text-red-500 p-2 rounded-full hover:bg-gray-100 transition">
+      <span class="material-icons-round">logout</span>
+    </button>
+  </header>
 
+  <!-- MAIN CONTAINER (Scrollable Content) -->
+  <main class="flex-1 max-w-md mx-auto w-full px-4 py-6 overflow-y-auto">
+    
+    <!-- 1. LOGIN SCREEN (Hidden by default if logged in) -->
+    <div id="loginScreen" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-6 mt-4">
+      <div class="text-center">
+        <h2 class="text-xl font-bold text-gray-900">Selamat Datang</h2>
+        <p class="text-sm text-gray-500 mt-1">Silakan masuk ke akun member Anda</p>
+      </div>
+      <form id="loginForm" class="space-y-4" onsubmit="handleLogin(event)">
     <div id="mainApp" style="display:none">
       <div style="margin-bottom:1.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
-        <div>
+<div>
+          <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Email</label>
+          <input type="email" id="emailInput" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50 focus:bg-white text-base transition" placeholder="nama@email.com">
           <h1 id="appTitle">📊 Sistem Akuisisi English — Master Tracker v4.7</h1>
           <p class="subtitle">SLA-Based (Krashen & Paul Nation) · Google Sheets Database</p>
-        </div>
+</div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Password</label>
+          <input type="password" id="passwordInput" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50 focus:bg-white text-base transition" placeholder="••••••••">
         <div style="display:flex;gap:8px;align-items:center">
           <button class="btn" style="background:#791F1F" onclick="handleLogout()">Logout 🚪</button>
-        </div>
+</div>
+        <button type="submit" id="loginSubmitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3.5 rounded-xl shadow-md transition transform active:scale-95 flex justify-center items-center">
+          <span>Masuk</span>
+        </button>
+      </form>
+    </div>
       </div>
 
+    <!-- 2. MAIN DASHBOARD SCREEN (Hidden before login) -->
+    <div id="dashboardScreen" class="hidden space-y-6">
+      
+      <!-- Ringkasan Progress Card -->
+      <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-5 text-white shadow-lg space-y-4">
+        <div>
+          <p class="text-xs text-blue-100 uppercase tracking-wider font-medium">Progress Belajar Anda</p>
+          <h3 id="userWelcome" class="text-xl font-bold mt-1">-</h3>
       <div class="nav">
         <button class="nav-btn active" id="btn-dashboard" onclick="show('dashboard')">📈 Dashboard</button>
         <button class="nav-btn" id="btn-tracking" onclick="show('tracking')">📝 Daily Tracking</button>
@@ -64,7 +114,15 @@
           <div class="stat-box"><div class="stat-number" id="totalProgress">0%</div><div class="stat-label">Total Progress Checklist</div></div>
           <div class="stat-box"><div class="stat-number" id="totalDays">0</div><div class="stat-label">Habit Streak (Days)</div></div>
           <div class="stat-box"><div class="stat-number" id="vocabCount">0</div><div class="stat-label">Vocab Bank (Kata)</div></div>
-        </div>
+</div>
+        <div class="grid grid-cols-2 gap-4 pt-2">
+          <div class="bg-white/10 backdrop-blur-sm rounded-xl p-3">
+            <span class="text-xs text-blue-200 block">Total Vocab</span>
+            <span id="vocabCount" class="text-xl font-bold block mt-1">0</span>
+          </div>
+          <div class="bg-white/10 backdrop-blur-sm rounded-xl p-3">
+            <span class="text-xs text-blue-200 block">Avg WPM</span>
+            <span id="avgWpm" class="text-xl font-bold block mt-1">0</span>
         <div class="card">
           <div style="font-size:13px;font-weight:600;margin-bottom:4px;color:#333">Grafik Aktivitas Harian (7 Log Terakhir)</div>
           <div class="graph-container" id="trackingGraph"></div>
@@ -86,11 +144,21 @@
             <div class="input-group"><label class="input-label">Tanggal</label><input type="date" id="logDate"></div>
             <div class="input-group"><label class="input-label">Durasi Input (Menit)</label><input type="number" id="inputDuration" value="20"></div>
             <div class="input-group"><label class="input-label">Passage Dibaca</label><input type="number" id="passagesRead" value="1"></div>
-          </div>
+</div>
           <button class="btn" style="margin-top:0.5rem" onclick="logDailyActivity()">Simpan Log Harian</button>
-        </div>
-      </div>
+</div>
+</div>
 
+      <!-- Form Input Harian (Mobile Action Card) -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 space-y-4">
+        <h4 class="font-bold text-gray-900 flex items-center gap-2">
+          <span class="material-icons-round text-emerald-500">edit_note</span> Input Log Harian
+        </h4>
+        <form id="logForm" class="space-y-4" onsubmit="handleSaveLog(event)">
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs text-gray-500 font-medium mb-1">WPM</label>
+              <input type="number" id="wpmInput" required class="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-base" placeholder="Contoh: 120">
       <div id="flashcard-tab" class="section">
         <div class="section-title">🃏 Spaced Repetition Flashcard Review</div>
         <div style="text-align:center;color:#666;margin-bottom:1rem" id="fcTracker">Memuat kartu peninjauan...</div>
@@ -100,12 +168,19 @@
               <div class="fc-word" id="fcFrontWord">-</div>
               <button class="btn-speak" id="btnSpeak" onclick="speakCurrentWord(event)" title="Dengarkan pelafalan">🔊</button>
               <div class="fc-hint">Klik kartu untuk melihat arti</div>
-            </div>
+</div>
+            <div>
+              <label class="block text-xs text-gray-500 font-medium mb-1">Akurasi (%)</label>
+              <input type="number" id="accuracyInput" min="0" max="100" required class="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-base" placeholder="0-100">
             <div class="card-face card-back">
               <div class="fc-meaning" id="fcBackMeaning">-</div>
               <div class="fc-hint">Klik kartu untuk melihat kata</div>
-            </div>
-          </div>
+</div>
+</div>
+          <button type="submit" id="logSubmitBtn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-xl shadow-sm transition active:scale-95">
+            Simpan Log Hari Ini
+          </button>
+        </form>
         </div>
         <div class="fc-controls">
           <button class="btn" style="background:#4b5563" onclick="prevCard(event)">⬅️ Sebelumnya</button>
@@ -117,8 +192,15 @@
           <div class="speech-row"><span class="speech-label">🐢 Kecepatan bicara</span><div class="speed-group"><button class="speed-btn active" onclick="setSpeed(0.7,this)">Lambat</button><button class="speed-btn" onclick="setSpeed(1.0,this)">Normal</button><button class="speed-btn" onclick="setSpeed(1.3,this)">Cepat</button></div></div>
           <div id="speechStatus" style="font-size:12px;color:#888;text-align:center;min-height:16px;margin-top:4px"></div>
         </div>
-      </div>
+</div>
 
+      <!-- Checklist Fase Belajar -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 space-y-3">
+        <h4 class="font-bold text-gray-900 flex items-center gap-2">
+          <span class="material-icons-round text-indigo-500">assignment_turned_in</span> Checklist Fase
+        </h4>
+        <div class="space-y-2" id="checklistContainer">
+          <!-- Diisi via JavaScript -->
       <div id="vocab-milestone" class="section">
         <div class="section-title">Vocabulary Milestone Status</div>
         <div class="card">
@@ -129,9 +211,122 @@
             <tr><td><span class="badge b-p3">Fase 3 (M9)</span></td><td>1200 - 1300 Kata</td><td id="vocabP3status"><span class="badge b-no">❌ Belum</span></td></tr>
             <tr><td><span class="badge b-p4">Fase 4 (M12)</span></td><td>1800 - 2000 Kata</td><td id="vocabP4status"><span class="badge b-no">❌ Belum</span></td></tr>
           </tbody></table>
-        </div>
-      </div>
+</div>
+</div>
 
+    </div>
+
+  </main>
+
+  <!-- BOTTOM NAVIGATION BAR (Wajib untuk Mobile UX) -->
+  <nav id="bottomNav" class="hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-2 flex justify-around items-center shadow-lg z-50 max-w-md mx-auto">
+    <button onclick="switchTab('dashboard')" class="flex flex-col items-center space-y-0.5 text-blue-600">
+      <span class="material-icons-round">dashboard</span>
+      <span class="text-[10px] font-medium">Dashboard</span>
+    </button>
+    <button onclick="openSpeakingLab()" class="flex flex-col items-center space-y-0.5 text-gray-400 hover:text-blue-600">
+      <span class="material-icons-round">record_voice_over</span>
+      <span class="text-[10px] font-medium">Speaking Lab</span>
+    </button>
+  </nav>
+
+  <!-- TOAST NOTIFICATION (Pengganti alert() yang mengganggu di mobile) -->
+  <div id="toast" class="fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-sm px-4 py-2.5 rounded-full shadow-xl opacity-0 pointer-events-none transition-opacity duration-300 z-50 flex items-center space-x-2">
+    <span id="toastIcon" class="material-icons-round text-base text-emerald-400">check_circle</span>
+    <span id="toastMessage">Sukses</span>
+  </div>
+
+  <!-- JAVASCRIPT: LOGIC & BACKEND CONNECTION -->
+  <script>
+    // Ganti URL ini dengan URL Web App Apps Script Anda yang sudah di-deploy
+    const WEB_APP_URL = "PROSES_URL_GAS_ANDA_DISINI"; 
+    let currentUserEmail = "";
+
+    function showToast(message, isError = false) {
+      const toast = document.getElementById('toast');
+      const icon = document.getElementById('toastIcon');
+      document.getElementById('toastMessage').innerText = message;
+      
+      icon.innerText = isError ? 'error' : 'check_circle';
+      icon.className = `material-icons-round text-base ${isError ? 'text-red-400' : 'text-emerald-400'}`;
+      
+      toast.classList.remove('opacity-0');
+      toast.classList.add('opacity-100');
+      setTimeout(() => {
+        toast.classList.remove('opacity-100');
+        toast.classList.add('opacity-0');
+      }, 3000);
+    }
+
+    function toggleLoading(buttonId, isLoading, defaultText) {
+      const btn = document.getElementById(buttonId);
+      if (isLoading) {
+        btn.disabled = true;
+        btn.innerHTML = `<svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 0113-7.25V4a1 1 0 112 0v3.5a1 1 0 01-1 1h-3.5a1 1 0 110-2h1.4A6.001 6.001 0 1020 12a1 1 0 112 0 8 8 0 01-20 0z"></path></svg>`;
+      } else {
+        btn.disabled = false;
+        btn.innerHTML = defaultText;
+      }
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      toggleLoading('loginSubmitBtn', true, '');
+      
+      const email = document.getElementById('emailInput').value;
+      const password = document.getElementById('passwordInput').value;
+
+      try {
+        // Enkripsi dasar/hash client-side disarankan di sini sebelum dikirim
+        const response = await fetch(WEB_APP_URL, {
+          method: 'POST',
+          body: new URLSearchParams({
+            action: 'login',
+            email: email,
+            password: password
+          })
+        });
+        const data = await response.json();
+
+        if (data.status === 'success') {
+          currentUserEmail = email;
+          showToast('Login berhasil!');
+          initDashboard();
+        } else {
+          showToast(data.message || 'Login gagal', true);
+        }
+      } catch (err) {
+        showToast('Koneksi gagal/Server tidak merespon', true);
+      } finally {
+        toggleLoading('loginSubmitBtn', false, 'Masuk');
+      }
+    }
+
+    function initDashboard() {
+      document.getElementById('loginScreen').classList.add('hidden');
+      document.getElementById('dashboardScreen').classList.remove('hidden');
+      document.getElementById('bottomNav').classList.remove('hidden');
+      document.getElementById('logoutBtn').classList.remove('hidden');
+      
+      // Load data simulasi awal (Ganti dengan fetch dari endpoint dashboardData jika ada)
+      document.getElementById('userWelcome').innerText = currentUserEmail.split('@')[0];
+      loadChecklistMock();
+    }
+
+    function loadChecklistMock() {
+      const container = document.getElementById('checklistContainer');
+      const phases = ['Fase 1: Pronunciation Basic', 'Fase 2: Fluency Building'];
+      container.innerHTML = phases.map((phase, i) => `
+        <label class="flex items-center space-x-3 p-3 bg-gray-50 rounded-xl border border-gray-100 active:bg-gray-100 transition">
+          <input type="checkbox" onchange="handleChecklistChange(${i}, this.checked)" class="w-5 h-5 rounded text-blue-600 focus:ring-blue-500 border-gray-300">
+          <span class="text-sm font-medium text-gray-700">${phase}</span>
+        </label>
+      `).join('');
+    }
+
+    async function handleSaveLog(e) {
+      e.preventDefault();
+      toggleLoading('logSubmitBtn', true, '');
       <div id="vocab-list" class="section">
         <div class="section-title">List Vocabularies (Real-time Database Feed)</div>
         <div class="vocab-counter-floating"><span>Progress Penyerapan Kata:</span><span id="floatingCounter">0 Kata Terkuasai</span></div>
@@ -146,6 +341,8 @@
         </div>
       </div>
 
+      const wpm = document.getElementById('wpmInput').value;
+      const acc = document.getElementById('accuracyInput').value;
       <div id="reading" class="section">
         <div class="section-title">Reading Speed & WPM Monitor</div>
         <div class="card" style="background:#f4f7fa;border:1px solid #cbd5e1">
@@ -168,6 +365,29 @@
         </div>
       </div>
 
+      try {
+        const response = await fetch(WEB_APP_URL, {
+          method: 'POST',
+          body: new URLSearchParams({
+            action: 'saveDailyLog',
+            email: currentUserEmail,
+            wpm: wpm,
+            accuracy: acc
+          })
+        });
+        const data = await response.json();
+        if(data.status === 'success') {
+          showToast('Log harian berhasil disimpan!');
+          document.getElementById('logForm').reset();
+        } else {
+          showToast(data.message, true);
+        }
+      } catch (err) {
+        showToast('Gagal menyimpan data', true);
+      } finally {
+        toggleLoading('logSubmitBtn', false, 'Simpan Log Hari Ini');
+      }
+    }
       <div id="speaking-lab" class="section">
         <div id="spSetupCard" class="card" style="border:1.5px solid #C7D2FE;background:#FAFAFE;margin-bottom:0">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
@@ -225,6 +445,10 @@
         </div>
       </div>
 
+    async function handleChecklistChange(index, isChecked) {
+      showToast(`Memperbarui checklist...`);
+      // Panggil fetch ke endpoint updatePhaseChecklistInSheet Anda di sini
+    }
       <div id="theory-tab" class="section">
         <div class="section-title">📖 Landasan Teori Ilmiah & Framework Metodologi</div>
         <div class="theory-grid">
@@ -235,6 +459,10 @@
         </div>
       </div>
 
+    function openSpeakingLab() {
+      showToast('Mengalihkan ke Speaking Lab...');
+      // Logika SSO Token Handoff Anda dimasukkan di sini
+    }
       <div id="phase1" class="section">
         <div class="section-title">Phase 1: Foundation Checklist (Target: 100 WPM)</div>
         <div class="card"><div class="warning-box"><strong>Kondisi Mutlak Kelulusan Fase 1:</strong> Wajib terpenuhi seluruhnya secara objektif sebelum membuka materi Fase 2.</div>
@@ -282,6 +510,10 @@
         </div>
       </div>
 
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      location.reload(); // Reset state aplikasi sederhana
+    });
+  </script>
       <div id="premium-content-section" class="section">
         <div class="section-title">🔒 Premium Member Content Area</div>
         <div id="premium-dynamic-placeholder"></div>
