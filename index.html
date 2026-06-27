@@ -452,17 +452,18 @@
   </div>
 
   <!-- CORE COMPATIBILITY INTERACTIVE LOGIC SCRIPT -->
-  <script>
-    // Memastikan tombol navigasi visual berubah warna saat diklik tanpa merusak skrip bawaan script.js
-    function setActiveNav(element) {
-      document.querySelectorAll('.nav-btn').forEach(btn => {
-        btn.classList.remove('bg-indigo-50', 'text-indigo-700');
-        btn.classList.add('text-slate-500', 'hover:bg-slate-50', 'hover:text-slate-800');
-      });
-      element.classList.remove('text-slate-500', 'hover:bg-slate-50', 'hover:text-slate-800');
-      element.classList.add('bg-indigo-50', 'text-indigo-700');
-    }
-  </script>
+<script>
+  function setActiveNav(element) {
+    // Reset semua tombol navigasi ke gaya default standar
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.classList.remove('bg-indigo-50', 'text-indigo-700', 'active');
+      btn.classList.add('text-slate-500', 'hover:bg-slate-50', 'hover:text-slate-800');
+    });
+    // Aktifkan gaya premium aktif pada tombol yang diklik
+    element.classList.remove('text-slate-500', 'hover:bg-slate-50', 'hover:text-slate-800');
+    element.classList.add('bg-indigo-50', 'text-indigo-700', 'active');
+  }
+</script>
   <script src="script.js"></script>
 </body>
 </html>
