@@ -240,9 +240,14 @@ function processDatabaseRender(data) {
     [1,2,3,4].forEach(p => {
       const cks = document.querySelectorAll(`.p${p}-chk`);
       const pct = 0;
+      // dashboard
       const pt = document.getElementById(`phase${p}Progress`), pb = document.getElementById(`phase${p}Bar`);
       if (pt) pt.textContent = pct + '%';
       if (pb) pb.style.width = pct + '%';
+      // teori & fase tab
+      const ptTh = document.getElementById(`phase${p}Progress-th`), pbTh = document.getElementById(`phase${p}Bar-th`);
+      if (ptTh) ptTh.textContent = pct + '%';
+      if (pbTh) pbTh.style.width = pct + '%';
     });
     calculateOverallGlobalProgress();
     initFlashcards();
@@ -396,9 +401,14 @@ async function syncPhaseChecklist(p, idx, el) {
     const cks = document.querySelectorAll(`.p${p}-chk`);
     let n = 0; cks.forEach(c => { if (c.checked) n++; });
     const pct = Math.round((n / cks.length) * 100);
+    // update progress bar di dashboard
     const pt = document.getElementById(`phase${p}Progress`), pb = document.getElementById(`phase${p}Bar`);
     if (pt) pt.textContent = pct + '%';
     if (pb) pb.style.width = pct + '%';
+    // update progress bar di tab Teori & Fase
+    const ptTh = document.getElementById(`phase${p}Progress-th`), pbTh = document.getElementById(`phase${p}Bar-th`);
+    if (ptTh) ptTh.textContent = pct + '%';
+    if (pbTh) pbTh.style.width = pct + '%';
     calculateOverallGlobalProgress();
   } catch(e) { alert('Error: ' + e.message); }
 }
