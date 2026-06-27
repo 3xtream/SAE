@@ -191,7 +191,7 @@ table tbody td {
 /* ── 12. FLASHCARD — ukuran kartu lebih natural ── */
 .flashcard-wrapper {
   max-width: 100%;
-  margin: 1rem auto;
+  margin: 1rem 0;
   perspective: 1000px;
 }
 
@@ -417,8 +417,8 @@ input[type="url"] {
   h1 { font-size: 20px; }
 
   .nav {
-    flex-wrap: wrap;
-    overflow-x: visible;
+    flex-wrap: nowrap;
+    overflow-x: auto;
     position: static;
     padding: 10px 0;
     background: transparent;
@@ -485,6 +485,14 @@ input[type="url"] {
   .stat-number { font-size: 28px; }
 
   .stat-label { font-size: 11px; }
+
+  .nav {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .nav::-webkit-scrollbar { display: none; }
 
   .flashcard { height: 220px; }
 
