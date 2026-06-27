@@ -1,507 +1,135 @@
-/* ================================================================
-   STYLE_MOBILE.CSS — Sistem Akuisisi English v4.7
-   Mobile-first responsive upgrades
-   Cara pakai: tambahkan <link rel="stylesheet" href="style_mobile.css">
-   SETELAH baris <link rel="stylesheet" href="style.css">
-   ================================================================ */
-
-/* ── 1. GLOBAL TOUCH-FRIENDLY DEFAULTS ── */
-* {
-  -webkit-tap-highlight-color: transparent;
-}
-
-body {
-  padding: 0;
-  background: #f4f6fb;
-  overscroll-behavior-y: contain;
-}
-
-.container {
-  padding: 0;
-  max-width: 100%;
-}
-
-/* ── 2. HEADER — mobile compact ── */
-#mainApp > div:first-child {
-  padding: 14px 16px 10px;
-  background: #fff;
-  border-bottom: 1px solid #e5e7eb;
-  position: sticky;
-  top: 0;
-  z-index: 200;
-  margin-bottom: 0;
-  box-shadow: 0 1px 4px rgba(0,0,0,.06);
-}
-
-h1 {
-  font-size: 16px;
-  line-height: 1.3;
-  word-break: break-word;
-}
-
-.subtitle {
-  font-size: 11px;
-  color: #888;
-  margin-bottom: 0;
-}
-
-#mainApp > div:first-child > div:last-child button {
-  font-size: 12px;
-  padding: 6px 12px;
-}
-
-/* ── 3. NAV — horizontal scroll pill bar ── */
-.nav {
-  display: flex;
-  flex-wrap: nowrap;
-  overflow-x: auto;
-  overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
-  scroll-snap-type: x proximity;
-  gap: 6px;
-  padding: 10px 16px;
-  margin-bottom: 0;
-  border-bottom: 2px solid #eee;
-  background: #fff;
-  position: sticky;
-  top: 57px;
-  z-index: 199;
-  scrollbar-width: none;
-}
-
-.nav::-webkit-scrollbar {
-  display: none;
-}
-
-.nav-btn {
-  flex-shrink: 0;
-  scroll-snap-align: start;
-  white-space: nowrap;
-  padding: 7px 13px;
-  font-size: 12px;
-  border-radius: 20px;
-  touch-action: manipulation;
-}
-
-/* Nav fade-out hint kanan */
-.nav::after {
-  content: '';
-  position: sticky;
-  right: 0;
-  width: 32px;
-  flex-shrink: 0;
-  background: linear-gradient(to right, transparent, #fff 80%);
-  pointer-events: none;
-}
-
-/* ── 4. SECTION CONTENT — padding ── */
-.section {
-  padding: 16px;
-}
-
-/* ── 5. STAT BOXES — 3 jadi 3 kolom kecil di mobile ── */
-.three-col {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-}
-
-.stat-box {
-  padding: 12px 8px;
-  border-radius: 10px;
-}
-
-.stat-number {
-  font-size: 22px;
-}
-
-.stat-label {
-  font-size: 9px;
-  line-height: 1.3;
-}
-
-/* ── 6. CARD ── */
-.card {
-  border-radius: 10px;
-  padding: 14px;
-  margin-bottom: 12px;
-}
-
-/* ── 7. PHASE BOXES — teks lebih kompak ── */
-.phase-box {
-  margin-bottom: 14px;
-}
-
-.phase-box > div:first-child span:first-child {
-  font-size: 11px;
-  line-height: 1.4;
-  display: block;
-  margin-bottom: 4px;
-}
-
-/* ── 8. GRAPH — tinggi lebih kecil di mobile ── */
-.graph-container {
-  height: 110px;
-  padding: 6px 8px;
-}
-
-.graph-label {
-  font-size: 8px;
-}
-
-/* ── 9. TABEL — horizontal scroll ── */
-.card table,
-table {
-  display: block;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  white-space: nowrap;
-  font-size: 12px;
-  margin: 8px 0;
-}
-
-table thead th {
-  font-size: 10px;
-  padding: 8px 10px;
-}
-
-table tbody td {
-  padding: 8px 10px;
-}
-
-/* ── 10. DAILY TRACKING — 3 col jadi 1 col ── */
-#tracking .three-col {
-  grid-template-columns: 1fr;
-  gap: 0;
-}
-
-#tracking .input-group {
-  margin: 8px 0;
-}
-
-/* ── 11. READING — kalkulator WPM 3col → 1col ── */
-#reading .three-col {
-  grid-template-columns: 1fr 1fr;
-}
-
-#reading .three-col .input-group:last-child {
-  grid-column: 1 / -1;
-}
-
-/* ── 12. FLASHCARD — ukuran kartu lebih natural ── */
-.flashcard-wrapper {
-  max-width: 100%;
-  margin: 1rem 0;
-  perspective: 1000px;
-}
-
-.flashcard {
-  height: 190px;
-}
-
-.fc-word {
-  font-size: 26px;
-}
-
-.fc-meaning {
-  font-size: 18px;
-}
-
-.fc-controls {
-  display: flex;
-  gap: 8px;
-  flex-wrap: nowrap;
-  justify-content: center;
-}
-
-.fc-controls .btn {
-  flex: 1;
-  padding: 10px 6px;
-  font-size: 12px;
-  min-width: 0;
-  text-align: center;
-}
-
-/* TTS speech controls */
-.speech-controls {
-  max-width: 100%;
-  margin-top: 12px;
-}
-
-.speed-group {
-  gap: 4px;
-}
-
-.speed-btn {
-  font-size: 11px;
-  padding: 4px 8px;
-}
-
-/* ── 13. VOCAB GRID — 2 kolom di mobile ── */
-.vocab-grid {
-  grid-template-columns: repeat(2, 1fr);
-  gap: 6px;
-}
-
-.vocab-item {
-  font-size: 12px;
-  padding: 6px 8px;
-}
-
-.vocab-counter-floating {
-  font-size: 12px;
-  padding: 10px 14px;
-  border-radius: 8px;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
-}
-
-/* ── 14. CHECKLIST — touch target lebih besar ── */
-.checklist li {
-  padding: 12px 0;
-  font-size: 13px;
-  line-height: 1.5;
-}
-
-.checklist input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  flex-shrink: 0;
-  margin-top: 2px;
-  cursor: pointer;
-}
-
-/* ── 15. BUTTONS — minimum touch target 44px ── */
-.btn {
-  min-height: 42px;
-  font-size: 13px;
-  touch-action: manipulation;
-}
-
-.btn-action {
-  min-height: 36px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* ── 16. FORM INPUTS — text tidak auto-zoom di iOS ── */
-input[type="number"],
-input[type="date"],
-input[type="email"],
-input[type="password"],
-input[type="text"],
-input[type="url"] {
-  font-size: 16px; /* iOS: ≥16px mencegah auto-zoom */
-  min-height: 42px;
-  padding: 10px 12px;
-  border-radius: 8px;
-}
-
-/* ── 17. API SETUP BOX ── */
-#apiSetup .api-row {
-  flex-direction: column;
-  gap: 6px;
-}
-
-#apiSetup button {
-  width: 100%;
-  min-height: 40px;
-}
-
-/* ── 18. AUTH WRAPPER ── */
-.auth-wrapper {
-  margin: 2rem 16px;
-  padding: 1.5rem;
-  border-radius: 12px;
-}
-
-/* ── 19. SPEAKING LAB ── */
-#speaking-lab .card {
-  padding: 12px;
-}
-
-#spLabUrl {
-  font-size: 13px;
-  padding: 10px 12px;
-}
-
-#spSetupCard > div:nth-child(2) > div:first-child > div:last-child {
-  flex-direction: column;
-}
-
-#spSetupCard button {
-  width: 100%;
-}
-
-#spLabIframe {
-  height: calc(100vh - 160px);
-}
-
-/* iframe header button wrap */
-#spIframeWrap > div:first-child {
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 12px 14px;
-}
-
-#spIframeWrap > div:first-child > div:last-child {
-  width: 100%;
-  justify-content: flex-start;
-}
-
-/* ── 20. THEORY GRID — 1 kolom ── */
-.theory-grid {
-  grid-template-columns: 1fr;
-  gap: 12px;
-}
-
-.theory-card {
-  padding: 14px;
-}
-
-/* ── 21. LOADING OVERLAY ── */
-.loading-overlay {
-  font-size: 14px;
-  text-align: center;
-  padding: 20px;
-}
-
-/* ── 22. SECTION TITLE ── */
-.section-title {
-  font-size: 11px;
-  margin-bottom: 12px;
-}
-
-/* ── 23. BADGE ── */
-.badge {
-  font-size: 10px;
-  padding: 3px 8px;
-}
-
-/* ── 24. INFO & WARNING BOX ── */
-.info-box,
-.warning-box {
-  font-size: 12px;
-  line-height: 1.5;
-  padding: 10px 12px;
-}
-
-/* ── 25. BOTTOM SAFE AREA (iPhone notch) ── */
-.section {
-  padding-bottom: calc(16px + env(safe-area-inset-bottom));
-}
-
-/* ================================================================
-   TABLET BREAKPOINT (≥600px) — partial restore
-   ================================================================ */
-@media (min-width: 600px) {
-  body { padding: 0; }
-
-  .container { padding: 0 12px; }
-
-  #mainApp > div:first-child {
-    padding: 14px 20px;
-    position: static;
-    border-bottom: none;
-    box-shadow: none;
-    background: transparent;
-    margin-bottom: 0.5rem;
-  }
-
-  h1 { font-size: 20px; }
-
-  .nav {
-    flex-wrap: wrap;
-    overflow-x: visible;
-    position: static;
-    padding: 10px 0;
-    background: transparent;
-    margin-bottom: 1rem;
-  }
-
-  .nav::after { display: none; }
-
-  .three-col {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-  }
-
-  #tracking .three-col {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  .vocab-grid {
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  }
-
-  .flashcard-wrapper { max-width: 400px; }
-
-  .theory-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  input[type="number"],
-  input[type="date"],
-  input[type="email"],
-  input[type="password"],
-  input[type="text"],
-  input[type="url"] {
-    font-size: 13px;
-    min-height: unset;
-  }
-}
-
-/* ================================================================
-   DESKTOP BREAKPOINT (≥900px) — full restore ke style.css lama
-   ================================================================ */
-@media (min-width: 900px) {
-  body {
-    padding: 1.5rem;
-    background: #fafafa;
-  }
-
-  .container {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 0;
-  }
-
-  #mainApp > div:first-child {
-    margin-bottom: 1.5rem;
-  }
-
-  h1 { font-size: 24px; }
-
-  .section { padding: 0; }
-
-  .graph-container { height: 160px; }
-
-  .stat-number { font-size: 28px; }
-
-  .stat-label { font-size: 11px; }
-
-  .flashcard { height: 220px; }
-
-  .fc-word { font-size: 32px; }
-
-  .fc-controls .btn {
-    flex: unset;
-    padding: 8px 16px;
-    font-size: 13px;
-  }
-
-  table {
-    display: table;
-    white-space: normal;
-    font-size: 13px;
-  }
-
-  .vocab-counter-floating {
-    flex-direction: row;
-    align-items: center;
-    font-size: inherit;
-  }
-}
+:root {
+  --bg-phase-1: #EEEDFE; --text-phase-1: #3C3489;
+  --bg-phase-2: #E1F5EE; --text-phase-2: #085041;
+  --bg-phase-3: #FAEEDA; --text-phase-3: #633806;
+  --bg-phase-4: #FAECE7; --text-phase-4: #712B13;
+  --color-primary: #0C447C;
+  --color-accent: #0284c7;
+  --sp-primary: #6C63FF; --sp-primary-light: #EAE9FF; --sp-primary-dark: #4F46E5;
+  --sp-success-light: #DCFCE7; --sp-warning-light: #FEF3C7; --sp-danger-light: #FEE2E2;
+  --sp-text: #1E1B4B; --sp-text-muted: #6B7280; --sp-border: #E5E7EB; --sp-radius-sm: 10px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;font-size:14px;color:#1a1a1a;background:#fafafa;padding:1.5rem;line-height:1.4}
+
+/* ── API URL SETUP ── */
+#apiSetup{background:#fff3cd;border:1.5px solid #ffc107;border-radius:8px;padding:1.2rem;margin-bottom:1.5rem;display:block}
+#apiSetup h4{color:#856404;margin-bottom:8px;font-size:14px}
+#apiSetup .api-row{display:flex;gap:8px;margin-top:6px}
+#apiSetup input{flex:1;padding:8px 10px;border:1.5px solid #ffc107;border-radius:6px;font-size:13px;font-family:inherit}
+#apiSetup button{padding:8px 14px;background:#856404;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit;white-space:nowrap}
+.api-status{font-size:11px;margin-top:5px;color:#666}
+
+.info-box{background:#f4f7fa;border-left:4px solid var(--color-primary);padding:1rem;margin:1rem 0;border-radius:4px}
+.warning-box{background:var(--bg-phase-3);border-left:4px solid var(--text-phase-3);padding:1rem;margin:1rem 0;border-radius:4px}
+.container{max-width:1100px;margin:0 auto}
+.checklist{list-style:none}
+.checklist li{padding:10px 0;border-bottom:1px solid #eee;display:flex;align-items:flex-start;font-size:13px;line-height:1.4}
+.checklist li:last-child{border-bottom:none}
+.checklist input[type="checkbox"]{margin-right:10px;margin-top:3px;cursor:pointer}
+.btn-action{padding:6px 12px;background:#fff;border:1px solid #ccc;border-radius:4px;cursor:pointer;font-size:12px;transition:all .2s;text-decoration:none;color:#333;display:inline-block}
+.btn-action:hover{border-color:#999;background:#f5f5f5}
+h1{font-size:24px;font-weight:600;margin-bottom:4px;color:var(--color-primary)}
+.subtitle{color:#666;font-size:13px;margin-bottom:1.5rem}
+.nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1.5rem;border-bottom:2px solid #eee;padding-bottom:1rem}
+.nav-btn{padding:8px 14px;border:1px solid #ccc;border-radius:20px;background:#fff;cursor:pointer;font-size:13px;color:#666;transition:all .2s;font-weight:500}
+.nav-btn:hover{border-color:#999;background:#f5f5f5}
+.nav-btn.active{background:var(--color-primary);color:#fff;border-color:var(--color-primary)}
+.nav-btn.sp-navbtn{border-color:var(--sp-primary);color:var(--sp-primary)}
+.nav-btn.sp-navbtn:hover{background:var(--sp-primary-light)}
+.nav-btn.sp-navbtn.active{background:var(--sp-primary);color:#fff;border-color:var(--sp-primary)}
+.section{display:none;animation:fadeIn .2s}
+.section.active{display:block !important}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.card{background:#fff;border:1px solid #ddd;border-radius:8px;padding:1.2rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.section-title{font-size:12px;font-weight:600;color:var(--color-primary);margin-bottom:1rem;padding-bottom:8px;border-bottom:2px solid var(--color-primary);text-transform:uppercase;letter-spacing:.5px}
+.phase-box{border-left:4px solid;padding-left:1rem;margin-bottom:1rem}
+.p1-box{border-left-color:var(--text-phase-1)}.p2-box{border-left-color:var(--text-phase-2)}.p3-box{border-left-color:var(--text-phase-3)}.p4-box{border-left-color:var(--text-phase-4)}
+.badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;white-space:nowrap;margin-right:4px;margin-bottom:4px}
+.b-p1{background:var(--bg-phase-1);color:var(--text-phase-1)}.b-p2{background:var(--bg-phase-2);color:var(--text-phase-2)}.b-p3{background:var(--bg-phase-3);color:var(--text-phase-3)}.b-p4{background:var(--bg-phase-4);color:var(--text-phase-4)}
+.b-ok{background:#EAF3DE;color:#27500A}.b-warn{background:#FAEEDA;color:#633806}.b-no{background:#FCEBEB;color:#791F1F}
+.progress-bar-bg{width:100%;height:8px;background:#eee;border-radius:4px;overflow:hidden}
+.progress-bar-fill{height:100%;border-radius:4px;transition:width .3s}
+.p1-fill{background:var(--text-phase-1)}.p2-fill{background:var(--text-phase-2)}.p3-fill{background:var(--text-phase-3)}.p4-fill{background:var(--text-phase-4)}
+table{width:100%;border-collapse:collapse;font-size:13px;margin:1rem 0}
+th{text-align:left;padding:10px;background:#f5f5f5;border-bottom:1.5px solid #ccc;font-weight:600;font-size:11px;color:#666;text-transform:uppercase}
+td{padding:10px;border-bottom:1px solid #eee;vertical-align:middle}
+tr:hover{background:#f9f9f9}
+.input-group{margin:12px 0}
+.input-label{font-size:12px;font-weight:600;color:#333;display:block;margin-bottom:4px}
+input[type="number"],input[type="date"],input[type="email"],input[type="password"],input[type="text"],input[type="url"]{width:100%;padding:8px 10px;border:1px solid #ccc;border-radius:4px;font-family:inherit;font-size:13px}
+input[type="number"]{max-width:140px}
+.three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+.btn{padding:8px 16px;background:var(--color-primary);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;transition:all .2s}
+.btn:hover{background:#0a3359}
+.btn:disabled{background:#ccc;cursor:not-allowed}
+.checklist input[type="checkbox"]{margin-right:12px;margin-top:3px;transform:scale(1.1);cursor:pointer}
+.stat-box{background:#fff;border:1px solid #eee;border-radius:8px;padding:1rem;text-align:center}
+.stat-number{font-size:28px;font-weight:700;color:var(--color-primary)}
+.stat-label{font-size:11px;color:#666;margin-top:4px;text-transform:uppercase;letter-spacing:.5px}
+.vocab-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px;margin-top:10px}
+.vocab-item{display:flex;align-items:center;background:#f9f9f9;padding:6px 10px;border:1px solid #eee;border-radius:4px;font-size:13px;user-select:none;cursor:pointer}
+.vocab-item input{margin-right:8px;cursor:pointer}
+.vocab-item span{color:#666;font-size:11px;margin-left:4px}
+.vocab-cat-title{font-size:12px;font-weight:700;color:var(--color-primary);text-transform:uppercase;margin-top:18px;margin-bottom:6px;border-bottom:2px solid #ddd;padding-bottom:3px}
+.vocab-counter-floating{background:var(--color-primary);color:#fff;padding:10px 15px;border-radius:6px;margin-bottom:15px;font-weight:bold;display:flex;justify-content:space-between;align-items:center}
+.graph-container{display:flex;align-items:flex-end;justify-content:space-between;height:160px;padding:10px 20px;background:#fdfdfd;border:1px dashed #ccc;border-radius:6px;margin-top:10px}
+.graph-bar{flex:1;margin:0 4px;background:var(--color-primary);border-top-left-radius:3px;border-top-right-radius:3px;position:relative;min-height:2px;transition:height 0.4s ease}
+.graph-bar .tooltip{display:none;position:absolute;top:-25px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:2px 6px;border-radius:4px;font-size:10px;white-space:nowrap;z-index:10}
+.graph-bar:hover .tooltip{display:block}
+.graph-label{font-size:9px;color:#777;text-align:center;margin-top:4px}
+.auth-wrapper{max-width:400px;margin:4rem auto;background:#fff;padding:2rem;border-radius:8px;border:1px solid #ddd;box-shadow:0 4px 12px rgba(0,0,0,0.05)}
+.auth-toggle{display:flex;justify-content:space-around;margin-bottom:1.5rem;border-bottom:1px solid #eee;padding-bottom:0.5rem}
+.auth-toggle span{cursor:pointer;font-weight:600;color:#666}
+.auth-toggle span.active{color:var(--color-primary);border-bottom:2px solid var(--color-primary);padding-bottom:0.5rem}
+.auth-box{display:none}
+.auth-box.active{display:block}
+.loading-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,0.8);z-index:9999;justify-content:center;align-items:center;font-weight:bold;color:var(--color-primary)}
+
+/* FLASHCARD */
+.flashcard-wrapper{perspective:1000px;max-width:400px;margin:2rem auto}
+.btn-speak{position:absolute;bottom:38px;right:14px;background:rgba(255,255,255,0.85);border:1.5px solid #cbd5e1;border-radius:50%;width:38px;height:38px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s,transform 0.1s;z-index:10;box-shadow:0 2px 6px rgba(0,0,0,0.1)}
+.btn-speak:hover{background:#e0f2fe;transform:scale(1.1)}
+.btn-speak.speaking{background:#fef9c3;animation:pulse-speak 0.6s infinite alternate}
+@keyframes pulse-speak{from{transform:scale(1)}to{transform:scale(1.15)}}
+.speech-controls{max-width:400px;margin:1rem auto 0;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:12px 16px;display:flex;flex-direction:column;gap:10px}
+.speech-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.speech-label{font-size:13px;color:#475569;flex:1}
+.speed-group{display:flex;gap:6px}
+.speed-btn{font-size:12px;padding:4px 10px;border-radius:20px;border:1.5px solid #cbd5e1;background:#fff;cursor:pointer;color:#475569;transition:all 0.15s}
+.speed-btn.active{background:#0284c7;color:#fff;border-color:#0284c7}
+.toggle-switch{position:relative;display:inline-block;width:42px;height:24px;flex-shrink:0}
+.toggle-switch input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;cursor:pointer;inset:0;background:#cbd5e1;border-radius:24px;transition:.3s}
+.toggle-slider:before{content:"";position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s}
+.toggle-switch input:checked + .toggle-slider{background:#0284c7}
+.toggle-switch input:checked + .toggle-slider:before{transform:translateX(18px)}
+.flashcard{width:100%;height:220px;position:relative;transform-style:preserve-3d;transition:transform 0.4s;cursor:pointer;border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,0.1)}
+.flashcard.flipped{transform:rotateY(180deg)}
+.card-face{position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:12px;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:2rem;border:2px solid #e2e8f0}
+.card-front{background:#ffffff;color:var(--color-primary)}
+.card-back{background:var(--color-primary);color:#ffffff;transform:rotateY(180deg)}
+.fc-word{font-size:32px;font-weight:800;margin-bottom:10px;letter-spacing:-0.5px}
+.fc-meaning{font-size:22px;font-weight:500}
+.fc-hint{font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;position:absolute;bottom:15px}
+.card-back .fc-hint{color:#93c5fd}
+.fc-controls{display:flex;justify-content:center;gap:12px;margin-top:1.5rem}
+.theory-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(48%,1fr));gap:1.5rem;margin-top:1rem}
+.theory-card{background:#ffffff;border:1px solid #e2e8f0;border-radius:12px;padding:1.5rem;box-shadow:0 4px 6px -1px rgba(0,0,0,0.05);transition:transform 0.2s,box-shadow 0.2s}
+.theory-card:hover{transform:translateY(-2px);box-shadow:0 10px 15px -3px rgba(0,0,0,0.08)}
+.theory-header{display:flex;align-items:center;gap:10px;margin-bottom:1rem;border-bottom:1px solid #f1f5f9;padding-bottom:0.75rem}
+.theory-icon{font-size:24px;background:#f0fdf4;padding:8px;border-radius:8px}
+.theory-card:nth-child(2) .theory-icon{background:#eff6ff}
+.theory-card:nth-child(3) .theory-icon{background:#fff7ed}
+.theory-card:nth-child(4) .theory-icon{background:#faf5ff}
+.theory-card-title{font-size:15px;font-weight:700;color:#1e293b}
+.theory-desc{color:#475569;font-size:13.5px;line-height:1.6;text-align:justify}
+.theory-callout{background:#f8fafc;border-left:4px solid var(--color-accent);padding:10px 12px;margin-top:10px;border-radius:0 6px 6px 0;font-style:italic;font-size:12.5px;color:#334155}
+
+/* Speaking Lab iframe */
+.sp-iframe-wrap{border-radius:12px;overflow:hidden;border:1.5px solid #C7D2FE;box-shadow:0 4px 20px rgba(108,99,255,.12);background:#F5F3FF;position:relative}
+.sp-info-row{display:flex;align-items:flex-start;gap:10px;background:#EAE9FF;border-radius:0 0 10px 10px;padding:10px 16px;font-size:12px;color:#4F46E5;line-height:1.5}
+
+@keyframes sp-spin{to{transform:rotate(360deg)}}
+
+@media(max-width:768px){.three-col{grid-template-columns:1fr}.theory-grid{grid-template-columns:1fr}}
