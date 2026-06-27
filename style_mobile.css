@@ -191,7 +191,7 @@ table tbody td {
 /* ── 12. FLASHCARD — ukuran kartu lebih natural ── */
 .flashcard-wrapper {
   max-width: 100%;
-  margin: 1rem 0;
+  margin: 1rem auto;
   perspective: 1000px;
 }
 
