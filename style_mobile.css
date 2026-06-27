@@ -1,0 +1,507 @@
+/* ================================================================
+   STYLE_MOBILE.CSS — Sistem Akuisisi English v4.7
+   Mobile-first responsive upgrades
+   Cara pakai: tambahkan <link rel="stylesheet" href="style_mobile.css">
+   SETELAH baris <link rel="stylesheet" href="style.css">
+   ================================================================ */
+
+/* ── 1. GLOBAL TOUCH-FRIENDLY DEFAULTS ── */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  padding: 0;
+  background: #f4f6fb;
+  overscroll-behavior-y: contain;
+}
+
+.container {
+  padding: 0;
+  max-width: 100%;
+}
+
+/* ── 2. HEADER — mobile compact ── */
+#mainApp > div:first-child {
+  padding: 14px 16px 10px;
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  margin-bottom: 0;
+  box-shadow: 0 1px 4px rgba(0,0,0,.06);
+}
+
+h1 {
+  font-size: 16px;
+  line-height: 1.3;
+  word-break: break-word;
+}
+
+.subtitle {
+  font-size: 11px;
+  color: #888;
+  margin-bottom: 0;
+}
+
+#mainApp > div:first-child > div:last-child button {
+  font-size: 12px;
+  padding: 6px 12px;
+}
+
+/* ── 3. NAV — horizontal scroll pill bar ── */
+.nav {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x proximity;
+  gap: 6px;
+  padding: 10px 16px;
+  margin-bottom: 0;
+  border-bottom: 2px solid #eee;
+  background: #fff;
+  position: sticky;
+  top: 57px;
+  z-index: 199;
+  scrollbar-width: none;
+}
+
+.nav::-webkit-scrollbar {
+  display: none;
+}
+
+.nav-btn {
+  flex-shrink: 0;
+  scroll-snap-align: start;
+  white-space: nowrap;
+  padding: 7px 13px;
+  font-size: 12px;
+  border-radius: 20px;
+  touch-action: manipulation;
+}
+
+/* Nav fade-out hint kanan */
+.nav::after {
+  content: '';
+  position: sticky;
+  right: 0;
+  width: 32px;
+  flex-shrink: 0;
+  background: linear-gradient(to right, transparent, #fff 80%);
+  pointer-events: none;
+}
+
+/* ── 4. SECTION CONTENT — padding ── */
+.section {
+  padding: 16px;
+}
+
+/* ── 5. STAT BOXES — 3 jadi 3 kolom kecil di mobile ── */
+.three-col {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.stat-box {
+  padding: 12px 8px;
+  border-radius: 10px;
+}
+
+.stat-number {
+  font-size: 22px;
+}
+
+.stat-label {
+  font-size: 9px;
+  line-height: 1.3;
+}
+
+/* ── 6. CARD ── */
+.card {
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+
+/* ── 7. PHASE BOXES — teks lebih kompak ── */
+.phase-box {
+  margin-bottom: 14px;
+}
+
+.phase-box > div:first-child span:first-child {
+  font-size: 11px;
+  line-height: 1.4;
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* ── 8. GRAPH — tinggi lebih kecil di mobile ── */
+.graph-container {
+  height: 110px;
+  padding: 6px 8px;
+}
+
+.graph-label {
+  font-size: 8px;
+}
+
+/* ── 9. TABEL — horizontal scroll ── */
+.card table,
+table {
+  display: block;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  white-space: nowrap;
+  font-size: 12px;
+  margin: 8px 0;
+}
+
+table thead th {
+  font-size: 10px;
+  padding: 8px 10px;
+}
+
+table tbody td {
+  padding: 8px 10px;
+}
+
+/* ── 10. DAILY TRACKING — 3 col jadi 1 col ── */
+#tracking .three-col {
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+
+#tracking .input-group {
+  margin: 8px 0;
+}
+
+/* ── 11. READING — kalkulator WPM 3col → 1col ── */
+#reading .three-col {
+  grid-template-columns: 1fr 1fr;
+}
+
+#reading .three-col .input-group:last-child {
+  grid-column: 1 / -1;
+}
+
+/* ── 12. FLASHCARD — ukuran kartu lebih natural ── */
+.flashcard-wrapper {
+  max-width: 100%;
+  margin: 1rem 0;
+  perspective: 1000px;
+}
+
+.flashcard {
+  height: 190px;
+}
+
+.fc-word {
+  font-size: 26px;
+}
+
+.fc-meaning {
+  font-size: 18px;
+}
+
+.fc-controls {
+  display: flex;
+  gap: 8px;
+  flex-wrap: nowrap;
+  justify-content: center;
+}
+
+.fc-controls .btn {
+  flex: 1;
+  padding: 10px 6px;
+  font-size: 12px;
+  min-width: 0;
+  text-align: center;
+}
+
+/* TTS speech controls */
+.speech-controls {
+  max-width: 100%;
+  margin-top: 12px;
+}
+
+.speed-group {
+  gap: 4px;
+}
+
+.speed-btn {
+  font-size: 11px;
+  padding: 4px 8px;
+}
+
+/* ── 13. VOCAB GRID — 2 kolom di mobile ── */
+.vocab-grid {
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+}
+
+.vocab-item {
+  font-size: 12px;
+  padding: 6px 8px;
+}
+
+.vocab-counter-floating {
+  font-size: 12px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+/* ── 14. CHECKLIST — touch target lebih besar ── */
+.checklist li {
+  padding: 12px 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.checklist input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  cursor: pointer;
+}
+
+/* ── 15. BUTTONS — minimum touch target 44px ── */
+.btn {
+  min-height: 42px;
+  font-size: 13px;
+  touch-action: manipulation;
+}
+
+.btn-action {
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── 16. FORM INPUTS — text tidak auto-zoom di iOS ── */
+input[type="number"],
+input[type="date"],
+input[type="email"],
+input[type="password"],
+input[type="text"],
+input[type="url"] {
+  font-size: 16px; /* iOS: ≥16px mencegah auto-zoom */
+  min-height: 42px;
+  padding: 10px 12px;
+  border-radius: 8px;
+}
+
+/* ── 17. API SETUP BOX ── */
+#apiSetup .api-row {
+  flex-direction: column;
+  gap: 6px;
+}
+
+#apiSetup button {
+  width: 100%;
+  min-height: 40px;
+}
+
+/* ── 18. AUTH WRAPPER ── */
+.auth-wrapper {
+  margin: 2rem 16px;
+  padding: 1.5rem;
+  border-radius: 12px;
+}
+
+/* ── 19. SPEAKING LAB ── */
+#speaking-lab .card {
+  padding: 12px;
+}
+
+#spLabUrl {
+  font-size: 13px;
+  padding: 10px 12px;
+}
+
+#spSetupCard > div:nth-child(2) > div:first-child > div:last-child {
+  flex-direction: column;
+}
+
+#spSetupCard button {
+  width: 100%;
+}
+
+#spLabIframe {
+  height: calc(100vh - 160px);
+}
+
+/* iframe header button wrap */
+#spIframeWrap > div:first-child {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+}
+
+#spIframeWrap > div:first-child > div:last-child {
+  width: 100%;
+  justify-content: flex-start;
+}
+
+/* ── 20. THEORY GRID — 1 kolom ── */
+.theory-grid {
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.theory-card {
+  padding: 14px;
+}
+
+/* ── 21. LOADING OVERLAY ── */
+.loading-overlay {
+  font-size: 14px;
+  text-align: center;
+  padding: 20px;
+}
+
+/* ── 22. SECTION TITLE ── */
+.section-title {
+  font-size: 11px;
+  margin-bottom: 12px;
+}
+
+/* ── 23. BADGE ── */
+.badge {
+  font-size: 10px;
+  padding: 3px 8px;
+}
+
+/* ── 24. INFO & WARNING BOX ── */
+.info-box,
+.warning-box {
+  font-size: 12px;
+  line-height: 1.5;
+  padding: 10px 12px;
+}
+
+/* ── 25. BOTTOM SAFE AREA (iPhone notch) ── */
+.section {
+  padding-bottom: calc(16px + env(safe-area-inset-bottom));
+}
+
+/* ================================================================
+   TABLET BREAKPOINT (≥600px) — partial restore
+   ================================================================ */
+@media (min-width: 600px) {
+  body { padding: 0; }
+
+  .container { padding: 0 12px; }
+
+  #mainApp > div:first-child {
+    padding: 14px 20px;
+    position: static;
+    border-bottom: none;
+    box-shadow: none;
+    background: transparent;
+    margin-bottom: 0.5rem;
+  }
+
+  h1 { font-size: 20px; }
+
+  .nav {
+    flex-wrap: wrap;
+    overflow-x: visible;
+    position: static;
+    padding: 10px 0;
+    background: transparent;
+    margin-bottom: 1rem;
+  }
+
+  .nav::after { display: none; }
+
+  .three-col {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+
+  #tracking .three-col {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .vocab-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  }
+
+  .flashcard-wrapper { max-width: 400px; }
+
+  .theory-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  input[type="number"],
+  input[type="date"],
+  input[type="email"],
+  input[type="password"],
+  input[type="text"],
+  input[type="url"] {
+    font-size: 13px;
+    min-height: unset;
+  }
+}
+
+/* ================================================================
+   DESKTOP BREAKPOINT (≥900px) — full restore ke style.css lama
+   ================================================================ */
+@media (min-width: 900px) {
+  body {
+    padding: 1.5rem;
+    background: #fafafa;
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0;
+  }
+
+  #mainApp > div:first-child {
+    margin-bottom: 1.5rem;
+  }
+
+  h1 { font-size: 24px; }
+
+  .section { padding: 0; }
+
+  .graph-container { height: 160px; }
+
+  .stat-number { font-size: 28px; }
+
+  .stat-label { font-size: 11px; }
+
+  .flashcard { height: 220px; }
+
+  .fc-word { font-size: 32px; }
+
+  .fc-controls .btn {
+    flex: unset;
+    padding: 8px 16px;
+    font-size: 13px;
+  }
+
+  table {
+    display: table;
+    white-space: normal;
+    font-size: 13px;
+  }
+
+  .vocab-counter-floating {
+    flex-direction: row;
+    align-items: center;
+    font-size: inherit;
+  }
+}
