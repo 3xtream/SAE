@@ -19,6 +19,13 @@ let currentUser      = null;
 let flashcardList    = [];
 let currentCardIndex = 0;
 let speechRate       = 0.7;
+// =====================================
+// QUIZ
+// =====================================
+let quizQuestions = [];
+let currentQuestion = 0;
+let score = 0;
+let userAnswers = [];
 
 // ═══════════════════════════════════════════════════════════════════════════
 //  NOTIFIKASI BANNER INLINE (Menggantikan alert() yang memblokir UI)
@@ -839,3 +846,65 @@ function showIframeError(msg) {
   if (errBox) errBox.style.setProperty('display', 'flex', 'important');
   if (errMsg) errMsg.textContent = msg;
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  QUIZ
+// ═══════════════════════════════════════════════════════════════════════════
+
+
+async function startQuiz(){
+
+    try{
+
+        const level =
+            document.getElementById("quiz-level").value;
+
+        const limit =
+            Number(document.getElementById("quiz-limit").value);
+
+        const shuffle =
+            document.getElementById("quiz-shuffle").checked;
+
+        const result = await callAPI(
+            "getQuestions",
+            {
+                email: currentUser.email,
+                token: currentUser.token,
+                level: level,
+                limit: limit,
+                shuffle: shuffle
+            }
+        );
+
+        if(!result.success){
+
+            alert(result.message);
+
+            return;
+
+        }
+
+        quizQuestions = result.questions;
+
+        currentQuestion = 0;
+
+        score = 0;
+
+        userAnswers = [];
+
+        console.log(quizQuestions);
+
+        alert("Berhasil mengambil "
+                + quizQuestions.length
+                + " soal.");
+
+    }
+
+    catch(err){
+
+        alert(err.message);
+
+    }
+
+}
+
