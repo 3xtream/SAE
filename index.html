@@ -326,32 +326,44 @@
     <p class="text-xs text-slate-500 mt-1">Latih kemampuan pengucapan dan kelancaran berbicara Anda langsung menggunakan modul interaktif eksternal.</p>
   </div>
 
-  <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden p-8 flex flex-col items-center justify-center text-center min-h-[400px]">
-    
-    <div class="w-16 h-16 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 text-2xl mb-4 border border-indigo-100/50 shadow-2xs">
-      <i class="fa-solid fa-rocket animate-bounce"></i>
+  <!-- Container utama Speaking Lab — dikelola penuh oleh loadSpeakingLabIframe() di script.js -->
+  <div id="spIframeWrap" class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden relative min-h-[480px] flex flex-col items-center justify-center">
+
+    <!-- Setup card (disembunyikan oleh activateApp()) -->
+    <div id="spSetupCard" style="display:none;" class="w-full p-8 flex flex-col items-center justify-center text-center">
+      <p class="text-xs text-slate-500">Konfigurasi Speaking Lab...</p>
     </div>
 
-    <h4 class="text-sm font-bold text-slate-800">Modul AI Speaking Lab Siap Meluncur</h4>
-    
-    <div class="text-xs text-slate-600 max-w-sm mt-2 p-4 bg-slate-50 rounded-xl border border-slate-200 text-left leading-relaxed space-y-1.5">
-      <p class="font-semibold text-indigo-700 flex items-center gap-1">
-        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Autentikasi Sesi Aman
-      </p>
-      <p class="text-slate-500 text-[11px]">Untuk mematuhi aturan enkripsi keamanan browser (X-Frame-Options), modul interaktif dijalankan terpisah di luar frame dashboard.</p>
+    <!-- Loading spinner — ditampilkan sementara loadSpeakingLabIframe() berjalan -->
+    <div id="spIframeLoader" style="display:none;" class="absolute inset-0 flex items-center justify-center bg-white/80 z-20">
+      <div class="flex flex-col items-center gap-3">
+        <div class="w-10 h-10 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
+        <p class="text-xs font-semibold text-slate-500">Memuat Speaking Lab...</p>
+      </div>
     </div>
 
-    <a href="https://3xtream.github.io/english/speaking-lab.html" target="_blank" rel="noopener noreferrer" class="mt-6 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl transition-all shadow-md shadow-indigo-100 flex items-center gap-2 cursor-pointer">
-      <i class="fa-solid fa-arrow-up-right-from-square text-[11px]"></i> Buka AI Speaking Lab di Tab Baru
-    </a>
+    <!-- Iframe (disembunyikan karena X-Frame-Options) -->
+    <iframe id="spLabIframe" style="display:none;" class="w-full h-full border-0 min-h-[480px]"></iframe>
 
-    <div style="display: none;">
-      <a id="spOpenTabBtn" href="#"></a>
-      <iframe id="spLabIframe"></iframe>
-      <div id="spIframeLoader"></div>
-      <div id="spIframeErr"></div>
-      <div id="spIframeErrMsg"></div>
-      <div id="spSetupCard"></div>
+    <!-- Error/launcher box — diisi dan ditampilkan oleh loadSpeakingLabIframe() -->
+    <div id="spIframeErr" style="display:none;" class="absolute inset-0 bg-indigo-50/50 flex flex-col items-center justify-center p-8 text-center z-10">
+      
+      <div class="w-16 h-16 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 text-2xl mb-4 border border-indigo-100/50 shadow-2xs">
+        <i class="fa-solid fa-rocket animate-bounce"></i>
+      </div>
+
+      <h4 class="text-sm font-bold text-slate-800">Modul AI Speaking Lab Siap Meluncur</h4>
+
+      <!-- Pesan detail diisi oleh script.js melalui spIframeErrMsg -->
+      <div id="spIframeErrMsg" class="text-xs text-slate-600 max-w-sm mt-2 p-4 bg-white rounded-2xl border border-slate-200 shadow-2xs text-left leading-relaxed"></div>
+
+      <!-- Tombol fallback langsung (selalu tampil sebagai cadangan) -->
+      <a href="https://3xtream.github.io/english/speaking-lab.html" target="_blank" rel="noopener noreferrer"
+         id="spOpenTabBtn"
+         class="mt-5 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl transition-all shadow-md shadow-indigo-100 flex items-center gap-2 cursor-pointer">
+        <i class="fa-solid fa-arrow-up-right-from-square text-[11px]"></i> Buka AI Speaking Lab di Tab Baru
+      </a>
+
     </div>
 
   </div>
