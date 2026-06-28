@@ -532,10 +532,8 @@ async function loadSpeakingLabIframe() {
   document.getElementById('spIframeWrap').style.display   = '';
   
   try {
-    const res = await callAPI('getSpeakingLabUrl', { email: currentUser.email, token: currentUser.token });
-    if (!res.success) { showIframeError(res.message || 'Gagal mendapatkan URL sesi.'); return; }
-    
-    const ssoUrl = res.url;
+    // BYPASS: Langsung tembak ke URL tujuan tanpa meminta verifikasi token sesi ke Google Apps Script
+    const ssoUrl = GITHUB_SPEAKING_LAB_URL;
     document.getElementById('spOpenTabBtn').href = ssoUrl;
     
     const iframe = document.getElementById('spLabIframe');
@@ -560,7 +558,7 @@ async function loadSpeakingLabIframe() {
     iframe.onerror = function() { showIframeError('Iframe gagal dimuat. Pastikan URL GitHub Pages benar.'); };
     iframe.src = ssoUrl;
   } catch(e) { 
-    showIframeError('Gagal koneksi ke server: ' + e.message); 
+    showIframeError('Gagal koneksi: ' + e.message); 
   }
 }
 
