@@ -318,53 +318,50 @@
 
           <!-- ================= TAB 4: SPEAKING LAB (GITHUB CONFIG) ================= -->
           <div id="speaking-lab" class="section space-y-6" style="display: none;">
-  
-  <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs">
-    <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
-      <i class="fa-solid fa-microphone text-indigo-600"></i> AI Speaking Laboratory
-    </h3>
-    <p class="text-xs text-slate-500 mt-1">Latih kemampuan pengucapan dan kelancaran berbicara Anda langsung menggunakan modul interaktif eksternal.</p>
+
+  <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs flex items-center justify-between gap-4">
+    <div>
+      <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+        <i class="fa-solid fa-microphone text-indigo-600"></i> AI Speaking Laboratory
+      </h3>
+      <p class="text-xs text-slate-500 mt-1">Modul interaktif Speaking Lab ditampilkan langsung di halaman ini.</p>
+    </div>
+    <a id="spOpenTabBtn" href="https://3xtream.github.io/english/speaking-lab.html" target="_blank" rel="noopener noreferrer"
+       class="shrink-0 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-[11px] rounded-xl transition-all flex items-center gap-1.5 cursor-pointer">
+      <i class="fa-solid fa-arrow-up-right-from-square"></i> Tab Baru
+    </a>
   </div>
 
-  <!-- Container utama Speaking Lab — dikelola penuh oleh loadSpeakingLabIframe() di script.js -->
-  <div id="spIframeWrap" class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden relative min-h-[480px] flex flex-col items-center justify-center">
+  <!-- Elemen pendukung yang masih direferensikan script.js (disembunyikan, tidak dihapus) -->
+  <div id="spSetupCard" style="display:none;"></div>
+  <a id="spLabIframe" style="display:none;"></a>
 
-    <!-- Setup card (disembunyikan oleh activateApp()) -->
-    <div id="spSetupCard" style="display:none;" class="w-full p-8 flex flex-col items-center justify-center text-center">
-      <p class="text-xs text-slate-500">Konfigurasi Speaking Lab...</p>
+  <!-- Container utama: loading → konten inline -->
+  <div id="spIframeWrap" class="rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+
+    <!-- Loading state -->
+    <div id="spIframeLoader" class="bg-white flex flex-col items-center justify-center gap-3 py-20">
+      <div class="w-10 h-10 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
+      <p class="text-xs font-semibold text-slate-500">Memuat Speaking Lab...</p>
     </div>
 
-    <!-- Loading spinner — ditampilkan sementara loadSpeakingLabIframe() berjalan -->
-    <div id="spIframeLoader" style="display:none;" class="absolute inset-0 flex items-center justify-center bg-white/80 z-20">
-      <div class="flex flex-col items-center gap-3">
-        <div class="w-10 h-10 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
-        <p class="text-xs font-semibold text-slate-500">Memuat Speaking Lab...</p>
+    <!-- Error/fallback state (tersembunyi secara default) -->
+    <div id="spIframeErr" style="display:none;" class="bg-white flex flex-col items-center justify-center p-10 text-center gap-4">
+      <div class="w-14 h-14 rounded-2xl bg-rose-50 flex items-center justify-center text-rose-500 text-2xl border border-rose-100">
+        <i class="fa-solid fa-triangle-exclamation"></i>
       </div>
-    </div>
-
-    <!-- Iframe (disembunyikan karena X-Frame-Options) -->
-    <iframe id="spLabIframe" style="display:none;" class="w-full h-full border-0 min-h-[480px]"></iframe>
-
-    <!-- Error/launcher box — diisi dan ditampilkan oleh loadSpeakingLabIframe() -->
-    <div id="spIframeErr" style="display:none;" class="absolute inset-0 bg-indigo-50/50 flex flex-col items-center justify-center p-8 text-center z-10">
-      
-      <div class="w-16 h-16 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 text-2xl mb-4 border border-indigo-100/50 shadow-2xs">
-        <i class="fa-solid fa-rocket animate-bounce"></i>
+      <div>
+        <h4 class="text-sm font-bold text-slate-800 mb-1">Gagal Memuat Konten</h4>
+        <p id="spIframeErrMsg" class="text-xs text-slate-500 max-w-xs"></p>
       </div>
-
-      <h4 class="text-sm font-bold text-slate-800">Modul AI Speaking Lab Siap Meluncur</h4>
-
-      <!-- Pesan detail diisi oleh script.js melalui spIframeErrMsg -->
-      <div id="spIframeErrMsg" class="text-xs text-slate-600 max-w-sm mt-2 p-4 bg-white rounded-2xl border border-slate-200 shadow-2xs text-left leading-relaxed"></div>
-
-      <!-- Tombol fallback langsung (selalu tampil sebagai cadangan) -->
       <a href="https://3xtream.github.io/english/speaking-lab.html" target="_blank" rel="noopener noreferrer"
-         id="spOpenTabBtn"
-         class="mt-5 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl transition-all shadow-md shadow-indigo-100 flex items-center gap-2 cursor-pointer">
-        <i class="fa-solid fa-arrow-up-right-from-square text-[11px]"></i> Buka AI Speaking Lab di Tab Baru
+         class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl transition-all flex items-center gap-2 cursor-pointer">
+        <i class="fa-solid fa-arrow-up-right-from-square text-[11px]"></i> Buka di Tab Baru
       </a>
-
     </div>
+
+    <!-- Konten speaking-lab diinject di sini oleh loadSpeakingLabIframe() -->
+    <div id="spInlineContent" style="display:none;"></div>
 
   </div>
 </div>
