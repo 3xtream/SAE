@@ -282,10 +282,10 @@
     </div>
 
     <div class="grid grid-cols-2 gap-3">
-      <button onclick="handleCardAction(false, event)" class="flex items-center justify-center gap-2 py-3 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200/50 font-bold text-xs rounded-xl transition-all shadow-2xs">
-        <i class="fa-solid fa-xmark text-sm"></i> Lupa / Belum Hafal
+      <button onclick="nextCard(event)" class="flex items-center justify-center gap-2 py-3 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200/50 font-bold text-xs rounded-xl transition-all shadow-2xs cursor-pointer">
+        <i class="fa-solid fa-xmark text-sm"></i> Lupa / Lewati
       </button>
-      <button onclick="handleCardAction(true, event)" class="flex items-center justify-center gap-2 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl transition-all shadow-sm shadow-emerald-100">
+      <button onclick="markAsMasteredFromCard(event)" class="flex items-center justify-center gap-2 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl transition-all shadow-sm shadow-emerald-100 cursor-pointer">
         <i class="fa-solid fa-check text-sm"></i> Ingat / Kuasai!
       </button>
     </div>
