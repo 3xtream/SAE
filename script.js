@@ -143,17 +143,33 @@ async function handleLogin() {
   finally { showLoader(false); }
 }
 
-function activateApp() {
-  document.getElementById('authSection').style.display = 'none';
-  document.getElementById('mainApp').style.display = 'block';
-  document.getElementById('appTitle').textContent = `📊 Master Tracker: ${currentUser.fullName}`;
-  refreshDataFromDatabase();
-  
-  const setupCard = document.getElementById('spSetupCard');
-  const iframeWrap = document.getElementById('spIframeWrap');
-  if (setupCard) setupCard.style.display = 'none';
-  if (iframeWrap) iframeWrap.style.display = '';
-}
+function setActiveNav(element) {
+    // 1. Reset semua tombol navigasi ke gaya default
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.classList.remove('bg-indigo-50', 'text-indigo-700', 'active');
+      btn.classList.add('text-slate-500', 'hover:bg-slate-50', 'hover:text-slate-800');
+    });
+    
+    // 2. Aktifkan gaya visual pada tombol navigasi yang diklik
+    element.classList.remove('text-slate-500', 'hover:bg-slate-50', 'hover:text-slate-800');
+    element.classList.add('bg-indigo-50', 'text-indigo-700', 'active');
+  }
+
+  // OVERRIDE FUNGSI SHOW UNTUK MENANGANI DISPLAY TAILWIND
+  function show(sectionId) {
+    // 1. Sembunyikan SEMUA elemen yang memiliki class 'section'
+    document.querySelectorAll('.section').forEach(sec => {
+      sec.style.setProperty('display', 'none', 'important');
+      sec.classList.remove('active');
+    });
+
+    // 2. Tampilkan HANYA elemen section yang dipilih
+    const activeSection = document.getElementById(sectionId);
+    if (activeSection) {
+      activeSection.style.setProperty('display', 'block', 'important');
+      activeSection.classList.add('active');
+    }
+  }
 
 function handleLogout() {
   try { localStorage.removeItem(LS_SESSION_KEY); } catch(e) {}
