@@ -11,9 +11,10 @@ let currentCardIndex = 0;
 let speechRate = 0.7;
 
 // ═══════════════════════════════════════════════════════
-//  GLOBAL FRONT-END NAVIGATION ENGINE
+//  GLOBAL FRONT-END NAVIGATION ENGINE (Dipindahkan dari HTML)
 // ═══════════════════════════════════════════════════════
 function pindahTab(sectionId, element) {
+  // 1. Atur gaya visual tombol sidebar jika dipicu dari klik manual
   if (element) {
     document.querySelectorAll('.nav-btn').forEach(btn => {
       btn.classList.remove('bg-indigo-50', 'text-indigo-700', 'active');
@@ -23,19 +24,24 @@ function pindahTab(sectionId, element) {
     element.classList.add('bg-indigo-50', 'text-indigo-700', 'active');
   }
 
+  // 2. Sembunyikan semua section
   document.querySelectorAll('.section').forEach(sec => {
     sec.style.setProperty('display', 'none', 'important');
     sec.classList.remove('active');
   });
 
+  // 3. Tampilkan section aktif
   const activeSection = document.getElementById(sectionId);
   if (activeSection) {
     activeSection.style.setProperty('display', 'block', 'important');
     activeSection.classList.add('active');
   }
 
+  // 4. Inisialisasi modul internal otomatis
   if (sectionId === 'flashcard-tab') {
     initFlashcards();
+  } else if (sectionId === 'speaking-lab') {
+    loadSpeakingLabIframe();
   } else if (sectionId === 'premium-content-section') {
     loadAndShowPremiumContent();
   }
@@ -51,15 +57,12 @@ function flipCard() {
 // ═══════════════════════════════════════════════════════
 async function callAPI(action, params = {}) {
   if (!GAS_API_URL) throw new Error('URL API belum dikonfigurasi.');
-  
   const body = JSON.stringify({ action, ...params });
-  
-  const res = await fetch(GAS_API_URL, {
-    method: 'POST',
+  const res  = await fetch(GAS_API_URL, {
+    method:  'POST',
     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: body
+    body
   });
-  
   if (!res.ok) throw new Error('HTTP ' + res.status);
   return await res.json();
 }
@@ -69,10 +72,6 @@ function setSystemLoading(visible, text = 'Memproses...') {
   const ldt = document.getElementById('loadingText');
   if (ld) ld.style.display = visible ? 'flex' : 'none';
   if (ldt) ldt.textContent = text;
-}
-
-function showLoading(visible) {
-  setSystemLoading(visible);
 }
 
 // ═══════════════════════════════════════════════════════
@@ -93,34 +92,23 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-async function handleLogin(e) {
-  if (e) e.preventDefault();
-  
+async function handleLogin() {
   const email = document.getElementById('loginEmail').value.trim();
-  const password = document.getElementById('loginToken').value.trim(); 
-
-  if (!email || !password) {
-    alert('Harap isi email dan token.');
-    return;
-  }
-
+  const token = document.getElementById('loginToken').value.trim();
+  if (!email || !token) { alert('Harap isi email dan token.'); return; }
+  
   setSystemLoading(true, 'Memverifikasi Akses Member...');
   try {
-    const res = await callAPI('loginUser', { email, password });
-
-    if (res && res.success) {
-      currentUser = res.user;
-      localStorage.setItem(LS_SESSION_KEY, JSON.stringify({ email: res.user.email, token: res.token }));
-      activateApp(); 
+    const res = await callAPI('login', { email, token });
+    if (res.success) {
+      currentUser = { email, token, fullName: res.fullName };
+      localStorage.setItem(LS_SESSION_KEY, JSON.stringify(currentUser));
+      activateApp();
     } else {
-      alert('Login gagal: ' + (res ? res.message : 'Respon kosong'));
+      alert('Login gagal: ' + res.message);
     }
-  } catch (err) {
-    // Jika login gagal karena masalah openById di kode.gs, kita ijinkan masuk ke dashboard secara lokal
-    console.warn('Login terhambat server, mengaktifkan sesi lokal bypass.', err);
-    currentUser = { email: email, token: password, fullName: "Premium Member" };
-    localStorage.setItem(LS_SESSION_KEY, JSON.stringify(currentUser));
-    activateApp();
+  } catch(e) {
+    alert('Error Hubungan Server: ' + e.message);
   } finally {
     setSystemLoading(false);
   }
@@ -139,42 +127,23 @@ function activateApp() {
   document.getElementById('mainApp').style.display = 'block';
   document.getElementById('appTitle').innerHTML = `<span class="w-2 h-6 bg-indigo-600 rounded-full inline-block"></span> Sistem Tracker · 🧑‍💻 ${currentUser.fullName}`;
   refreshDataFromDatabase();
+  
+  // Set default aktif awal ke halaman dashboard utama secara aman
   pindahTab('dashboard', document.getElementById('btn-dashboard'));
 }
 
 // ═══════════════════════════════════════════════════════
-//  DATABASE SYNC WITH LOCAL FALLBACK (BYPASS ERROR CODE.GS)
+//  DATABASE SYNC & DATA RENDERING
 // ═══════════════════════════════════════════════════════
 async function refreshDataFromDatabase() {
   if (!currentUser) return;
   setSystemLoading(true, 'Sinkronisasi Data Excel Spreadsheet...');
   try {
-    // Mencoba memanggil action bawaan kode.gs lama Anda
     const data = await callAPI('getData', { email: currentUser.email, token: currentUser.token });
-    
-    if (data && data.stats && data.vocabularies) {
-      processDatabaseRender(data);
-    } else {
-      throw new Error('Struktur respons tidak sesuai.');
-    }
+    processDatabaseRender(data);
   } catch(e) {
-    console.log('Bypass error signature openById aktif. Memuat layout data lokal aman.');
-    
-    // PENYESUAIAN FRONTIER: Memetakan dummy data secara presisi berdasarkan sheet Vocab_Bank Anda
-    const localData = {
-      stats: { total: 25, mastered: 12, review: 13, ratio: 48 },
-      targetDate: "Vocab_Bank Active",
-      vocabularies: [
-        { word: "Accomplish", meaning: "Mencapai / Menyelesaikan", isMastered: true },
-        { word: "Acquire", meaning: "Memperoleh / Mendapatkan", isMastered: true },
-        { word: "Fluency", meaning: "Kelancaran berbicara", isMastered: true },
-        { word: "Enhance", meaning: "Meningkatkan / Memperbaiki", isMastered: false },
-        { word: "Determine", meaning: "Menentukan", isMastered: false },
-        { word: "Retention", meaning: "Daya ingat / Retensi", isMastered: false },
-        { word: "Spontaneous", meaning: "Spontan / Tanpa rencana", isMastered: false }
-      ]
-    };
-    processDatabaseRender(localData);
+    console.error(e);
+    alert('Gagal memuat database: ' + e.message);
   } finally {
     setSystemLoading(false);
   }
@@ -271,22 +240,30 @@ async function markAsMasteredFromCard(e) {
   const currentItem = flashcardList[currentCardIndex];
   setSystemLoading(true, 'Menyimpan Status Progres...');
   try {
-    await callAPI('updateStatus', {
+    const res = await callAPI('updateStatus', {
       email: currentUser.email,
       token: currentUser.token,
       word: currentItem.word,
       isMastered: true
     });
+    if (res.success) {
+      const card = document.getElementById('fCard');
+      if (card) card.classList.remove('flipped');
+      setTimeout(() => {
+        flashcardList.splice(currentCardIndex, 1);
+        displayCard();
+        callAPI('getData', { email: currentUser.email, token: currentUser.token }).then(d => {
+          document.getElementById('statTotal').textContent    = d.stats.total;
+          document.getElementById('statMastered').textContent = d.stats.mastered;
+          document.getElementById('statReview').textContent   = d.stats.review;
+          document.getElementById('statRatio').textContent    = d.stats.ratio + '%';
+        });
+      }, 150);
+    }
   } catch(err) {
-    console.warn('Update status database dilewati via local save.');
+    alert('Gagal update: ' + err.message);
   } finally {
-    const card = document.getElementById('fCard');
-    if (card) card.classList.remove('flipped');
-    setTimeout(() => {
-      flashcardList.splice(currentCardIndex, 1);
-      displayCard();
-      setSystemLoading(false);
-    }, 150);
+    setSystemLoading(false);
   }
 }
 
@@ -326,7 +303,7 @@ function speakWordEngine(text) {
 }
 
 // ═══════════════════════════════════════════════════════
-//  TABLE FILTERS & INTERACTION
+//  CORE SYSTEM TAB 3: TABLE FILTERS & INTERACTION
 // ═══════════════════════════════════════════════════════
 function filterVocabList() {
   const query = document.getElementById('vocabSearch').value.toLowerCase();
@@ -349,47 +326,107 @@ function filterVocabList() {
 async function toggleRowStatus(word, currentStatus) {
   setSystemLoading(true, 'Memperbarui Database Sheets...');
   try {
-    await callAPI('updateStatus', {
+    const res = await callAPI('updateStatus', {
       email: currentUser.email,
       token: currentUser.token,
       word,
       isMastered: !currentStatus
     });
+    if (res.success) refreshDataFromDatabase();
   } catch(e) {
-    console.warn('Gagal sinkron status sheet, memperbarui secara visual lokal.');
-  } finally {
+    alert('Gagal memproses data: ' + e.message);
     setSystemLoading(false);
   }
 }
 
 // ═══════════════════════════════════════════════════════
-//  PREMIUM EXTENDED CONTENT MODULES
+//  CORE SYSTEM TAB 4: SPEAKING LAB GATEWAY
+// ═══════════════════════════════════════════════════════
+async function loadSpeakingLabIframe() {
+  const loader = document.getElementById('spIframeLoader');
+  const errBox = document.getElementById('spIframeErr');
+  const iframe = document.getElementById('spLabIframe');
+  const wrap   = document.getElementById('spIframeWrap');
+  const openBtn = document.getElementById('spOpenTabBtn');
+
+  if (loader) loader.style.setProperty('display', 'none', 'important');
+  if (iframe) iframe.style.setProperty('display', 'none', 'important');
+  if (wrap)   wrap.style.setProperty('display', 'flex', 'important');
+  if (errBox) errBox.style.setProperty('display', 'flex', 'important');
+
+  const GITHUB_SPEAKING_LAB_URL = 'https://3xtream.github.io/english/speaking-lab.html';
+  if (openBtn) openBtn.href = GITHUB_SPEAKING_LAB_URL;
+
+  if (errBox) {
+    errBox.className = "w-full bg-indigo-50/40 flex flex-col items-center justify-center p-8 text-center rounded-2xl";
+    
+    const userName = (typeof currentUser !== 'undefined' && currentUser && currentUser.fullName) 
+                     ? currentUser.fullName 
+                     : 'Member Terautentikasi';
+
+    const errMsg = document.getElementById('spIframeErrMsg');
+    if (errMsg) {
+      errMsg.className = "text-xs text-slate-600 max-w-sm mt-2 p-4 bg-white rounded-2xl border border-slate-200 shadow-2xs text-left leading-relaxed";
+      errMsg.innerHTML = `
+        <span class="block font-bold text-indigo-700 mb-1">🚀 Siap Meluncur ke AI Laboratory</span>
+        Untuk mematuhi kebijakan keamanan browser (X-Frame-Options), modul interaktif Speaking Lab dijalankan secara mandiri via jendela tab baru.
+        <div class="mt-3 pt-2 border-t border-slate-100 flex flex-col gap-1 text-[11px] text-slate-400 font-mono">
+          <span>User: ${userName}</span>
+          <span>Status: Sesi Terautentikasi ✓</span>
+        </div>
+      `;
+    }
+
+    let launchBtn = document.getElementById('spLaunchBtn');
+    if (!launchBtn) {
+      launchBtn = document.createElement('a');
+      launchBtn.id = 'spLaunchBtn';
+      launchBtn.target = '_blank';
+      launchBtn.rel = 'noopener noreferrer';
+      launchBtn.className = "mt-5 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl transition-all shadow-md shadow-indigo-100 flex items-center gap-2 cursor-pointer";
+      launchBtn.innerHTML = `<i class="fa-solid fa-rocket text-sm"></i> Mulai Speaking Lab Sekarang`;
+      errBox.appendChild(launchBtn);
+    }
+    launchBtn.href = GITHUB_SPEAKING_LAB_URL;
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+//  CORE SYSTEM TAB 6: PREMIUM EXTENDED CONTENT
 // ═══════════════════════════════════════════════════════
 async function loadAndShowPremiumContent() {
   if (!currentUser) return;
   const pContainer = document.getElementById('premiumContainer');
   if (!pContainer) return;
-  pContainer.innerHTML = '';
-  
-  // Modul Statis Pengganti agar halaman tidak tersendat error API
-  const defaultModules = [
-    { category: "E-BOOK", title: "1000 Inti Kosakata Percakapan Amerika", description: "Panduan akselerasi frasa harian paling produktif.", link: "#" },
-    { category: "STREAMING", title: "Rekaman Mentari Innovative Teaching Championship", description: "Modul strategi pendampingan bimbingan interaktif.", link: "#" }
-  ];
-  
-  defaultModules.forEach(item => {
-    const card = document.createElement('div');
-    card.className = "bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-4";
-    card.innerHTML = `
-      <div class="space-y-1.5">
-        <span class="px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-100 rounded-md font-bold text-[9px] uppercase tracking-wider inline-block">${item.category}</span>
-        <h4 class="text-xs font-bold text-slate-800 leading-snug">${item.title}</h4>
-        <p class="text-[11px] text-slate-400 font-medium leading-relaxed">${item.description}</p>
-      </div>
-      <a href="${item.link}" target="_blank" class="w-full text-center py-2.5 bg-slate-50 hover:bg-indigo-50 border border-slate-200/80 text-slate-700 font-bold text-[11px] rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer">
-        Akses Konten <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
-      </a>
-    `;
-    pContainer.appendChild(card);
-  });
+  pContainer.innerHTML = `
+    <div class="col-span-full bg-white p-6 rounded-2xl border border-slate-200/80 text-center text-slate-400 text-xs py-12 flex flex-col items-center justify-center gap-2">
+      <div class="w-5 h-5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+      Memuat modul premium dari repositori khusus...
+    </div>
+  `;
+  try {
+    const data = await callAPI('getPremiumContent', { email: currentUser.email, token: currentUser.token });
+    pContainer.innerHTML = '';
+    if (!data.contents || data.contents.length === 0) {
+      pContainer.innerHTML = `<div class="col-span-full bg-white p-6 rounded-2xl border border-slate-200/80 text-center text-slate-400 text-xs py-12">Belum ada materi bimbingan premium khusus untuk akun Anda saat ini.</div>`;
+      return;
+    }
+    data.contents.forEach(item => {
+      const card = document.createElement('div');
+      card.className = "bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-4";
+      card.innerHTML = `
+        <div class="space-y-1.5">
+          <span class="px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-100 rounded-md font-bold text-[9px] uppercase tracking-wider inline-block">${item.category || 'Modul'}</span>
+          <h4 class="text-xs font-bold text-slate-800 leading-snug">${item.title}</h4>
+          <p class="text-[11px] text-slate-400 font-medium leading-relaxed">${item.description || 'Tidak ada deskripsi tambahan.'}</p>
+        </div>
+        <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="w-full text-center py-2.5 bg-slate-50 hover:bg-indigo-50 border border-slate-200/80 hover:border-indigo-100 text-slate-700 hover:text-indigo-700 font-bold text-[11px] rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+          Akses Konten <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
+        </a>
+      `;
+      pContainer.appendChild(card);
+    });
+  } catch(e) {
+    pContainer.innerHTML = `<div class="col-span-full bg-rose-50 border border-rose-100 p-6 rounded-2xl text-center text-rose-600 font-bold text-xs py-12">Gagal mengambil materi premium: ${e.message}</div>`;
+  }
 }
