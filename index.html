@@ -10,7 +10,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <style>
     body { font-family: 'Inter', sans-serif; }
-    /* Mempertahankan fungsi sistem tab/navigasi asli script.js */
     .section { display: none; }
     .section.active { display: block; animation: fadeIn 0.25s ease-in-out; }
     .perspective { perspective: 1000px; }
@@ -21,480 +20,285 @@
     @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800 antialiased selection:bg-indigo-500 selection:text-white">
-  <div class="min-h-screen flex flex-col">
+<body class="bg-slate-50 text-slate-800 min-h-screen antialiased selection:bg-indigo-500 selection:text-white">
+
+  <div id="authSection" class="flex items-center justify-center min-h-screen px-4 py-12 bg-linear-to-br from-indigo-900 via-slate-950 to-purple-950 relative overflow-hidden">
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(99,102,241,0.15),transparent_50%)]"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_70%_70%,rgba(168,85,247,0.1),transparent_50%)]"></div>
     
-    <!-- AUTH SECTION (Dibuat minimalis, elegan & center) -->
-    <div id="authSection" class="flex-1 flex flex-col items-center justify-center px-4 py-12" style="display:none">
-      <div class="w-full max-w-md bg-white rounded-2xl border border-slate-200/80 shadow-xs p-8 space-y-6">
-        <div class="text-center space-y-2">
-          <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center text-white font-black text-xl mx-auto shadow-md shadow-indigo-100">E</div>
-          <h2 class="text-xl font-bold tracking-tight text-slate-900">Sistem Akuisisi English</h2>
+    <div class="w-full max-w-md bg-white/95 backdrop-blur-xl p-8 rounded-3xl shadow-2xl border border-white/20 transition-all space-y-6 relative z-10">
+      <div class="text-center space-y-2">
+        <div class="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-tr from-indigo-600 to-violet-600 rounded-2xl text-white text-2xl shadow-lg shadow-indigo-500/30">
+          <i class="fa-solid fa-graduation-cap"></i>
         </div>
-        <div class="flex bg-slate-100 p-1 rounded-xl text-xs font-bold text-slate-600">
-          <span id="tabLogin" class="flex-1 py-2.5 text-center rounded-lg cursor-pointer transition-all bg-white text-slate-900 shadow-2xs" onclick="switchAuth('login')">Masuk</span>
-          <span id="tabRegister" class="flex-1 py-2.5 text-center rounded-lg cursor-pointer transition-all hover:text-slate-900" onclick="switchAuth('register')">Daftar Member</span>
-        </div>
-        <!-- Login Form -->
-        <div id="loginBox" class="space-y-4">
-          <div class="space-y-1"><label class="text-xs font-semibold text-slate-500">Email</label><input type="email" id="loginEmail" class="w-full p-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50/50" required></div>
-          <div class="space-y-1"><label class="text-xs font-semibold text-slate-500">Password</label><input type="password" id="loginPassword" class="w-full p-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50/50" required></div>
-          <button class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl text-sm transition-all cursor-pointer shadow-sm shadow-indigo-100 mt-2" onclick="handleLogin()">Login</button>
-        </div>
-        <!-- Register Form -->
-        <div id="registerBox" class="space-y-4 hidden">
-          <div class="space-y-1"><label class="text-xs font-semibold text-slate-500">Nama Lengkap</label><input type="text" id="regName" class="w-full p-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50/50" required></div>
-          <div class="space-y-1"><label class="text-xs font-semibold text-slate-500">Email</label><input type="email" id="regEmail" class="w-full p-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50/50" required></div>
-          <div class="space-y-1"><label class="text-xs font-semibold text-slate-500">Password</label><input type="password" id="regPassword" class="w-full p-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50/50" required></div>
-          <button class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl text-sm transition-all cursor-pointer shadow-sm shadow-indigo-100 mt-2" onclick="handleRegister()">Daftar Sekarang</button>
-        </div>
+        <h2 class="text-2xl font-black tracking-tight text-slate-900 pt-2">Master System v4.7</h2>
+        <p class="text-xs text-slate-500 font-medium">Sistem Akuisisi Bahasa Inggris 1 Tahun</p>
       </div>
-    </div>
 
-    <!-- MAIN APP INTERFACE -->
-    <div id="mainApp" class="w-full flex-1 flex flex-col" style="display:none">
-      
-      <!-- STICKY APPTOP HEADER -->
-      <header class="bg-white border-b border-slate-200/80 sticky top-0 z-40 backdrop-blur-md bg-white/95">
-        <div class="max-w-6xl w-full mx-auto px-4 md:px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 id="appTitle" class="text-lg font-black text-slate-900 tracking-tight flex items-center gap-2">
-              <span class="w-2 h-6 bg-indigo-600 rounded-full inline-block"></span>
-              Sistem Akuisisi English <span class="text-xs font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-md ml-1">v4.7</span>
-            </h1>
-            <p class="text-xs text-slate-400 font-medium mt-0.5">SLA-Based (Krashen & Paul Nation) · Google Sheets Database</p>
+      <div class="space-y-4 pt-2">
+        <div class="space-y-1">
+          <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider pl-1">Email Terdaftar</label>
+          <div class="relative">
+            <i class="fa-solid fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+            <input type="email" id="loginEmail" placeholder="nama@email.com" class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-hidden focus:border-indigo-500 focus:bg-white transition-all font-medium placeholder:text-slate-400">
           </div>
-          <button class="self-end sm:self-center px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200/60 font-bold text-xs rounded-xl transition-all cursor-pointer" onclick="handleLogout()">
-            <i class="fa-solid fa-door-open mr-1.5"></i>Logout
-          </button>
         </div>
-      </header>
 
-      <!-- MAIN CONTAINER GRID -->
-      <div class="max-w-6xl w-full mx-auto px-4 md:px-6 py-6 flex-1 grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
+        <div class="space-y-1">
+          <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider pl-1">Token Akses Premium</label>
+          <div class="relative">
+            <i class="fa-solid fa-key absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+            <input type="password" id="loginToken" placeholder="••••••••••••" class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-hidden focus:border-indigo-500 focus:bg-white transition-all font-mono placeholder:text-slate-300">
+          </div>
+        </div>
         
-        <!-- SIDEBAR NAVIGATION PANEL (Sticky Desktop) -->
-<nav class="lg:sticky lg:top-24 flex flex-row lg:flex-col overflow-x-auto lg:overflow-visible gap-1.5 bg-white p-2 border border-slate-200/80 rounded-2xl shadow-2xs scrollbar-none shrink-0 z-30">
-  <button class="nav-btn active flex items-center gap-2.5 px-4 py-3 text-left rounded-xl font-bold text-xs whitespace-nowrap transition-all cursor-pointer bg-indigo-50 text-indigo-700 w-full" id="btn-dashboard" onclick="setActiveNav(this); show('dashboard')">
-    <i class="fa-solid fa-chart-line text-sm w-4 text-center"></i>Dashboard
-  </button>
-  <button class="nav-btn flex items-center gap-2.5 px-4 py-3 text-left rounded-xl font-bold text-xs whitespace-nowrap transition-all cursor-pointer text-slate-500 hover:bg-slate-50 hover:text-slate-800 w-full" id="btn-flashcard-tab" onclick="setActiveNav(this); show('flashcard-tab')">
-    <i class="fa-solid fa-layer-group text-sm w-4 text-center"></i>Flashcard Review
-  </button>
-  <button class="nav-btn flex items-center gap-2.5 px-4 py-3 text-left rounded-xl font-bold text-xs whitespace-nowrap transition-all cursor-pointer text-slate-500 hover:bg-slate-50 hover:text-slate-800 w-full" id="btn-vocab-list" onclick="setActiveNav(this); show('vocab-list')">
-    <i class="fa-solid fa-font text-sm w-4 text-center"></i>List Vocabularies
-  </button>
-  <button class="nav-btn sp-navbtn flex items-center gap-2.5 px-4 py-3 text-left rounded-xl font-bold text-xs whitespace-nowrap transition-all cursor-pointer text-slate-500 hover:bg-slate-50 hover:text-slate-800 w-full" id="btn-speaking-lab" onclick="setActiveNav(this); show('speaking-lab')">
-    <i class="fa-solid fa-microphone text-sm w-4 text-center"></i>Speaking Lab
-  </button>
-  <button class="nav-btn flex items-center gap-2.5 px-4 py-3 text-left rounded-xl font-bold text-xs whitespace-nowrap transition-all cursor-pointer text-slate-500 hover:bg-slate-50 hover:text-slate-800 w-full" id="btn-theory-tab" onclick="setActiveNav(this); show('theory-tab')">
-    <i class="fa-solid fa-book text-sm w-4 text-center"></i>Teori & Fase
-  </button>
-  <button class="nav-btn flex items-center gap-2.5 px-4 py-3 text-left rounded-xl font-bold text-xs whitespace-nowrap transition-all cursor-pointer text-slate-500 hover:bg-slate-50 hover:text-slate-800 w-full border-t border-slate-100 lg:mt-2 pt-3" id="btn-premium-content-section" onclick="setActiveNav(this); show('premium-content-section'); loadAndShowPremiumContent()">
-  <i class="fa-solid fa-lock text-sm w-4 text-center text-amber-500"></i>Premium Content
-  </button>
-</nav>
+        <button onclick="handleLogin()" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl transition-all shadow-md shadow-indigo-100 cursor-pointer flex items-center justify-center gap-2">
+          Masuk Ke Dashboard <i class="fa-solid fa-arrow-right text-xs"></i>
+        </button>
+      </div>
 
-        <!-- MAIN CENTRAL CONTENT AREA -->
-        <div class="lg:col-span-3 space-y-6">
-
-          <!-- ================= TAB 1: OVERALL PROGRESS DASHBOARD ================= -->
-          <div id="dashboard" class="section active space-y-6">
-            
-            <!-- STATS COUNTER GRID -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between">
-                <span class="text-slate-400 text-[10px] font-bold uppercase tracking-wider block">Total Progress Checklist</span>
-                <span class="text-2xl font-black text-slate-900 mt-2 block" id="totalProgress">0%</span>
-              </div>
-              <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between">
-                <span class="text-slate-400 text-[10px] font-bold uppercase tracking-wider block">Habit Streak (Days)</span>
-                <span class="text-2xl font-black text-slate-900 mt-2 block text-indigo-600" id="totalDays">0</span>
-              </div>
-              <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between">
-                <span class="text-slate-400 text-[10px] font-bold uppercase tracking-wider block">Vocab Bank (Kata)</span>
-                <span class="text-2xl font-black text-slate-900 mt-2 block text-emerald-600" id="vocabCount">0</span>
-              </div>
-            </div>
-
-            <!-- GAFIK AKTIVITAS -->
-            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs space-y-3">
-              <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Grafik Aktivitas Harian (7 Log Terakhir)</h3>
-              <div class="bg-slate-50/50 rounded-xl p-4 border border-slate-100">
-                <div class="graph-container min-h-[140px] flex items-end justify-between gap-2" id="trackingGraph"></div>
-                <div class="flex justify-between text-[10px] font-mono text-slate-400 mt-3 px-1 border-t border-slate-100 pt-2" id="graphLabels"></div>
-              </div>
-            </div>
-
-            <!-- PHASE PROGRESSION STATUS -->
-            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs space-y-4">
-              <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Phase Progression Status</h3>
-              
-              <div class="space-y-4">
-                <!-- Fase 1 -->
-                <div class="bg-slate-50/60 p-4 rounded-xl border border-slate-100 space-y-2">
-                  <div class="flex justify-between text-xs font-bold">
-                    <span class="text-indigo-600">FASE 1: Foundation (M1-M3) · <span class="font-normal text-slate-500">Target: 100 WPM & 300-400 Vocab</span></span>
-                    <span class="text-slate-500 font-mono" id="phase1Progress">0%</span>
-                  </div>
-                  <div class="w-full bg-slate-200/70 h-2 rounded-full overflow-hidden">
-                    <div id="phase1Bar" class="bg-indigo-600 h-full w-0 transition-all duration-500"></div>
-                  </div>
-                </div>
-
-                <!-- Fase 2 -->
-                <div class="bg-slate-50/60 p-4 rounded-xl border border-slate-100 space-y-2">
-                  <div class="flex justify-between text-xs font-bold">
-                    <span class="text-violet-600">FASE 2: Expansion (M4-M6) · <span class="font-normal text-slate-500">Target: 130 WPM & 800-900 Vocab</span></span>
-                    <span class="text-slate-500 font-mono" id="phase2Progress">0%</span>
-                  </div>
-                  <div class="w-full bg-slate-200/70 h-2 rounded-full overflow-hidden">
-                    <div id="phase2Bar" class="bg-violet-600 h-full w-0 transition-all duration-500"></div>
-                  </div>
-                </div>
-
-                <!-- Fase 3 -->
-                <div class="bg-slate-50/60 p-4 rounded-xl border border-slate-100 space-y-2">
-                  <div class="flex justify-between text-xs font-bold">
-                    <span class="text-cyan-600">FASE 3: Activation (M7-M9) · <span class="font-normal text-slate-500">Target: 160 WPM & 1200-1300 Vocab</span></span>
-                    <span class="text-slate-500 font-mono" id="phase3Progress">0%</span>
-                  </div>
-                  <div class="w-full bg-slate-200/70 h-2 rounded-full overflow-hidden">
-                    <div id="phase3Bar" class="bg-cyan-600 h-full w-0 transition-all duration-500"></div>
-                  </div>
-                </div>
-
-                <!-- Fase 4 -->
-                <div class="bg-slate-50/60 p-4 rounded-xl border border-slate-100 space-y-2">
-                  <div class="flex justify-between text-xs font-bold">
-                    <span class="text-emerald-600">FASE 4: Mastery (M10-M12) · <span class="font-normal text-slate-500">Target: Fluency & 1800-2000 Vocab</span></span>
-                    <span class="text-slate-500 font-mono" id="phase4Progress">0%</span>
-                  </div>
-                  <div class="w-full bg-slate-200/70 h-2 rounded-full overflow-hidden">
-                    <div id="phase4Bar" class="bg-emerald-600 h-full w-0 transition-all duration-500"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- DAILY TRACKING INPUT -->
-            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs space-y-4">
-              <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5"><i class="fa-regular fa-pen-to-square text-indigo-500"></i>Daily Activity Input</h3>
-              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div class="space-y-1"><label class="text-xs font-semibold text-slate-500">Tanggal</label><input type="date" id="logDate" class="w-full p-2.5 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50/50"></div>
-                <div class="space-y-1"><label class="text-xs font-semibold text-slate-500">Durasi Input (Menit)</label><input type="number" id="inputDuration" value="20" class="w-full p-2.5 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50/50"></div>
-                <div class="space-y-1"><label class="text-xs font-semibold text-slate-500">Passage Dibaca</label><input type="number" id="passagesRead" value="1" class="w-full p-2.5 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50/50"></div>
-              </div>
-              <button class="w-full sm:w-auto px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl transition-all cursor-pointer shadow-sm shadow-indigo-100" onclick="logDailyActivity()">Simpan Log Harian</button>
-            </div>
-
-            <!-- READING SPEED MONITOR -->
-            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs space-y-5">
-              <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5"><i class="fa-solid fa-bolt text-amber-500"></i>Reading Speed & WPM Monitor</h3>
-              
-              <div class="bg-indigo-50/50 border border-indigo-100 rounded-xl p-4 space-y-3">
-                <h4 class="text-xs font-bold text-indigo-950 flex items-center gap-1"><i class="fa-solid fa-calculator"></i> Kalkulator WPM Mandiri</h4>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
-                  <div class="space-y-1"><label class="text-[11px] font-semibold text-slate-500">Jumlah Kata Teks</label><input type="number" id="calcWords" value="150" oninput="runWpmCalc()" class="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none"></div>
-                  <div class="space-y-1"><label class="text-[11px] font-semibold text-slate-500">Waktu Tempuh (Detik)</label><input type="number" id="calcSeconds" value="90" oninput="runWpmCalc()" class="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none"></div>
-                  <div class="space-y-1"><label class="text-[11px] font-bold text-indigo-700">Hasil Kalkulasi WPM</label><div id="calcResult" class="text-xl font-black text-indigo-600 py-1">100 WPM</div></div>
-                </div>
-                <button class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[10px] rounded-lg transition-all cursor-pointer shadow-xs" onclick="applyCalcToInput()">Gunakan Hasil Sebagai WPM</button>
-              </div>
-
-              <div class="space-y-1 max-w-xs"><label class="text-xs font-semibold text-slate-500">Kecepatan Membaca Saat Ini (WPM)</label><input type="number" id="currentWpmInput" onchange="handleWpmChange()" value="0" class="w-full p-2.5 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 bg-slate-50/50 focus:outline-none focus:ring-2 focus:ring-indigo-500"></div>
-              
-              <!-- VERIFIKASI TARGET MEMBACA -->
-              <div class="space-y-3 pt-2">
-                <h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Verifikasi Target Membaca Per Fase</h4>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-1.5">
-                    <div class="flex justify-between text-xs font-medium text-slate-600"><span>Fase 1: 100 WPM</span><span id="wpmP1status" class="text-[11px]"></span></div>
-                    <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden"><div id="wpmP1bar" class="h-full bg-indigo-600 w-0"></div></div>
-                  </div>
-                  <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-1.5">
-                    <div class="flex justify-between text-xs font-medium text-slate-600"><span>Fase 2: 130 WPM</span><span id="wpmP2status" class="text-[11px]"></span></div>
-                    <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden"><div id="wpmP2bar" class="h-full bg-violet-600 w-0"></div></div>
-                  </div>
-                  <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-1.5">
-                    <div class="flex justify-between text-xs font-medium text-slate-600"><span>Fase 3: 160 WPM</span><span id="wpmP3status" class="text-[11px]"></span></div>
-                    <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden"><div id="wpmP3bar" class="h-full bg-cyan-600 w-0"></div></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- VOCABULARY MILESTONE STATUS -->
-            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs space-y-4">
-              <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3"><h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5"><i class="fa-solid fa-bullseye text-emerald-500"></i>Vocabulary Milestone Status</h3><div class="flex items-center gap-2 text-xs"><span class="text-slate-400 font-semibold">Terkuasai:</span><input type="number" id="currentVocabInput" value="0" readonly class="w-16 p-1 text-center font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 rounded-md outline-none"></div></div>
-              
-              <div class="overflow-x-auto rounded-xl border border-slate-100 bg-slate-50/50">
-                <table class="w-full border-collapse text-left text-xs text-slate-600">
-                  <thead class="bg-slate-100 text-[10px] font-bold uppercase text-slate-500 border-b border-slate-200/60">
-                    <tr><th class="p-3.5">Milestone Fase</th><th class="p-3.5">Target</th><th class="p-3.5">Status</th></tr>
-                  </thead>
-                  <tbody class="divide-y divide-slate-100">
-                    <tr class="hover:bg-white/80"><td class="p-3.5 font-semibold text-indigo-600">Fase 1 (M3)</td><td class="p-3.5">300 - 400 Kata</td><td class="p-3.5" id="vocabP1status"><span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-medium bg-rose-50 text-rose-700 border border-rose-100">❌ Belum</span></td></tr>
-                    <tr class="hover:bg-white/80"><td class="p-3.5 font-semibold text-violet-600">Fase 2 (M6)</td><td class="p-3.5">800 - 900 Kata</td><td class="p-3.5" id="vocabP2status"><span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-medium bg-rose-50 text-rose-700 border border-rose-100">❌ Belum</span></td></tr>
-                    <tr class="hover:bg-white/80"><td class="p-3.5 font-semibold text-cyan-600">Fase 3 (M9)</td><td class="p-3.5">1200 - 1300 Kata</td><td class="p-3.5" id="vocabP3status"><span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-medium bg-rose-50 text-rose-700 border border-rose-100">❌ Belum</span></td></tr>
-                    <tr class="hover:bg-white/80"><td class="p-3.5 font-semibold text-emerald-600">Fase 4 (M12)</td><td class="p-3.5">1800 - 2000 Kata</td><td class="p-3.5" id="vocabP4status"><span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-medium bg-rose-50 text-rose-700 border border-rose-100">❌ Belum</span></td></tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-
-          <!-- ================= TAB 2: FLASHCARD REVIEW ================= -->
-          <div id="flashcard-tab" class="section space-y-6 max-w-lg mx-auto" style="display: none;">
-  
-  <div class="flex justify-between items-center bg-white px-5 py-3 rounded-2xl border border-slate-200/80 shadow-2xs">
-    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Review Session</span>
-    <span id="fcTracker" class="text-xs font-mono font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg">0/0 Kartu</span>
+      <div class="border-t border-slate-100 pt-4 flex items-center justify-between text-[11px] font-semibold text-slate-400 px-1">
+        <span>Mentari Group Partner</span>
+        <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Server Active</span>
+      </div>
+    </div>
   </div>
 
-  <div class="group perspective h-72 cursor-pointer" onclick="flipCard()">
-    <div id="fCard" class="relative w-full h-full duration-500 transform-style-3d shadow-xs rounded-3xl border border-slate-200/80 transition-all">
+  <div id="loading" class="fixed inset-0 bg-slate-950/40 backdrop-blur-md z-50 flex flex-col items-center justify-center space-y-4" style="display: none;">
+    <div class="bg-white p-6 rounded-2xl shadow-xl flex flex-col items-center space-y-3 border border-slate-100 max-w-xs text-center">
+      <div class="w-9 h-9 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+      <p id="loadingText" class="text-xs font-bold text-slate-700">Sinkronisasi Database...</p>
+    </div>
+  </div>
+
+  <div id="mainApp" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6" style="display: none;">
+    
+    <header class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-4 sm:p-6 rounded-2xl border border-slate-200/80 shadow-2xs">
+      <div class="space-y-0.5">
+        <h1 id="appTitle" class="text-base sm:text-lg font-black tracking-tight text-slate-900 flex items-center gap-2">Sistem Dashboard</h1>
+        <p class="text-xs text-slate-500 font-medium">Kelola, review, dan pantau akselerasi kefasihan bahasa Inggris Anda.</p>
+      </div>
+      <button onclick="handleLogout()" class="w-full sm:w-auto px-4 py-2 bg-slate-100 hover:bg-rose-50 hover:text-rose-600 text-slate-600 font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer">
+        <i class="fa-solid fa-power-off text-sm"></i> Keluar Sistem
+      </button>
+    </header>
+
+    <div class="flex flex-col lg:flex-row gap-6 items-start">
       
-      <div class="absolute inset-0 w-full h-full bg-white rounded-3xl backface-hidden flex flex-col items-center justify-center p-6 space-y-4">
-        <h2 id="fcFrontWord" class="text-3xl font-black tracking-tight text-slate-800 text-center">🎉 Selesai!</h2>
-        <span class="text-xs text-slate-400 font-semibold uppercase tracking-widest flex items-center gap-1"><i class="fa-solid fa-rotate"></i> Klik untuk Membalik</span>
-      </div>
+      <nav class="lg:sticky lg:top-6 flex flex-row lg:flex-col overflow-x-auto lg:overflow-visible gap-1.5 bg-white p-2 border border-slate-200/80 rounded-2xl shadow-2xs scrollbar-none shrink-0 z-30 w-full lg:w-64">
+        <button class="nav-btn active flex items-center gap-2.5 px-4 py-3 text-left rounded-xl font-bold text-xs whitespace-nowrap transition-all cursor-pointer bg-indigo-50 text-indigo-700 w-full" id="btn-dashboard" onclick="pindahTab('dashboard', this)">
+          <i class="fa-solid fa-chart-line text-sm w-4 text-center"></i>Dashboard
+        </button>
+        <button class="nav-btn flex items-center gap-2.5 px-4 py-3 text-left rounded-xl font-bold text-xs whitespace-nowrap transition-all cursor-pointer text-slate-500 hover:bg-slate-50 hover:text-slate-800 w-full" id="btn-flashcard-tab" onclick="pindahTab('flashcard-tab', this)">
+          <i class="fa-solid fa-layer-group text-sm w-4 text-center"></i>Flashcard Review
+        </button>
+        <button class="nav-btn flex items-center gap-2.5 px-4 py-3 text-left rounded-xl font-bold text-xs whitespace-nowrap transition-all cursor-pointer text-slate-500 hover:bg-slate-50 hover:text-slate-800 w-full" id="btn-vocab-list" onclick="pindahTab('vocab-list', this)">
+          <i class="fa-solid fa-font text-sm w-4 text-center"></i>List Vocabularies
+        </button>
+        <button class="nav-btn flex items-center gap-2.5 px-4 py-3 text-left rounded-xl font-bold text-xs whitespace-nowrap transition-all cursor-pointer text-slate-500 hover:bg-slate-50 hover:text-slate-800 w-full" id="btn-speaking-lab" onclick="pindahTab('speaking-lab', this)">
+          <i class="fa-solid fa-microphone text-sm w-4 text-center"></i>Speaking Lab
+        </button>
+        <button class="nav-btn flex items-center gap-2.5 px-4 py-3 text-left rounded-xl font-bold text-xs whitespace-nowrap transition-all cursor-pointer text-slate-500 hover:bg-slate-50 hover:text-slate-800 w-full" id="btn-theory-tab" onclick="pindahTab('theory-tab', this)">
+          <i class="fa-solid fa-book text-sm w-4 text-center"></i>Teori & Fase
+        </button>
+        <button class="nav-btn flex items-center gap-2.5 px-4 py-3 text-left rounded-xl font-bold text-xs whitespace-nowrap transition-all cursor-pointer text-slate-500 hover:bg-slate-50 hover:text-slate-800 w-full border-t border-slate-100 lg:mt-2 pt-3" id="btn-premium-content-section" onclick="pindahTab('premium-content-section', this)">
+          <i class="fa-solid fa-lock text-sm w-4 text-center text-amber-500"></i>Premium Content
+        </button>
+      </nav>
 
-      <div class="absolute inset-0 w-full h-full bg-gradient-to-br from-indigo-600 to-violet-600 text-white rounded-3xl rotate-y-180 backface-hidden flex flex-col items-center justify-center p-6 space-y-3 shadow-md shadow-indigo-100">
-        <span class="text-[10px] bg-white/20 font-bold px-2 py-0.5 rounded-md uppercase tracking-wider">Arti / Makna</span>
-        <p id="fcBackMeaning" class="text-xl font-bold text-center leading-relaxed">Semua kosakata telah dikuasai.</p>
-      </div>
-
-    </div>
-  </div>
-
-  <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-2xs space-y-4">
-    <div class="flex flex-col sm:flex-row items-center justify-between gap-3 border-b border-slate-100 pb-3">
-      <button id="btnSpeak" onclick="speakCurrentWord(event)" class="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs rounded-xl transition-all">
-        <i class="fa-solid fa-volume-high text-sm"></i> Dengarkan Audio
-      </button>
-      <div class="flex items-center gap-1.5 w-full sm:w-auto justify-end">
-        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mr-1">Speed:</span>
-        <button onclick="setSpeed(0.5, this)" class="speed-btn px-2.5 py-1 text-[10px] font-bold bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200">0.5x</button>
-        <button onclick="setSpeed(0.7, this)" class="speed-btn active px-2.5 py-1 text-[10px] font-bold bg-indigo-600 text-white rounded-lg">0.7x</button>
-        <button onclick="setSpeed(1.0, this)" class="speed-btn px-2.5 py-1 text-[10px] font-bold bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200">1.0x</button>
-      </div>
-    </div>
-
-    <div class="grid grid-cols-2 gap-3">
-      <button onclick="nextCard(event)" class="flex items-center justify-center gap-2 py-3 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200/50 font-bold text-xs rounded-xl transition-all shadow-2xs cursor-pointer">
-        <i class="fa-solid fa-xmark text-sm"></i> Lupa / Lewati
-      </button>
-      <button onclick="markAsMasteredFromCard(event)" class="flex items-center justify-center gap-2 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl transition-all shadow-sm shadow-emerald-100 cursor-pointer">
-        <i class="fa-solid fa-check text-sm"></i> Ingat / Kuasai!
-      </button>
-    </div>
-  </div>
-
-  <div id="speechStatus" class="text-center font-mono text-[11px] font-bold text-indigo-500 animate-pulse"></div>
-
-</div>
-
-          <!-- ================= TAB 3: LIST VOCABULARIES ================= -->
-          <div id="vocab-list" class="section space-y-6" style="display: none;">
-            <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 bg-white p-4 rounded-2xl border border-slate-200/80 shadow-2xs">
-              <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Database Real-time Feed</h3>
-              <div class="bg-indigo-50 text-indigo-700 font-bold text-xs px-4 py-1.5 rounded-full border border-indigo-100" id="floatingCounter">0 Kata Terkuasai</div>
+      <main class="flex-1 w-full relative">
+        
+        <div id="dashboard" class="section active space-y-6">
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs space-y-1.5">
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Target Kosakata</span>
+              <p id="statTotal" class="text-2xl font-black text-slate-900">0</p>
             </div>
-
-            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs space-y-6">
-              <!-- Kategori Grid Wrapper -->
-              <div class="space-y-4">
-                <div><div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Kategori 1 (CAT1)</div><div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs" id="cat1"></div></div>
-                <div><div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Kategori 2 (CAT2)</div><div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs" id="cat2"></div></div>
-                <div><div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Kategori 3 (CAT3)</div><div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs" id="cat3"></div></div>
-                <div><div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Kategori 4 (CAT4)</div><div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs" id="cat4"></div></div>
-                <div><div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Kategori 5 (CAT5)</div><div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs" id="cat5"></div></div>
-                <div><div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Kategori 6 (CAT6)</div><div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs" id="cat6"></div></div>
-                <div><div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Kategori 7 (CAT7)</div><div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs" id="cat7"></div></div>
-              </div>
+            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs space-y-1.5">
+              <span class="text-[10px] font-bold text-emerald-500 uppercase tracking-wider block">Telah Dikuasai</span>
+              <p id="statMastered" class="text-2xl font-black text-emerald-600">0</p>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs space-y-1.5">
+              <span class="text-[10px] font-bold text-indigo-500 uppercase tracking-wider block">Sisa Review</span>
+              <p id="statReview" class="text-2xl font-black text-indigo-600">0</p>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs space-y-1.5">
+              <span class="text-[10px] font-bold text-violet-500 uppercase tracking-wider block">Rasio Kefasihan</span>
+              <p id="statRatio" class="text-2xl font-black text-violet-600">0%</p>
             </div>
           </div>
 
-          <!-- ================= TAB 4: SPEAKING LAB (GITHUB CONFIG) ================= -->
-          <div id="speaking-lab" class="section space-y-6" style="display: none;">
-  
-  <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs">
-    <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
-      <i class="fa-solid fa-microphone text-indigo-600"></i> AI Speaking Laboratory
-    </h3>
-    <p class="text-xs text-slate-500 mt-1">Latih kemampuan pengucapan dan kelancaran berbicara Anda langsung menggunakan modul interaktif eksternal.</p>
-  </div>
-
-  <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden p-8 flex flex-col items-center justify-center text-center min-h-[400px]">
-    
-    <div class="w-16 h-16 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 text-2xl mb-4 border border-indigo-100/50 shadow-2xs">
-      <i class="fa-solid fa-rocket animate-bounce"></i>
-    </div>
-
-    <h4 class="text-sm font-bold text-slate-800">Modul AI Speaking Lab Siap Meluncur</h4>
-    
-    <div class="text-xs text-slate-600 max-w-sm mt-2 p-4 bg-slate-50 rounded-xl border border-slate-200 text-left leading-relaxed space-y-1.5">
-      <p class="font-semibold text-indigo-700 flex items-center gap-1">
-        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Autentikasi Sesi Aman
-      </p>
-      <p class="text-slate-500 text-[11px]">Untuk mematuhi aturan enkripsi keamanan browser (X-Frame-Options), modul interaktif dijalankan terpisah di luar frame dashboard.</p>
-    </div>
-
-    <a href="https://3xtream.github.io/english/speaking-lab.html" target="_blank" rel="noopener noreferrer" class="mt-6 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl transition-all shadow-md shadow-indigo-100 flex items-center gap-2 cursor-pointer">
-      <i class="fa-solid fa-arrow-up-right-from-square text-[11px]"></i> Buka AI Speaking Lab di Tab Baru
-    </a>
-
-    <div style="display: none;">
-      <a id="spOpenTabBtn" href="#"></a>
-      <iframe id="spLabIframe"></iframe>
-      <div id="spIframeLoader"></div>
-      <div id="spIframeErr"></div>
-      <div id="spIframeErrMsg"></div>
-      <div id="spSetupCard"></div>
-    </div>
-
-  </div>
-</div>
-
-          <!-- ================= TAB 5: LANDASAN TEORI & FRAMEWORK ================= -->
-          <div id="theory-tab" class="section space-y-6" style="display: none;">
-            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs space-y-4">
-              <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">📖 Landasan Teori Ilmiah & Framework Metodologi</h3>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Teori 1 -->
-                <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 flex flex-col justify-between space-y-3">
-                  <div class="space-y-1"><h4 class="text-xs font-bold text-slate-900 flex items-center gap-1.5">💡 Input Hypothesis (i+1)</h4><p class="text-[11px] text-slate-500 leading-relaxed">Dipelopori oleh <strong>Stephen Krashen</strong>, manusia mengakuisisi bahasa secara alami melalui pemahaman penuh terhadap teks imersi.</p></div>
-                  <div class="text-[10px] italic bg-white p-2 border border-slate-100 text-indigo-600 rounded-lg">"We acquire language when we understand what we hear or read."</div>
-                </div>
-                <!-- Teori 2 -->
-                <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 flex flex-col justify-between space-y-3">
-                  <div class="space-y-1"><h4 class="text-xs font-bold text-slate-900 flex items-center gap-1.5">🕸️ Four Strands Framework</h4><p class="text-[11px] text-slate-500 leading-relaxed"><strong>Prof. Paul Nation</strong> menegaskan pembagian porsi berimbang: Input, Output, Language-focused, dan Fluency Development.</p></div>
-                  <div class="text-[10px] text-slate-500 bg-white p-2 border border-slate-100 rounded-lg">Keseimbangan aspek mempercepat pembentukan reflek bicara.</div>
-                </div>
-                <!-- Teori 3 -->
-                <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 flex flex-col justify-between space-y-3">
-                  <div class="space-y-1"><h4 class="text-xs font-bold text-slate-900 flex items-center gap-1.5">⏱️ Otomatisasi WPM</h4><p class="text-[11px] text-slate-500 leading-relaxed">Target kelulusan memaksa lompatan kognitif menangkap makna holistik tanpa terjebak jeratan Mental Translation Trap.</p></div>
-                  <div class="text-[10px] text-slate-500 bg-white p-2 border border-slate-100 rounded-lg">Membaca cepat memotong proses menerjemahkan di dalam pikiran.</div>
-                </div>
-                <!-- Teori 4 -->
-                <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 flex flex-col justify-between space-y-3">
-                  <div class="space-y-1"><h4 class="text-xs font-bold text-slate-900 flex items-center gap-1.5">🧠 Spaced Repetition System</h4><p class="text-[11px] text-slate-500 leading-relaxed">Fitur kartu pintar yang otomatis menyaring kosa kata lemah sebelum kurva memori melupakannya secara permanen.</p></div>
-                  <div class="text-[10px] text-slate-500 bg-white p-2 border border-slate-100 rounded-lg">Mengunci ingatan jangka pendek menjadi retensi permanen.</div>
-                </div>
+          <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs space-y-4">
+            <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-bolt text-amber-500"></i> Status Quick Target</h3>
+            <div class="p-4 bg-slate-50 border border-slate-200/60 rounded-xl flex items-center justify-between text-xs">
+              <div class="space-y-0.5">
+                <p class="font-bold text-slate-700">Sinkronisasi Tanggal Target Spreadsheet</p>
+                <p class="text-slate-400 font-medium">Menyesuaikan dengan timeline pilar pembelajaran utama.</p>
               </div>
-            </div>
-
-            <!-- CONDITIONS CHECKLIST PER PHASE -->
-            <div class="space-y-4">
-              <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1"><i class="fa-regular fa-square-check text-emerald-500"></i>Kondisi Kelulusan Per Fase</h3>
-              
-              <!-- Checklist Card Phase 1 -->
-              <div class="bg-white p-5 rounded-2xl border-l-4 border-indigo-600 border-y border-r border-slate-200/80 shadow-2xs space-y-3">
-                <div class="flex justify-between items-center"><h4 class="text-xs font-bold text-indigo-600">FASE 1: Foundation (M1–M3)</h4><span class="text-xs font-mono font-bold text-slate-400" id="phase1Progress-th">0%</span></div>
-                <div class="text-[10px] bg-amber-50 text-amber-800 p-2.5 rounded-lg border border-amber-100 font-medium"><strong>Kondisi Mutlak:</strong> Wajib terpenuhi seluruhnya secara objektif sebelum membuka materi Fase 2.</div>
-                <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden"><div id="phase1Bar-th" class="h-full bg-indigo-600 w-0"></div></div>
-                <ul class="text-xs text-slate-600 space-y-2 pt-1">
-                  <li class="flex items-start gap-2"><input type="checkbox" class="p1-chk mt-0.5 rounded border-slate-300 accent-indigo-600" data-idx="0" onchange="syncPhaseChecklist(1,0,this)"> <span>Akumulasi kosakata mencapai target dasar awal (300 - 400 Kata).</span></li>
-                  <li class="flex items-start gap-2"><input type="checkbox" class="p1-chk mt-0.5 rounded border-slate-300 accent-indigo-600" data-idx="1" onchange="syncPhaseChecklist(1,1,this)"> <span>Kecepatan membaca stabil minimal pada target kelulusan 100 WPM.</span></li>
-                  <li class="flex items-start gap-2"><input type="checkbox" class="p1-chk mt-0.5 rounded border-slate-300 accent-indigo-600" data-idx="2" onchange="syncPhaseChecklist(1,2,this)"> <span>Durasi input harian konsisten 20-30 menit tanpa bolos.</span></li>
-                  <li class="flex items-start gap-2"><input type="checkbox" class="p1-chk mt-0.5 rounded border-slate-300 accent-indigo-600" data-idx="3" onchange="syncPhaseChecklist(1,3,this)"> <span>Penguasaan struktur kalimat dasar subjek-predikat tanpa hambatan arti kata.</span></li>
-                  <li class="flex items-start gap-2"><input type="checkbox" class="p1-chk mt-0.5 rounded border-slate-300 accent-indigo-600" data-idx="4" onchange="syncPhaseChecklist(1,4,this)"> <span>Pembentukan kebiasaan harian (Habit Streak) terbentuk stabil di bulan pertama.</span></li>
-                </ul>
-              </div>
-
-              <!-- Checklist Card Phase 2 -->
-              <div class="bg-white p-5 rounded-2xl border-l-4 border-violet-600 border-y border-r border-slate-200/80 shadow-2xs space-y-3">
-                <div class="flex justify-between items-center"><h4 class="text-xs font-bold text-violet-600">FASE 2: Expansion (M4–M6)</h4><span class="text-xs font-mono font-bold text-slate-400" id="phase2Progress-th">0%</span></div>
-                <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden"><div id="phase2Bar-th" class="h-full bg-violet-600 w-0"></div></div>
-                <ul class="text-xs text-slate-600 space-y-2 pt-1">
-                  <li class="flex items-start gap-2"><input type="checkbox" class="p2-chk mt-0.5 rounded border-slate-300 accent-violet-600" data-idx="0" onchange="syncPhaseChecklist(2,0,this)"> <span>Akumulasi kosakata ekspansi tercapai (800 - 900 Kata).</span></li>
-                  <li class="flex items-start gap-2"><input type="checkbox" class="p2-chk mt-0.5 rounded border-slate-300 accent-violet-600" data-idx="1" onchange="syncPhaseChecklist(2,1,this)"> <span>Kecepatan membaca naik stabil menembus target kelulusan 130 WPM.</span></li>
-                  <li class="flex items-start gap-2"><input type="checkbox" class="p2-chk mt-0.5 rounded border-slate-300 accent-violet-600" data-idx="2" onchange="syncPhaseChecklist(2,2,this)"> <span>Buku bergradasi level A1+ / Graded Readers diselesaikan secara tuntas.</span></li>
-                  <li class="flex items-start gap-2"><input type="checkbox" class="p2-chk mt-0.5 rounded border-slate-300 accent-violet-600" data-idx="3" onchange="syncPhaseChecklist(2,3,this)"> <span>Pengenalan otomatis terhadap transisi tenses dasar (past, present, future).</span></li>
-                  <li class="flex items-start gap-2"><input type="checkbox" class="p2-chk mt-0.5 rounded border-slate-300 accent-violet-600" data-idx="4" onchange="syncPhaseChecklist(2,4,this)"> <span>Sesi peninjauan Flashcard mandiri dilakukan minimal 3 kali seminggu.</span></li>
-                </ul>
-              </div>
-
-              <!-- Checklist Card Phase 3 -->
-              <div class="bg-white p-5 rounded-2xl border-l-4 border-cyan-600 border-y border-r border-slate-200/80 shadow-2xs space-y-3">
-                <div class="flex justify-between items-center"><h4 class="text-xs font-bold text-cyan-600">FASE 3: Activation (M7–M9)</h4><span class="text-xs font-mono font-bold text-slate-400" id="phase3Progress-th">0%</span></div>
-                <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden"><div id="phase3Bar-th" class="h-full bg-cyan-600 w-0"></div></div>
-                <ul class="text-xs text-slate-600 space-y-2 pt-1">
-                  <li class="flex items-start gap-2"><input type="checkbox" class="p3-chk mt-0.5 rounded border-slate-300 accent-cyan-600" data-idx="0" onchange="syncPhaseChecklist(3,0,this)"> <span>Akumulasi kosakata aktivasi tercapai (1200 - 1300 Kata).</span></li>
-                  <li class="flex items-start gap-2"><input type="checkbox" class="p3-chk mt-0.5 rounded border-slate-300 accent-cyan-600" data-idx="1" onchange="syncPhaseChecklist(3,1,this)"> <span>Kecepatan membaca mencapai performa tinggi pada target kelulusan 160 WPM.</span></li>
-                  <li class="flex items-start gap-2"><input type="checkbox" class="p3-chk mt-0.5 rounded border-slate-300 accent-cyan-600" data-idx="2" onchange="syncPhaseChecklist(3,2,this)"> <span>Protokol Reading Aloud berjalan harian untuk aktivasi otot organ wicara.</span></li>
-                  <li class="flex items-start gap-2"><input type="checkbox" class="p3-chk mt-0.5 rounded border-slate-300 accent-cyan-600" data-idx="3" onchange="syncPhaseChecklist(3,3,this)"> <span>Mampu menangkap makna satu paragraf penuh tanpa melakukan translasi mental.</span></li>
-                </ul>
-              </div>
-
-              <!-- Checklist Card Phase 4 -->
-              <div class="bg-white p-5 rounded-2xl border-l-4 border-emerald-600 border-y border-r border-slate-200/80 shadow-2xs space-y-3">
-                <div class="flex justify-between items-center"><h4 class="text-xs font-bold text-emerald-600">FASE 4: Mastery (M10–M12)</h4><span class="text-xs font-mono font-bold text-slate-400" id="phase4Progress-th">0%</span></div>
-                <div class="text-[10px] bg-emerald-50 text-emerald-800 p-2.5 rounded-lg border border-emerald-100 font-medium"><strong>Evaluasi Akhir:</strong> Penilaian kelulusan akhir komprehensif program akselerasi.</div>
-                <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden"><div id="phase4Bar-th" class="h-full bg-emerald-600 w-0"></div></div>
-                <ul class="text-xs text-slate-600 space-y-2 pt-1">
-                  <li class="flex items-start gap-2"><input type="checkbox" class="p4-chk mt-0.5 rounded border-slate-300 accent-emerald-600" data-idx="0" onchange="syncPhaseChecklist(4,0,this)"> <span>Akumulasi kosakata tingkat mahir tercapai (1800 - 2000 Kata).</span></li>
-                  <li class="flex items-start gap-2"><input type="checkbox" class="p4-chk mt-0.5 rounded border-slate-300 accent-emerald-600" data-idx="1" onchange="syncPhaseChecklist(4,1,this)"> <span>Sesi praktek konversasional aktif berjalan lancar.</span></li>
-                  <li class="flex items-start gap-2"><input type="checkbox" class="p4-chk mt-0.5 rounded border-slate-300 accent-emerald-600" data-idx="2" onchange="syncPhaseChecklist(4,2,this)"> <span>Mampu memproduksi tulisan jurnal esai opini pendek secara natural.</span></li>
-                  <li class="flex items-start gap-2"><input type="checkbox" class="p4-chk mt-0.5 rounded border-slate-300 accent-emerald-600" data-idx="3" onchange="syncPhaseChecklist(4,3,this)"> <span>Kelulusan total dari seluruh rangkaian kurikulum akselerasi 1 tahun.</span></li>
-                </ul>
-              </div>
+              <span id="targetDateBadge" class="px-3 py-1.5 bg-indigo-50 border border-indigo-100 text-indigo-700 font-mono font-bold rounded-lg">-</span>
             </div>
           </div>
-
-          <!-- ================= TAB 6: PREMIUM CONTENT ================= -->
-          <div id="premium-content-section" class="section space-y-6" style="display: none;">
-            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs space-y-4">
-              <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1"><i class="fa-solid fa-gem text-amber-500"></i>Premium Member Content Area</h3>
-              <div id="premium-dynamic-placeholder" class="text-xs text-slate-500 min-h-[100px]"></div>
-            </div>
-          </div>
-
         </div>
-      </div>
+
+        <div id="flashcard-tab" class="section space-y-6 max-w-lg mx-auto">
+          <div class="flex justify-between items-center bg-white px-5 py-3 rounded-2xl border border-slate-200/80 shadow-2xs">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Review Session</span>
+            <span id="fcTracker" class="text-xs font-mono font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg">0/0 Kartu</span>
+          </div>
+
+          <div class="group perspective h-72 cursor-pointer" onclick="flipCard()">
+            <div id="fCard" class="relative w-full h-full duration-500 transform-style-3d shadow-xs rounded-3xl border border-slate-200/80 transition-all">
+              <div class="absolute inset-0 w-full h-full bg-white rounded-3xl backface-hidden flex flex-col items-center justify-center p-6 space-y-4">
+                <h2 id="fcFrontWord" class="text-3xl font-black tracking-tight text-slate-800 text-center">🔄 Memuat Kosakata...</h2>
+                <span class="text-xs text-slate-400 font-semibold uppercase tracking-widest flex items-center gap-1"><i class="fa-solid fa-rotate"></i> Klik untuk Membalik</span>
+              </div>
+              <div class="absolute inset-0 w-full h-full bg-gradient-to-br from-indigo-600 to-violet-600 text-white rounded-3xl rotate-y-180 backface-hidden flex flex-col items-center justify-center p-6 space-y-3 shadow-md shadow-indigo-100">
+                <span class="text-[10px] bg-white/20 font-bold px-2 py-0.5 rounded-md uppercase tracking-wider">Arti / Makna</span>
+                <p id="fcBackMeaning" class="text-xl font-bold text-center leading-relaxed">Semua kosakata telah dikuasai.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-2xs space-y-4">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-3 border-b border-slate-100 pb-3">
+              <button id="btnSpeak" onclick="speakCurrentWord(event)" class="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs rounded-xl transition-all">
+                <i class="fa-solid fa-volume-high text-sm"></i> Dengarkan Audio
+              </button>
+              <div class="flex items-center gap-1.5 w-full sm:w-auto justify-end">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mr-1">Speed:</span>
+                <button onclick="setSpeed(0.5, this)" class="speed-btn px-2.5 py-1 text-[10px] font-bold bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200">0.5x</button>
+                <button onclick="setSpeed(0.7, this)" class="speed-btn active px-2.5 py-1 text-[10px] font-bold bg-indigo-600 text-white rounded-lg">0.7x</button>
+                <button onclick="setSpeed(1.0, this)" class="speed-btn px-2.5 py-1 text-[10px] font-bold bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200">1.0x</button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <button onclick="nextCard(event)" class="flex items-center justify-center gap-2 py-3 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200/50 font-bold text-xs rounded-xl transition-all shadow-2xs cursor-pointer">
+                <i class="fa-solid fa-xmark text-sm"></i> Lupa / Lewati
+              </button>
+              <button onclick="markAsMasteredFromCard(event)" class="flex items-center justify-center gap-2 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl transition-all shadow-sm shadow-emerald-100 cursor-pointer">
+                <i class="fa-solid fa-check text-sm"></i> Ingat / Kuasai!
+              </button>
+            </div>
+          </div>
+          <div id="speechStatus" class="text-center font-mono text-[11px] font-bold text-indigo-500 animate-pulse"></div>
+        </div>
+
+        <div id="vocab-list" class="section space-y-4">
+          <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+            <div class="relative flex-1 max-w-md">
+              <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+              <input type="text" id="vocabSearch" oninput="filterVocabList()" placeholder="Cari kosakata atau terjemahan..." class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-hidden focus:border-indigo-500 focus:bg-white transition-all font-medium">
+            </div>
+            <div class="flex items-center gap-2">
+              <select id="filterStatus" onchange="filterVocabList()" class="bg-slate-50 border border-slate-200 text-xs font-bold text-slate-600 px-3 py-2.5 rounded-xl focus:outline-hidden focus:border-indigo-500 cursor-pointer">
+                <option value="ALL">Semua Status</option>
+                <option value="REVIEW">Butuh Review</option>
+                <option value="MASTERED">Sudah Dikuasai</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-slate-200/80 shadow-2xs overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr class="bg-slate-50/70 border-b border-slate-200/60 text-slate-400 font-bold uppercase tracking-wider">
+                    <th class="p-4 w-12 text-center">No</th>
+                    <th class="p-4">Kosakata Inggris</th>
+                    <th class="p-4">Arti & Makna Indonesia</th>
+                    <th class="p-4 w-32 text-center">Status</th>
+                    <th class="p-4 w-24 text-center">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="vocabTableBody" class="divide-y divide-slate-100 font-medium text-slate-700">
+                  <tr>
+                    <td colspan="5" class="p-8 text-center text-slate-400 font-bold">Silakan login untuk memuat data database...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div id="speaking-lab" class="section space-y-6">
+          <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs">
+            <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+              <i class="fa-solid fa-microphone text-indigo-600"></i> AI Speaking Laboratory
+            </h3>
+            <p class="text-xs text-slate-500 mt-1">Latih kemampuan pengucapan dan kelancaran berbicara Anda langsung menggunakan modul interaktif eksternal.</p>
+          </div>
+
+          <div id="spIframeWrap" class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden p-8 flex flex-col items-center justify-center text-center min-h-[350px]">
+            <div class="w-16 h-16 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 text-2xl mb-4 border border-indigo-100/50 shadow-2xs">
+              <i class="fa-solid fa-rocket animate-bounce"></i>
+            </div>
+            <h4 class="text-sm font-bold text-slate-800">Modul AI Speaking Lab Siap Meluncur</h4>
+            
+            <div class="text-xs text-slate-600 max-w-sm mt-2 p-4 bg-slate-50 rounded-xl border border-slate-200 text-left leading-relaxed space-y-1.5">
+              <p class="font-semibold text-indigo-700 flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Autentikasi Sesi Aman
+              </p>
+              <p id="spIframeErrMsg" class="text-slate-500 text-[11px]">Untuk mematuhi aturan enkripsi keamanan browser (X-Frame-Options), modul interaktif dijalankan terpisah di luar frame dashboard.</p>
+            </div>
+
+            <a id="spOpenTabBtn" href="https://3xtream.github.io/english/speaking-lab.html" target="_blank" rel="noopener noreferrer" class="mt-6 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl transition-all shadow-md shadow-indigo-100 flex items-center gap-2 cursor-pointer">
+              <i class="fa-solid fa-arrow-up-right-from-square text-[11px]"></i> Buka AI Speaking Lab di Tab Baru
+            </a>
+
+            <div style="display: none;">
+              <iframe id="spLabIframe"></iframe>
+              <div id="spIframeLoader"></div>
+              <div id="spIframeErr"></div>
+              <div id="spUrlStatus"></div>
+              <div id="spSetupCard"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="theory-tab" class="section space-y-6 max-w-3xl mx-auto">
+          <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs space-y-2">
+            <h3 class="text-base font-black tracking-tight text-slate-900">Pilar Metodologi Penguasaan Bahasa</h3>
+            <p class="text-xs text-slate-500 font-medium leading-relaxed">Sistem dirancang berdasarkan 3 tahapan aklimatisasi bahasa alami untuk memicu retensi jangka panjang tanpa menghafal rumus tata bahasa konvensional.</p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs space-y-2.5">
+              <span class="w-7 h-7 bg-indigo-50 border border-indigo-100 text-indigo-600 text-xs font-mono font-bold flex items-center justify-center rounded-lg">01</span>
+              <h4 class="text-xs font-bold text-slate-800">Fase Akuisisi Input</h4>
+              <p class="text-[11px] text-slate-400 font-medium leading-relaxed">Fokus penyerapan 1000 kosakata inti melalui Flashcard secara visual dan auditori untuk membangun struktur pemahaman dasar di otak secara spontan.</p>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs space-y-2.5">
+              <span class="w-7 h-7 bg-amber-50 border border-amber-100 text-amber-600 text-xs font-mono font-bold flex items-center justify-center rounded-lg">02</span>
+              <h4 class="text-xs font-bold text-slate-800">Fase Sinkronisasi Bicara</h4>
+              <p class="text-[11px] text-slate-400 font-medium leading-relaxed">Melatih koordinasi motorik organ wicara via AI Speaking Laboratory untuk meniru intonasi, ritme, dan pelafalan penutur asli (*shadowing*).</p>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs space-y-2.5">
+              <span class="w-7 h-7 bg-emerald-50 border border-emerald-100 text-emerald-600 text-xs font-mono font-bold flex items-center justify-center rounded-lg">03</span>
+              <h4 class="text-xs font-bold text-slate-800">Fase Otomatisasi Refleks</h4>
+              <p class="text-[11px] text-slate-400 font-medium leading-relaxed">Penyusunan kalimat langsung berdasarkan konteks tanpa melalui proses penerjemahan internal di pikiran. Membentuk insting bahasa alami.</p>
+            </div>
+          </div>
+        </div>
+
+        <div id="premium-content-section" class="section space-y-6">
+          <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs">
+            <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+              <i class="fa-solid fa-gem text-amber-500"></i> Materi Premium Tambahan
+            </h3>
+            <p class="text-xs text-slate-500 mt-1">Eksplorasi modul eksklusif, e-book, dan rekaman kelas bimbingan intensif Anda.</p>
+          </div>
+          <div id="premiumContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs text-center text-slate-400 font-bold text-xs py-12">
+              Memuat daftar konten premium...
+            </div>
+          </div>
+        </div>
+
+      </main>
     </div>
   </div>
 
-  <!-- CORE COMPATIBILITY INTERACTIVE LOGIC SCRIPT -->
   <script src="script.js"></script>
-  <script>
-    // Pindahkan fungsi ke bawah script.js agar berhasil meng-override fungsi aslinya
-
-    function setActiveNav(element) {
-      // 1. Reset semua tombol navigasi ke gaya default
-      document.querySelectorAll('.nav-btn').forEach(btn => {
-        btn.classList.remove('bg-indigo-50', 'text-indigo-700', 'active');
-        btn.classList.add('text-slate-500', 'hover:bg-slate-50', 'hover:text-slate-800');
-      });
-      
-      // 2. Aktifkan gaya visual pada tombol navigasi yang diklik
-      element.classList.remove('text-slate-500', 'hover:bg-slate-50', 'hover:text-slate-800');
-      element.classList.add('bg-indigo-50', 'text-indigo-700', 'active');
-    }
-
-    // OVERRIDE FUNGSI SHOW UNTUK MENANGANI DISPLAY TAILWIND V4
-    function show(sectionId) {
-      // 1. Sembunyikan SEMUA elemen yang memiliki class 'section'
-      document.querySelectorAll('.section').forEach(sec => {
-        sec.style.setProperty('display', 'none', 'important');
-        sec.classList.remove('active');
-      });
-
-      // 2. Tampilkan HANYA elemen section yang dipilih
-      const activeSection = document.getElementById(sectionId);
-      if (activeSection) {
-        activeSection.style.setProperty('display', 'block', 'important');
-        activeSection.classList.add('active');
-      }
-    }
-
-    function flipCard() {
-  const card = document.getElementById('fCard');
-  if (card) {
-    card.classList.toggle('flipped');
-  }
-}
-  </script>
 </body>
 </html>
