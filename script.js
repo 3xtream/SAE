@@ -987,16 +987,17 @@ async function muatLatihanSoal() {
 
   if(!skeleton || !container || !renderArea) return;
 
-  // Reset Tampilan ke State Loading
   skeleton.classList.remove('hidden');
   container.classList.add('hidden');
   if(resultBox) resultBox.classList.add('hidden');
   renderArea.innerHTML = '';
 
   try {
-    // MEMANFAATKAN FUNGSI UTALITAS callAPI ANDA
-    // Mengirim action "getLatihanSoal" ke backend
-    const result = await callAPI('getLatihanSoal');
+    // WAJIB MENGIRIMKAN EMAIL DAN TOKEN AGAR LOLOS VALIDASI PRIVAT
+    const result = await callAPI('getLatihanSoal', {
+      email: currentUser?.email,
+      token: currentUser?.token
+    });
 
     if (!result.success) {
       throw new Error(result.message || 'Gagal mengambil data soal.');
@@ -1010,7 +1011,6 @@ async function muatLatihanSoal() {
       renderDataSoalKeUi(masterDataSoal);
     }
 
-    // Tampilkan Konten Soal
     skeleton.classList.add('hidden');
     container.classList.remove('hidden');
   } catch (error) {
