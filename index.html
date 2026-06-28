@@ -144,10 +144,6 @@
                   id="btn-premium-content-section" onclick="setActiveNav(this); pindahTab('premium-content-section'); loadAndShowPremiumContent()">
             <i class="fa-solid fa-lock text-sm w-4 text-center text-amber-500"></i>Premium Content
           </button>
-          <button class="nav-btn flex items-center gap-2.5 px-4 py-3 text-left rounded-xl font-bold text-xs whitespace-nowrap transition-all cursor-pointer text-slate-500 hover:bg-slate-50 hover:text-slate-800 w-full"
-                id="btn-latihan-soal" onclick="setActiveNav(this); pindahTab('latihan-soal')">
-            <i class="fa-solid fa-pen-to-square text-sm w-4 text-center"></i>Latihan Soal
-          </button>
         </nav>
 
         <!-- ===== MAIN CONTENT ===== -->
@@ -628,11 +624,9 @@
         activeSection.style.setProperty('display', 'block', 'important');
         activeSection.classList.add('active');
       }
-      
       // Trigger fungsi spesifik saat tab tertentu dibuka
       if (sectionId === 'flashcard-tab' && typeof initFlashcards === 'function') initFlashcards();
       if (sectionId === 'speaking-lab'  && typeof loadSpeakingLabIframe === 'function') loadSpeakingLabIframe();
-      if (sectionId === 'latihan-soal'  && typeof muatLatihanSoal === 'function') muatLatihanSoal();
     }
 
     // Pastikan dashboard langsung terbuka saat app aktif
