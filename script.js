@@ -11,10 +11,9 @@ let currentCardIndex = 0;
 let speechRate = 0.7;
 
 // ═══════════════════════════════════════════════════════
-//  GLOBAL FRONT-END NAVIGATION ENGINE (Dipindahkan dari HTML)
+//  GLOBAL FRONT-END NAVIGATION ENGINE
 // ═══════════════════════════════════════════════════════
 function pindahTab(sectionId, element) {
-  // 1. Atur gaya visual tombol sidebar jika dipicu dari klik manual
   if (element) {
     document.querySelectorAll('.nav-btn').forEach(btn => {
       btn.classList.remove('bg-indigo-50', 'text-indigo-700', 'active');
@@ -24,20 +23,17 @@ function pindahTab(sectionId, element) {
     element.classList.add('bg-indigo-50', 'text-indigo-700', 'active');
   }
 
-  // 2. Sembunyikan semua section
   document.querySelectorAll('.section').forEach(sec => {
     sec.style.setProperty('display', 'none', 'important');
     sec.classList.remove('active');
   });
 
-  // 3. Tampilkan section aktif
   const activeSection = document.getElementById(sectionId);
   if (activeSection) {
     activeSection.style.setProperty('display', 'block', 'important');
     activeSection.classList.add('active');
   }
 
-  // 4. Inisialisasi modul internal otomatis
   if (sectionId === 'flashcard-tab') {
     initFlashcards();
   } else if (sectionId === 'speaking-lab') {
@@ -60,7 +56,6 @@ async function callAPI(action, params = {}) {
   
   const body = JSON.stringify({ action, ...params });
   
-  // Kirim data sebagai text/plain, yang secara aturan CORS tidak memerlukan preflight check dari server
   const res = await fetch(GAS_API_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -76,6 +71,11 @@ function setSystemLoading(visible, text = 'Memproses...') {
   const ldt = document.getElementById('loadingText');
   if (ld) ld.style.display = visible ? 'flex' : 'none';
   if (ldt) ldt.textContent = text;
+}
+
+// Fungsi alias pembantu mencegah error undifined panggilan loading lawas
+function showLoading(visible) {
+  setSystemLoading(visible);
 }
 
 // ═══════════════════════════════════════════════════════
@@ -107,16 +107,12 @@ async function handleLogin(e) {
     return;
   }
 
-  // Menggunakan fungsi loading yang benar sesuai bawaan sistem Anda
   setSystemLoading(true, 'Memverifikasi Akses Member...');
   try {
-    // Memanggil 'loginUser' sesuai switch-case yang ada di kode.gs lama Anda
     const res = await callAPI('loginUser', { email, password });
 
     if (res && res.success) {
       currentUser = res.user;
-      
-      // Menyimpan data sesi menggunakan variabel token hasil enkripsi dari kode.gs
       localStorage.setItem(LS_SESSION_KEY, JSON.stringify({ email: res.user.email, token: res.token }));
       activateApp(); 
     } else {
@@ -125,7 +121,6 @@ async function handleLogin(e) {
   } catch (err) {
     alert('Error Hubungan Server: ' + err.message);
   } finally {
-    // Mematikan animasi loading dengan fungsi yang benar
     setSystemLoading(false);
   }
 }
@@ -143,8 +138,6 @@ function activateApp() {
   document.getElementById('mainApp').style.display = 'block';
   document.getElementById('appTitle').innerHTML = `<span class="w-2 h-6 bg-indigo-600 rounded-full inline-block"></span> Sistem Tracker · 🧑‍💻 ${currentUser.fullName}`;
   refreshDataFromDatabase();
-  
-  // Set default aktif awal ke halaman dashboard utama secara aman
   pindahTab('dashboard', document.getElementById('btn-dashboard'));
 }
 
@@ -359,7 +352,7 @@ async function toggleRowStatus(word, currentStatus) {
 //  CORE SYSTEM TAB 4: SPEAKING LAB GATEWAY
 // ═══════════════════════════════════════════════════════
 function loadSpeakingLabIframe() {
-  // Sudah dirender langsung via iframe src di index.html
+  // Pasif - iFrame dirender otomatis langsung di halaman via HTML
 }
 
 // ═══════════════════════════════════════════════════════
