@@ -226,33 +226,16 @@
             <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
               <i class="fa-solid fa-microphone text-indigo-600"></i> AI Speaking Laboratory
             </h3>
-            <p class="text-xs text-slate-500 mt-1">Latih kemampuan pengucapan dan kelancaran berbicara Anda langsung menggunakan modul interaktif eksternal.</p>
+            <p class="text-xs text-slate-500 mt-1">Latih kemampuan pengucapan dan kelancaran berbicara Anda langsung di bawah ini.</p>
           </div>
 
-          <div id="spIframeWrap" class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden p-8 flex flex-col items-center justify-center text-center min-h-[350px]">
-            <div class="w-16 h-16 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 text-2xl mb-4 border border-indigo-100/50 shadow-2xs">
-              <i class="fa-solid fa-rocket animate-bounce"></i>
-            </div>
-            <h4 class="text-sm font-bold text-slate-800">Modul AI Speaking Lab Siap Meluncur</h4>
-            
-            <div class="text-xs text-slate-600 max-w-sm mt-2 p-4 bg-slate-50 rounded-xl border border-slate-200 text-left leading-relaxed space-y-1.5">
-              <p class="font-semibold text-indigo-700 flex items-center gap-1">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Autentikasi Sesi Aman
-              </p>
-              <p id="spIframeErrMsg" class="text-slate-500 text-[11px]">Untuk mematuhi aturan enkripsi keamanan browser (X-Frame-Options), modul interaktif dijalankan terpisah di luar frame dashboard.</p>
-            </div>
-
-            <a id="spOpenTabBtn" href="https://3xtream.github.io/english/speaking-lab.html" target="_blank" rel="noopener noreferrer" class="mt-6 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl transition-all shadow-md shadow-indigo-100 flex items-center gap-2 cursor-pointer">
-              <i class="fa-solid fa-arrow-up-right-from-square text-[11px]"></i> Buka AI Speaking Lab di Tab Baru
-            </a>
-
-            <div style="display: none;">
-              <iframe id="spLabIframe"></iframe>
-              <div id="spIframeLoader"></div>
-              <div id="spIframeErr"></div>
-              <div id="spUrlStatus"></div>
-              <div id="spSetupCard"></div>
-            </div>
+          <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden h-[600px] w-full relative">
+            <iframe 
+              id="spLabIframe" 
+              src="https://3xtream.github.io/english/speaking-lab.html" 
+              class="w-full h-full border-0"
+              allow="microphone">
+            </iframe>
           </div>
         </div>
 
