@@ -553,55 +553,90 @@ async function loadSpeakingLabIframe() {
     if (!res.ok) throw new Error(`HTTP ${res.status} — tidak bisa mengambil konten.`);
     const html = await res.text();
 
-    // Parse HTML
+    if (!inlineCt) throw new Error('Container #spInlineContent tidak ditemukan.');
+
+    // ─── SHADOW DOM: isolasi CSS total agar tidak bocor ke halaman utama ───
+    // Hapus shadow lama jika ada (misal: saat reload tab)
+    if (inlineCt._shadowAttached) {
+      // Shadow DOM tidak bisa di-detach; cukup kosongkan isinya
+      const existingShadow = inlineCt.shadowRoot;
+      if (existingShadow) {
+        existingShadow.innerHTML = '';
+      }
+    }
+
+    const shadow = inlineCt.shadowRoot || inlineCt.attachShadow({ mode: 'open' });
+    inlineCt._shadowAttached = true;
+
+    // Parse HTML speaking-lab
     const parser = new DOMParser();
     const doc    = parser.parseFromString(html, 'text/html');
 
-    if (!inlineCt) throw new Error('Container #spInlineContent tidak ditemukan.');
-
-    // Inject semua <style> dan <link rel="stylesheet"> dari <head>
+    // 1. Inject semua <style> dan <link rel="stylesheet"> dari <head> ke dalam shadow
+    const stylePromises = [];
     doc.querySelectorAll('head style, head link[rel="stylesheet"]').forEach(el => {
-      // Hindari duplikasi stylesheet yang sudah ada di halaman utama
-      if (el.tagName === 'LINK' && document.querySelector(`link[href="${el.href}"]`)) return;
       const clone = el.cloneNode(true);
-      inlineCt.appendChild(clone);
+      shadow.appendChild(clone);
+      if (clone.tagName === 'LINK') {
+        stylePromises.push(new Promise(r => { clone.onload = r; clone.onerror = r; }));
+      }
     });
 
-    // Scope wrapper untuk isolasi CSS dari speaking-lab
-    const scopeDiv = document.createElement('div');
-    scopeDiv.id = 'sp-lab-scope';
-    scopeDiv.style.cssText = 'position:relative; width:100%; overflow:hidden;';
+    // 2. Inject isi <body> ke dalam shadow DOM
+    const bodyWrapper = document.createElement('div');
+    bodyWrapper.style.cssText = 'display:block; width:100%;';
+    bodyWrapper.innerHTML = doc.body ? doc.body.innerHTML : html;
 
-    // Ambil isi <body> dari halaman speaking-lab
-    const bodyContent = doc.body ? doc.body.innerHTML : html;
-    scopeDiv.innerHTML = bodyContent;
+    // Hapus elemen overlay/loading bawaan speaking-lab agar tidak bertumpuk
+    bodyWrapper.querySelectorAll('#loading, .loading-overlay').forEach(el => el.remove());
 
-    // Hapus elemen yang mungkin bentrok (navbar duplikat, footer, dll.)
-    scopeDiv.querySelectorAll('header, nav, footer, #loading').forEach(el => el.remove());
+    shadow.appendChild(bodyWrapper);
 
-    inlineCt.appendChild(scopeDiv);
+    // 3. Tunggu stylesheet selesai dimuat
+    if (stylePromises.length) await Promise.allSettled(stylePromises);
 
-    // Eksekusi semua <script> dari body speaking-lab secara berurutan
+    // 4. Eksekusi semua <script> dari body speaking-lab secara berurutan
+    //    Script berjalan di scope window, tapi querySelector diarahkan ke shadow DOM
     const scripts = doc.body ? Array.from(doc.body.querySelectorAll('script')) : [];
     for (const origScript of scripts) {
       const s = document.createElement('script');
       if (origScript.src) {
-        // Script eksternal: load via src dan tunggu
+        // Script eksternal (CDN dll): load & tunggu selesai
         s.src   = origScript.src;
         s.async = false;
-        await new Promise((resolve, reject) => {
+        await new Promise(resolve => {
           s.onload  = resolve;
-          s.onerror = reject;
+          s.onerror = () => { console.warn('[SpeakingLab] Script gagal load:', origScript.src); resolve(); };
           document.head.appendChild(s);
         });
-      } else {
-        // Script inline: eksekusi langsung
-        s.textContent = origScript.textContent;
+      } else if (origScript.textContent.trim()) {
+        // Script inline: wrap agar document.querySelector mengarah ke shadow DOM
+        // sehingga manipulasi DOM speaking-lab terjadi di dalam shadow, bukan di halaman utama
+        s.textContent = `(function(){
+  var __shadowRoot = document.getElementById('spInlineContent') && document.getElementById('spInlineContent').shadowRoot;
+  if (__shadowRoot) {
+    var __origGetById = document.getElementById.bind(document);
+    var __origQS  = document.querySelector.bind(document);
+    var __origQSA = document.querySelectorAll.bind(document);
+    document.getElementById      = function(id)  { return __shadowRoot.getElementById ? __shadowRoot.getElementById(id) : (__shadowRoot.querySelector('#'+id) || __origGetById(id)); };
+    document.querySelector       = function(sel) { return __shadowRoot.querySelector(sel) || __origQS(sel); };
+    document.querySelectorAll    = function(sel) { var r = Array.from(__shadowRoot.querySelectorAll(sel)); return r.length ? r : __origQSA(sel); };
+  }
+  try {
+    ${origScript.textContent}
+  } finally {
+    if (__shadowRoot) {
+      document.getElementById   = __origGetById;
+      document.querySelector    = __origQS;
+      document.querySelectorAll = __origQSA;
+    }
+  }
+})();`;
         document.head.appendChild(s);
       }
     }
 
-    // Tandai sudah dimuat agar tidak fetch ulang saat tab diklik lagi
+    // Tandai sudah dimuat
     inlineCt.dataset.loaded = '1';
 
     if (loader)   loader.style.setProperty('display', 'none', 'important');
@@ -611,7 +646,7 @@ async function loadSpeakingLabIframe() {
     console.error('Speaking Lab fetch error:', err);
     if (loader) loader.style.setProperty('display', 'none', 'important');
     if (errBox) errBox.style.setProperty('display', 'flex', 'important');
-    if (errMsg) errMsg.textContent = `Gagal memuat konten: ${err.message}. Coba buka di tab baru.`;
+    if (errMsg) errMsg.textContent = `Gagal memuat konten: ${err.message}. Gunakan tombol Tab Baru.`;
   }
 }
 
