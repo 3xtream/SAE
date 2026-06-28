@@ -99,7 +99,7 @@ async function handleLogin() {
   
   setSystemLoading(true, 'Memverifikasi Akses Member...');
   try {
-    const res = await callAPI('login', { email, token });
+    const res = await callAPI('loginUser', { email, password });
     if (res.success) {
       currentUser = { email, token, fullName: res.fullName };
       localStorage.setItem(LS_SESSION_KEY, JSON.stringify(currentUser));
