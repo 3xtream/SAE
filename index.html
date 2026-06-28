@@ -35,12 +35,12 @@
         <p class="text-xs text-slate-500 font-medium">Sistem Akuisisi Bahasa Inggris 1 Tahun</p>
       </div>
 
-      <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4 pt-2">
+      <div class="space-y-4 pt-2">
         <div class="space-y-1">
           <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider pl-1">Email Terdaftar</label>
           <div class="relative">
             <i class="fa-solid fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-            <input type="email" id="loginEmail" required placeholder="nama@email.com" class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-hidden focus:border-indigo-500 focus:bg-white transition-all font-medium placeholder:text-slate-400">
+            <input type="email" id="loginEmail" placeholder="nama@email.com" class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-hidden focus:border-indigo-500 focus:bg-white transition-all font-medium placeholder:text-slate-400">
           </div>
         </div>
 
@@ -48,14 +48,14 @@
           <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider pl-1">Token Akses Premium</label>
           <div class="relative">
             <i class="fa-solid fa-key absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-            <input type="password" id="loginToken" required placeholder="••••••••••••" class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-hidden focus:border-indigo-500 focus:bg-white transition-all font-mono placeholder:text-slate-300">
+            <input type="password" id="loginToken" placeholder="••••••••••••" class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-hidden focus:border-indigo-500 focus:bg-white transition-all font-mono placeholder:text-slate-300">
           </div>
         </div>
         
-        <button type="submit" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl transition-all shadow-md shadow-indigo-100 cursor-pointer flex items-center justify-center gap-2">
+        <button onclick="handleLogin()" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl transition-all shadow-md shadow-indigo-100 cursor-pointer flex items-center justify-center gap-2">
           Masuk Ke Dashboard <i class="fa-solid fa-arrow-right text-xs"></i>
         </button>
-      </form>
+      </div>
 
       <div class="border-t border-slate-100 pt-4 flex items-center justify-between text-[11px] font-semibold text-slate-400 px-1">
         <span>Mentari Group Partner</span>
@@ -226,16 +226,33 @@
             <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
               <i class="fa-solid fa-microphone text-indigo-600"></i> AI Speaking Laboratory
             </h3>
-            <p class="text-xs text-slate-500 mt-1">Latih kemampuan pengucapan dan kelancaran berbicara Anda langsung di bawah ini.</p>
+            <p class="text-xs text-slate-500 mt-1">Latih kemampuan pengucapan dan kelancaran berbicara Anda langsung menggunakan modul interaktif eksternal.</p>
           </div>
 
-          <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden h-[650px] w-full relative">
-            <iframe 
-              id="spLabIframe" 
-              src="https://3xtream.github.io/english/speaking-lab.html" 
-              class="w-full h-full border-0"
-              allow="microphone">
-            </iframe>
+          <div id="spIframeWrap" class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden p-8 flex flex-col items-center justify-center text-center min-h-[350px]">
+            <div class="w-16 h-16 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 text-2xl mb-4 border border-indigo-100/50 shadow-2xs">
+              <i class="fa-solid fa-rocket animate-bounce"></i>
+            </div>
+            <h4 class="text-sm font-bold text-slate-800">Modul AI Speaking Lab Siap Meluncur</h4>
+            
+            <div class="text-xs text-slate-600 max-w-sm mt-2 p-4 bg-slate-50 rounded-xl border border-slate-200 text-left leading-relaxed space-y-1.5">
+              <p class="font-semibold text-indigo-700 flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Autentikasi Sesi Aman
+              </p>
+              <p id="spIframeErrMsg" class="text-slate-500 text-[11px]">Untuk mematuhi aturan enkripsi keamanan browser (X-Frame-Options), modul interaktif dijalankan terpisah di luar frame dashboard.</p>
+            </div>
+
+            <a id="spOpenTabBtn" href="https://3xtream.github.io/english/speaking-lab.html" target="_blank" rel="noopener noreferrer" class="mt-6 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl transition-all shadow-md shadow-indigo-100 flex items-center gap-2 cursor-pointer">
+              <i class="fa-solid fa-arrow-up-right-from-square text-[11px]"></i> Buka AI Speaking Lab di Tab Baru
+            </a>
+
+            <div style="display: none;">
+              <iframe id="spLabIframe"></iframe>
+              <div id="spIframeLoader"></div>
+              <div id="spIframeErr"></div>
+              <div id="spUrlStatus"></div>
+              <div id="spSetupCard"></div>
+            </div>
           </div>
         </div>
 
