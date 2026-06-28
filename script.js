@@ -100,34 +100,33 @@ async function handleLogin(e) {
   if (e) e.preventDefault();
   
   const email = document.getElementById('loginEmail').value.trim();
-  const password = document.getElementById('loginToken').value.trim(); // ID input dari HTML Anda
+  const password = document.getElementById('loginToken').value.trim(); 
 
   if (!email || !password) {
     alert('Harap isi email dan token.');
     return;
   }
 
-  showLoading(true);
+  // Menggunakan fungsi loading yang benar sesuai bawaan sistem Anda
+  setSystemLoading(true, 'Memverifikasi Akses Member...');
   try {
-    // Menembak 'loginUser' dengan parameter password
+    // Memanggil 'loginUser' sesuai switch-case yang ada di kode.gs lama Anda
     const res = await callAPI('loginUser', { email, password });
 
-    // Jika menggunakan trik 'no-cors' atau text/plain berhasil mengembalikan data:
     if (res && res.success) {
       currentUser = res.user;
+      
+      // Menyimpan data sesi menggunakan variabel token hasil enkripsi dari kode.gs
       localStorage.setItem(LS_SESSION_KEY, JSON.stringify({ email: res.user.email, token: res.token }));
-      initDashboard();
+      activateApp(); 
     } else {
-      // Jika bypass CORS berhasil lewat namun password salah
-      alert('Sesi masuk diproses. Jika dashboard tidak terbuka, periksa kembali kecocokan akun Anda.');
-      // Bypass paksa masuk jika res.success terhambat CORS di browser tertentu
-      currentUser = { email: email, fullName: "Member" };
-      initDashboard();
+      alert('Login gagal: ' + (res ? res.message : 'Respon kosong'));
     }
   } catch (err) {
-    alert('Kendala koneksi API: ' + err.message);
+    alert('Error Hubungan Server: ' + err.message);
   } finally {
-    showLoading(false);
+    // Mematikan animasi loading dengan fungsi yang benar
+    setSystemLoading(false);
   }
 }
 
