@@ -13,6 +13,11 @@
     /* Mempertahankan fungsi sistem tab/navigasi asli script.js */
     .section { display: none; }
     .section.active { display: block; animation: fadeIn 0.25s ease-in-out; }
+    .perspective { perspective: 1000px; }
+    .transform-style-3d { transform-style: preserve-3d; }
+    .backface-hidden { backface-visibility: hidden; }
+    .rotate-y-180 { transform: rotateY(180deg); }
+    #fCard.flipped { transform: rotateY(180deg); }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
   </style>
 </head>
@@ -241,50 +246,54 @@
 
           <!-- ================= TAB 2: FLASHCARD REVIEW ================= -->
           <div id="flashcard-tab" class="section space-y-6 max-w-lg mx-auto" style="display: none;">
-            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs space-y-4" style="display: none;">
-              <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5"> <i class="fa-solid fa-layer-group text-indigo-500"></i>Spaced Repetition Review</h3>
-              <div class="text-center text-xs text-slate-400 font-medium" id="fcTracker">Memuat kartu peninjauan...</div>
-              
-              <!-- Premium Interaktf Flashcard Wrapper -->
-              <div class="w-full aspect-[4/3] bg-gradient-to-tr from-slate-900 to-indigo-950 text-white rounded-3xl p-6 relative flex flex-col justify-between shadow-md cursor-pointer group overflow-hidden border border-slate-800" id="fCard" onclick="this.classList.toggle('flipped')">
-                <!-- Front Content -->
-                <div class="flex-1 flex flex-col justify-between items-center py-6 text-center">
-                  <div class="text-2xl font-black tracking-wide text-white group-hover:scale-105 transition-transform" id="fcFrontWord">-</div>
-                  <button class="w-10 h-10 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl flex items-center justify-center text-sm transition-all cursor-pointer" id="btnSpeak" onclick="speakCurrentWord(event)" title="Dengarkan pelafalan">🔊</button>
-                  <div class="text-[10px] text-slate-400 font-medium uppercase tracking-wider">Klik kartu untuk melihat arti</div>
-                </div>
-                <!-- Catatan: Untuk efek flip 3D murni dibutuhkan CSS tambahan, namun struktur Tailwind ini sangat rapi untuk fallback transisi -->
-                <div class="absolute inset-0 bg-slate-900 hidden flex-col justify-between p-6 text-center items-center" id="fcBackMeaningBlock">
-                  <div class="text-base font-medium text-slate-200 flex-1 flex items-center justify-center" id="fcBackMeaning">-</div>
-                  <div class="text-[10px] text-slate-500 font-medium uppercase tracking-wider">Klik kartu untuk membalik kata</div>
-                </div>
-              </div>
+  
+  <div class="flex justify-between items-center bg-white px-5 py-3 rounded-2xl border border-slate-200/80 shadow-2xs">
+    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Review Session</span>
+    <span id="fcTracker" class="text-xs font-mono font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg">0/0 Kartu</span>
+  </div>
 
-              <!-- Controls Buttons -->
-              <div class="grid grid-cols-3 gap-2 pt-2">
-                <button class="py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 font-bold text-xs rounded-xl transition-all cursor-pointer" onclick="prevCard(event)">⬅️ Prev</button>
-                <button class="py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl transition-all cursor-pointer shadow-xs shadow-emerald-100 text-center flex items-center justify-center" onclick="markAsMasteredFromCard(event)">✅ Hafal</button>
-                <button class="py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl transition-all cursor-pointer shadow-xs shadow-indigo-100" onclick="nextCard(event)">Next ➡️</button>
-              </div>
+  <div class="group perspective h-72 cursor-pointer" onclick="flipCard()">
+    <div id="fCard" class="relative w-full h-full duration-500 transform-style-3d shadow-xs rounded-3xl border border-slate-200/80 transition-all">
+      
+      <div class="absolute inset-0 w-full h-full bg-white rounded-3xl backface-hidden flex flex-col items-center justify-center p-6 space-y-4">
+        <h2 id="fcFrontWord" class="text-3xl font-black tracking-tight text-slate-800 text-center">🎉 Selesai!</h2>
+        <span class="text-xs text-slate-400 font-semibold uppercase tracking-widest flex items-center gap-1"><i class="fa-solid fa-rotate"></i> Klik untuk Membalik</span>
+      </div>
 
-              <!-- Speech Configuration Grid -->
-              <div class="border-t border-slate-100 pt-4 space-y-3">
-                <div class="flex justify-between items-center text-xs">
-                  <span class="text-slate-500 font-medium">🔁 Auto-play saat ganti kartu</span>
-                  <label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="autoPlayToggle" class="sr-only peer"><div class="w-8 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-indigo-600"></div></label>
-                </div>
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-                  <span class="text-slate-500 font-medium">🐢 Kecepatan bicara</span>
-                  <div class="flex p-0.5 bg-slate-100 border border-slate-200/60 rounded-lg text-[11px] font-bold text-slate-500">
-                    <button class="px-3 py-1 rounded-md cursor-pointer transition-all bg-white text-slate-800 shadow-3xs" onclick="setSpeed(0.7,this)">Lambat</button>
-                    <button class="px-3 py-1 rounded-md cursor-pointer transition-all hover:text-slate-800" onclick="setSpeed(1.0,this)">Normal</button>
-                    <button class="px-3 py-1 rounded-md cursor-pointer transition-all hover:text-slate-800" onclick="setSpeed(1.3,this)">Cepat</button>
-                  </div>
-                </div>
-                <div id="speechStatus" class="text-[10px] text-slate-400 font-medium text-center min-h-[14px]"></div>
-              </div>
-            </div>
-          </div>
+      <div class="absolute inset-0 w-full h-full bg-gradient-to-br from-indigo-600 to-violet-600 text-white rounded-3xl rotate-y-180 backface-hidden flex flex-col items-center justify-center p-6 space-y-3 shadow-md shadow-indigo-100">
+        <span class="text-[10px] bg-white/20 font-bold px-2 py-0.5 rounded-md uppercase tracking-wider">Arti / Makna</span>
+        <p id="fcBackMeaning" class="text-xl font-bold text-center leading-relaxed">Semua kosakata telah dikuasai.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-2xs space-y-4">
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-3 border-b border-slate-100 pb-3">
+      <button id="btnSpeak" onclick="speakCurrentWord(event)" class="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs rounded-xl transition-all">
+        <i class="fa-solid fa-volume-high text-sm"></i> Dengarkan Audio
+      </button>
+      <div class="flex items-center gap-1.5 w-full sm:w-auto justify-end">
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mr-1">Speed:</span>
+        <button onclick="setSpeed(0.5, this)" class="speed-btn px-2.5 py-1 text-[10px] font-bold bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200">0.5x</button>
+        <button onclick="setSpeed(0.7, this)" class="speed-btn active px-2.5 py-1 text-[10px] font-bold bg-indigo-600 text-white rounded-lg">0.7x</button>
+        <button onclick="setSpeed(1.0, this)" class="speed-btn px-2.5 py-1 text-[10px] font-bold bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200">1.0x</button>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-3">
+      <button onclick="handleCardAction(false, event)" class="flex items-center justify-center gap-2 py-3 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200/50 font-bold text-xs rounded-xl transition-all shadow-2xs">
+        <i class="fa-solid fa-xmark text-sm"></i> Lupa / Belum Hafal
+      </button>
+      <button onclick="handleCardAction(true, event)" class="flex items-center justify-center gap-2 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl transition-all shadow-sm shadow-emerald-100">
+        <i class="fa-solid fa-check text-sm"></i> Ingat / Kuasai!
+      </button>
+    </div>
+  </div>
+
+  <div id="speechStatus" class="text-center font-mono text-[11px] font-bold text-indigo-500 animate-pulse"></div>
+
+</div>
 
           <!-- ================= TAB 3: LIST VOCABULARIES ================= -->
           <div id="vocab-list" class="section space-y-6" style="display: none;">
