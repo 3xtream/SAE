@@ -75,22 +75,22 @@
         
         <!-- SIDEBAR NAVIGATION PANEL (Sticky Desktop) -->
 <nav class="lg:sticky lg:top-24 flex flex-row lg:flex-col overflow-x-auto lg:overflow-visible gap-1.5 bg-white p-2 border border-slate-200/80 rounded-2xl shadow-2xs scrollbar-none shrink-0 z-30">
-  <button class="nav-btn active flex items-center gap-2.5 px-4 py-3 text-left rounded-xl font-bold text-xs whitespace-nowrap transition-all cursor-pointer bg-indigo-50 text-indigo-700 w-full" id="btn-dashboard" onclick="setActiveNav(this); show('dashboard')">
+  <button class="nav-btn active flex items-center gap-2.5 px-4 py-3 text-left rounded-xl font-bold text-xs whitespace-nowrap transition-all cursor-pointer bg-indigo-50 text-indigo-700 w-full" id="btn-dashboard" onclick="setActiveNav(this); pindahTab('dashboard')">
     <i class="fa-solid fa-chart-line text-sm w-4 text-center"></i>Dashboard
   </button>
-  <button class="nav-btn flex items-center gap-2.5 px-4 py-3 text-left rounded-xl font-bold text-xs whitespace-nowrap transition-all cursor-pointer text-slate-500 hover:bg-slate-50 hover:text-slate-800 w-full" id="btn-flashcard-tab" onclick="setActiveNav(this); show('flashcard-tab')">
+  <button class="nav-btn flex items-center gap-2.5 px-4 py-3 text-left rounded-xl font-bold text-xs whitespace-nowrap transition-all cursor-pointer text-slate-500 hover:bg-slate-50 hover:text-slate-800 w-full" id="btn-flashcard-tab" onclick="setActiveNav(this); pindahTab('flashcard-tab')">
     <i class="fa-solid fa-layer-group text-sm w-4 text-center"></i>Flashcard Review
   </button>
-  <button class="nav-btn flex items-center gap-2.5 px-4 py-3 text-left rounded-xl font-bold text-xs whitespace-nowrap transition-all cursor-pointer text-slate-500 hover:bg-slate-50 hover:text-slate-800 w-full" id="btn-vocab-list" onclick="setActiveNav(this); show('vocab-list')">
+  <button class="nav-btn flex items-center gap-2.5 px-4 py-3 text-left rounded-xl font-bold text-xs whitespace-nowrap transition-all cursor-pointer text-slate-500 hover:bg-slate-50 hover:text-slate-800 w-full" id="btn-vocab-list" onclick="setActiveNav(this); pindahTab('vocab-list')">
     <i class="fa-solid fa-font text-sm w-4 text-center"></i>List Vocabularies
   </button>
-  <button class="nav-btn sp-navbtn flex items-center gap-2.5 px-4 py-3 text-left rounded-xl font-bold text-xs whitespace-nowrap transition-all cursor-pointer text-slate-500 hover:bg-slate-50 hover:text-slate-800 w-full" id="btn-speaking-lab" onclick="setActiveNav(this); show('speaking-lab')">
+  <button class="nav-btn sp-navbtn flex items-center gap-2.5 px-4 py-3 text-left rounded-xl font-bold text-xs whitespace-nowrap transition-all cursor-pointer text-slate-500 hover:bg-slate-50 hover:text-slate-800 w-full" id="btn-speaking-lab" onclick="setActiveNav(this); pindahTab('speaking-lab')">
     <i class="fa-solid fa-microphone text-sm w-4 text-center"></i>Speaking Lab
   </button>
-  <button class="nav-btn flex items-center gap-2.5 px-4 py-3 text-left rounded-xl font-bold text-xs whitespace-nowrap transition-all cursor-pointer text-slate-500 hover:bg-slate-50 hover:text-slate-800 w-full" id="btn-theory-tab" onclick="setActiveNav(this); show('theory-tab')">
+  <button class="nav-btn flex items-center gap-2.5 px-4 py-3 text-left rounded-xl font-bold text-xs whitespace-nowrap transition-all cursor-pointer text-slate-500 hover:bg-slate-50 hover:text-slate-800 w-full" id="btn-theory-tab" onclick="setActiveNav(this); pindahTab('theory-tab')">
     <i class="fa-solid fa-book text-sm w-4 text-center"></i>Teori & Fase
   </button>
-  <button class="nav-btn flex items-center gap-2.5 px-4 py-3 text-left rounded-xl font-bold text-xs whitespace-nowrap transition-all cursor-pointer text-slate-500 hover:bg-slate-50 hover:text-slate-800 w-full border-t border-slate-100 lg:mt-2 pt-3" id="btn-premium-content-section" onclick="setActiveNav(this); show('premium-content-section'); loadAndShowPremiumContent()">
+  <button class="nav-btn flex items-center gap-2.5 px-4 py-3 text-left rounded-xl font-bold text-xs whitespace-nowrap transition-all cursor-pointer text-slate-500 hover:bg-slate-50 hover:text-slate-800 w-full border-t border-slate-100 lg:mt-2 pt-3" id="btn-premium-content-section" onclick="setActiveNav(this); pindahTab('premium-content-section'); loadAndShowPremiumContent()">
   <i class="fa-solid fa-lock text-sm w-4 text-center text-amber-500"></i>Premium Content
   </button>
 </nav>
