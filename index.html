@@ -10,6 +10,29 @@
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <style>
     body { font-family: 'Inter', sans-serif; }
+    /* Menargetkan semua div anak yang dimasukkan JavaScript secara otomatis */
+    #vocab-list .grid-target > div {
+      display: flex !important;
+      align-items: center !important; /* Posisi teks tepat di tengah vertikal */
+      justify-content: flex-start !important; /* Teks rata kiri */
+      height: 40px !important; /* Tinggi box seragam */
+      padding-left: 1rem !important;
+      padding-right: 1rem !important;
+      background-color: #f8fafc !important; /* Warna abu-abu lembut (slate-50) */
+      border: 1px solid #e2e8f0 !important; /* Border abu-abu terang */
+      border-radius: 0.75rem !important; /* Sudut membulat rapi (rounded-xl) */
+      font-weight: 600 !important; /* Font tebal/semibold */
+      color: #334155 !important; /* Warna teks */
+      text-align: left !important;
+      box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+      transition: all 0.2s !important;
+    }
+
+    /* Efek hover saat mouse mengarah ke kotak kata */
+    #vocab-list .grid-target > div:hover {
+      background-color: #f1f5f9 !important; /* Abu-abu sedikit lebih gelap saat dihover */
+      color: #1e293b !important;
+    }
     /* Mempertahankan fungsi sistem tab/navigasi asli script.js */
     .section { display: none; }
     .section.active { display: block; animation: fadeIn 0.25s ease-in-out; }
@@ -306,37 +329,37 @@
                 
                 <div>
                   <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Kategori 1 (CAT1)</div>
-                  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 text-xs" id="cat1"></div>
+                  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 text-xs grid-target" id="cat1"></div>
                 </div>
                 
                 <div class="border-t border-slate-100 pt-4">
                   <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Kategori 2 (CAT2)</div>
-                  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 text-xs" id="cat2"></div>
+                  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 text-xs grid-target" id="cat2"></div>
                 </div>
           
                 <div class="border-t border-slate-100 pt-4">
                   <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Kategori 3 (CAT3)</div>
-                  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 text-xs" id="cat3"></div>
+                  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 text-xs grid-target" id="cat3"></div>
                 </div>
           
                 <div class="border-t border-slate-100 pt-4">
                   <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Kategori 4 (CAT4)</div>
-                  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 text-xs" id="cat4"></div>
+                  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 text-xs grid-target" id="cat4"></div>
                 </div>
           
                 <div class="border-t border-slate-100 pt-4">
                   <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Kategori 5 (CAT5)</div>
-                  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 text-xs" id="cat5"></div>
+                  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 text-xs grid-target" id="cat5"></div>
                 </div>
           
                 <div class="border-t border-slate-100 pt-4">
                   <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Kategori 6 (CAT6)</div>
-                  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 text-xs" id="cat6"></div>
+                  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 text-xs grid-target" id="cat6"></div>
                 </div>
           
                 <div class="border-t border-slate-100 pt-4">
                   <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Kategori 7 (CAT7)</div>
-                  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 text-xs" id="cat7"></div>
+                  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 text-xs grid-target" id="cat7"></div>
                 </div>
           
               </div>
