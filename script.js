@@ -146,13 +146,14 @@ async function handleLogin() {
 function activateApp() {
   document.getElementById('authSection').style.display = 'none';
   document.getElementById('mainApp').style.display = 'block';
-  document.getElementById('appTitle').textContent = `📊 Master Tracker: ${currentUser.fullName}`;
+  document.getElementById('appTitle').innerHTML = `<span class="w-2 h-6 bg-indigo-600 rounded-full inline-block"></span> Sistem Tracker · 🧑‍💻 ${currentUser.fullName}`;
   refreshDataFromDatabase();
   
+  // Penanganan aman menggunakan pengecekan eksistensi elemen HTML v4
   const setupCard = document.getElementById('spSetupCard');
   const iframeWrap = document.getElementById('spIframeWrap');
-  if (setupCard) setupCard.style.display = 'none';
-  if (iframeWrap) iframeWrap.style.display = '';
+  if (setupCard) setupCard.style.setProperty('display', 'none', 'important');
+  if (iframeWrap) iframeWrap.style.setProperty('display', 'flex', 'important');
 }
 
 function handleLogout() {
@@ -528,20 +529,19 @@ async function loadSpeakingLabIframe() {
   const wrap   = document.getElementById('spIframeWrap');
   const openBtn = document.getElementById('spOpenTabBtn');
 
-  // 1. Amankan display agar container langsung muncul tanpa menunggu response server
+  // 1. Amankan display agar container langsung merender UI peluncur tab mandiri
   if (loader) loader.style.setProperty('display', 'none', 'important');
   if (iframe) iframe.style.setProperty('display', 'none', 'important');
   if (wrap)   wrap.style.setProperty('display', 'flex', 'important');
   if (errBox) errBox.style.setProperty('display', 'flex', 'important');
 
-  // 2. Set URL target langsung ke tombol navigasi atas jika ada
   const GITHUB_SPEAKING_LAB_URL = 'https://3xtream.github.io/english/speaking-lab.html';
   if (openBtn) openBtn.href = GITHUB_SPEAKING_LAB_URL;
 
   if (errBox) {
     errBox.className = "absolute inset-0 bg-indigo-50/50 flex flex-col items-center justify-center p-8 text-center z-10";
     
-    // 3. Ambil data nama user dengan fallback aman jika currentUser belum siap (null)
+    // Fallback protektif jika variabel currentUser belum teresolusi sempurna dari server GAS
     const userName = (typeof currentUser !== 'undefined' && currentUser && currentUser.fullName) 
                      ? currentUser.fullName 
                      : 'Member Terautentikasi';
@@ -551,7 +551,7 @@ async function loadSpeakingLabIframe() {
       errMsg.className = "text-xs text-slate-600 max-w-sm mt-2 p-4 bg-white rounded-2xl border border-slate-200 shadow-2xs text-left leading-relaxed";
       errMsg.innerHTML = `
         <span class="block font-bold text-indigo-700 mb-1">🚀 Siap Meluncur ke AI Laboratory</span>
-        Untuk mematuhi kebijakan enkripsi keamanan browser (X-Frame-Options), modul interaktif Speaking Lab dijalankan secara mandiri via jendela tab baru.
+        Untuk mematuhi kebijakan enkripsi keamanan enkapsulasi browser (X-Frame-Options), modul interaktif Speaking Lab akan dijalankan secara mandiri via jendela tab baru.
         <div class="mt-3 pt-2 border-t border-slate-100 flex flex-col gap-1 text-[11px] text-slate-400 font-mono">
           <span>User: ${userName}</span>
           <span>Status: Sesi Terautentikasi ✓</span>
@@ -559,7 +559,7 @@ async function loadSpeakingLabIframe() {
       `;
     }
 
-    // 4. Buat/pastikan tombol peluncur besar di tengah berfungsi langsung tanpa interupsi
+    // Pastikan tombol utama di bagian tengah halaman peluncur terbuat dan mengarah ke tab baru
     let launchBtn = document.getElementById('spLaunchBtn');
     if (!launchBtn) {
       launchBtn = document.createElement('a');
