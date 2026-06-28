@@ -526,54 +526,92 @@ function setSpUrlStatus(type, html) {
 }
 
 async function loadSpeakingLabIframe() {
-  const loader = document.getElementById('spIframeLoader');
-  const errBox = document.getElementById('spIframeErr');
-  const iframe = document.getElementById('spLabIframe');
-  const wrap   = document.getElementById('spIframeWrap');
-  const openBtn = document.getElementById('spOpenTabBtn');
+  const loader    = document.getElementById('spIframeLoader');
+  const errBox    = document.getElementById('spIframeErr');
+  const errMsg    = document.getElementById('spIframeErrMsg');
+  const inlineCt  = document.getElementById('spInlineContent');
+  const wrap      = document.getElementById('spIframeWrap');
 
-  // 1. Amankan display agar container langsung merender UI peluncur tab mandiri
-  if (loader) loader.style.setProperty('display', 'none', 'important');
-  if (iframe) iframe.style.setProperty('display', 'none', 'important');
-  if (wrap)   wrap.style.setProperty('display', 'flex', 'important');
-  if (errBox) errBox.style.setProperty('display', 'flex', 'important');
+  const SPEAKING_LAB_URL = 'https://3xtream.github.io/english/speaking-lab.html';
 
-  const GITHUB_SPEAKING_LAB_URL = 'https://3xtream.github.io/english/speaking-lab.html';
-  if (openBtn) openBtn.href = GITHUB_SPEAKING_LAB_URL;
+  // Reset state: tampilkan loader, sembunyikan lainnya
+  if (loader)   loader.style.setProperty('display', 'flex', 'important');
+  if (errBox)   errBox.style.setProperty('display', 'none', 'important');
+  if (inlineCt) inlineCt.style.setProperty('display', 'none', 'important');
+  if (wrap)     wrap.style.setProperty('display', 'block', 'important');
 
-  if (errBox) {
-    errBox.className = "absolute inset-0 bg-indigo-50/50 flex flex-col items-center justify-center p-8 text-center z-10";
-    
-    // Fallback protektif jika variabel currentUser belum teresolusi sempurna dari server GAS
-    const userName = (typeof currentUser !== 'undefined' && currentUser && currentUser.fullName) 
-                     ? currentUser.fullName 
-                     : 'Member Terautentikasi';
+  // Jika sudah pernah dimuat sebelumnya, tampilkan langsung tanpa fetch ulang
+  if (inlineCt && inlineCt.dataset.loaded === '1') {
+    if (loader)   loader.style.setProperty('display', 'none', 'important');
+    if (inlineCt) inlineCt.style.setProperty('display', 'block', 'important');
+    return;
+  }
 
-    const errMsg = document.getElementById('spIframeErrMsg');
-    if (errMsg) {
-      errMsg.className = "text-xs text-slate-600 max-w-sm mt-2 p-4 bg-white rounded-2xl border border-slate-200 shadow-2xs text-left leading-relaxed";
-      errMsg.innerHTML = `
-        <span class="block font-bold text-indigo-700 mb-1">🚀 Siap Meluncur ke AI Laboratory</span>
-        Untuk mematuhi kebijakan enkripsi keamanan enkapsulasi browser (X-Frame-Options), modul interaktif Speaking Lab akan dijalankan secara mandiri via jendela tab baru.
-        <div class="mt-3 pt-2 border-t border-slate-100 flex flex-col gap-1 text-[11px] text-slate-400 font-mono">
-          <span>User: ${userName}</span>
-          <span>Status: Sesi Terautentikasi ✓</span>
-        </div>
-      `;
+  try {
+    // Fetch HTML speaking-lab langsung dari GitHub Pages
+    const res = await fetch(SPEAKING_LAB_URL, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`HTTP ${res.status} — tidak bisa mengambil konten.`);
+    const html = await res.text();
+
+    // Parse HTML
+    const parser = new DOMParser();
+    const doc    = parser.parseFromString(html, 'text/html');
+
+    if (!inlineCt) throw new Error('Container #spInlineContent tidak ditemukan.');
+
+    // Inject semua <style> dan <link rel="stylesheet"> dari <head>
+    doc.querySelectorAll('head style, head link[rel="stylesheet"]').forEach(el => {
+      // Hindari duplikasi stylesheet yang sudah ada di halaman utama
+      if (el.tagName === 'LINK' && document.querySelector(`link[href="${el.href}"]`)) return;
+      const clone = el.cloneNode(true);
+      inlineCt.appendChild(clone);
+    });
+
+    // Scope wrapper untuk isolasi CSS dari speaking-lab
+    const scopeDiv = document.createElement('div');
+    scopeDiv.id = 'sp-lab-scope';
+    scopeDiv.style.cssText = 'position:relative; width:100%; overflow:hidden;';
+
+    // Ambil isi <body> dari halaman speaking-lab
+    const bodyContent = doc.body ? doc.body.innerHTML : html;
+    scopeDiv.innerHTML = bodyContent;
+
+    // Hapus elemen yang mungkin bentrok (navbar duplikat, footer, dll.)
+    scopeDiv.querySelectorAll('header, nav, footer, #loading').forEach(el => el.remove());
+
+    inlineCt.appendChild(scopeDiv);
+
+    // Eksekusi semua <script> dari body speaking-lab secara berurutan
+    const scripts = doc.body ? Array.from(doc.body.querySelectorAll('script')) : [];
+    for (const origScript of scripts) {
+      const s = document.createElement('script');
+      if (origScript.src) {
+        // Script eksternal: load via src dan tunggu
+        s.src   = origScript.src;
+        s.async = false;
+        await new Promise((resolve, reject) => {
+          s.onload  = resolve;
+          s.onerror = reject;
+          document.head.appendChild(s);
+        });
+      } else {
+        // Script inline: eksekusi langsung
+        s.textContent = origScript.textContent;
+        document.head.appendChild(s);
+      }
     }
 
-    // Pastikan tombol utama di bagian tengah halaman peluncur terbuat dan mengarah ke tab baru
-    let launchBtn = document.getElementById('spLaunchBtn');
-    if (!launchBtn) {
-      launchBtn = document.createElement('a');
-      launchBtn.id = 'spLaunchBtn';
-      launchBtn.target = '_blank';
-      launchBtn.rel = 'noopener noreferrer';
-      launchBtn.className = "mt-5 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl transition-all shadow-md shadow-indigo-100 flex items-center gap-2 cursor-pointer";
-      launchBtn.innerHTML = `<i class="fa-solid fa-rocket text-sm"></i> Mulai Speaking Lab Sekarang`;
-      errBox.appendChild(launchBtn);
-    }
-    launchBtn.href = GITHUB_SPEAKING_LAB_URL;
+    // Tandai sudah dimuat agar tidak fetch ulang saat tab diklik lagi
+    inlineCt.dataset.loaded = '1';
+
+    if (loader)   loader.style.setProperty('display', 'none', 'important');
+    if (inlineCt) inlineCt.style.setProperty('display', 'block', 'important');
+
+  } catch (err) {
+    console.error('Speaking Lab fetch error:', err);
+    if (loader) loader.style.setProperty('display', 'none', 'important');
+    if (errBox) errBox.style.setProperty('display', 'flex', 'important');
+    if (errMsg) errMsg.textContent = `Gagal memuat konten: ${err.message}. Coba buka di tab baru.`;
   }
 }
 
