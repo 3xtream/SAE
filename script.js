@@ -353,14 +353,12 @@ function show(id) {
   
   if (id === 'flashcard-tab') initFlashcards();
   if (id === 'speaking-lab') {
-    const iframeEl = document.getElementById('spLabIframe');
     const setupCard = document.getElementById('spSetupCard');
     if (setupCard) setupCard.style.display = 'none';
     
-    if (iframeEl && !iframeEl.src) {
-      document.getElementById('spIframeLoader').style.display = 'flex';
-      loadSpeakingLabIframe();
-    }
+    // PAKSA MUAT ULANG IFRAME SETIAP KALI TAB DIKLIK
+    document.getElementById('spIframeLoader').style.display = 'flex';
+    loadSpeakingLabIframe();
   }
 }
 
