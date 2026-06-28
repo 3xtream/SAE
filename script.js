@@ -342,53 +342,8 @@ async function toggleRowStatus(word, currentStatus) {
 // ═══════════════════════════════════════════════════════
 //  CORE SYSTEM TAB 4: SPEAKING LAB GATEWAY
 // ═══════════════════════════════════════════════════════
-async function loadSpeakingLabIframe() {
-  const loader = document.getElementById('spIframeLoader');
-  const errBox = document.getElementById('spIframeErr');
-  const iframe = document.getElementById('spLabIframe');
-  const wrap   = document.getElementById('spIframeWrap');
-  const openBtn = document.getElementById('spOpenTabBtn');
-
-  if (loader) loader.style.setProperty('display', 'none', 'important');
-  if (iframe) iframe.style.setProperty('display', 'none', 'important');
-  if (wrap)   wrap.style.setProperty('display', 'flex', 'important');
-  if (errBox) errBox.style.setProperty('display', 'flex', 'important');
-
-  const GITHUB_SPEAKING_LAB_URL = 'https://3xtream.github.io/english/speaking-lab.html';
-  if (openBtn) openBtn.href = GITHUB_SPEAKING_LAB_URL;
-
-  if (errBox) {
-    errBox.className = "w-full bg-indigo-50/40 flex flex-col items-center justify-center p-8 text-center rounded-2xl";
-    
-    const userName = (typeof currentUser !== 'undefined' && currentUser && currentUser.fullName) 
-                     ? currentUser.fullName 
-                     : 'Member Terautentikasi';
-
-    const errMsg = document.getElementById('spIframeErrMsg');
-    if (errMsg) {
-      errMsg.className = "text-xs text-slate-600 max-w-sm mt-2 p-4 bg-white rounded-2xl border border-slate-200 shadow-2xs text-left leading-relaxed";
-      errMsg.innerHTML = `
-        <span class="block font-bold text-indigo-700 mb-1">🚀 Siap Meluncur ke AI Laboratory</span>
-        Untuk mematuhi kebijakan keamanan browser (X-Frame-Options), modul interaktif Speaking Lab dijalankan secara mandiri via jendela tab baru.
-        <div class="mt-3 pt-2 border-t border-slate-100 flex flex-col gap-1 text-[11px] text-slate-400 font-mono">
-          <span>User: ${userName}</span>
-          <span>Status: Sesi Terautentikasi ✓</span>
-        </div>
-      `;
-    }
-
-    let launchBtn = document.getElementById('spLaunchBtn');
-    if (!launchBtn) {
-      launchBtn = document.createElement('a');
-      launchBtn.id = 'spLaunchBtn';
-      launchBtn.target = '_blank';
-      launchBtn.rel = 'noopener noreferrer';
-      launchBtn.className = "mt-5 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl transition-all shadow-md shadow-indigo-100 flex items-center gap-2 cursor-pointer";
-      launchBtn.innerHTML = `<i class="fa-solid fa-rocket text-sm"></i> Mulai Speaking Lab Sekarang`;
-      errBox.appendChild(launchBtn);
-    }
-    launchBtn.href = GITHUB_SPEAKING_LAB_URL;
-  }
+function loadSpeakingLabIframe() {
+  // Sudah dirender langsung via iframe src di index.html
 }
 
 // ═══════════════════════════════════════════════════════
