@@ -246,76 +246,148 @@
 
           <!-- ================= TAB 2: FLASHCARD REVIEW ================= -->
           <div id="flashcard-tab" class="section space-y-6 max-w-lg mx-auto" style="display: none;">
-  
-  <div class="flex justify-between items-center bg-white px-5 py-3 rounded-2xl border border-slate-200/80 shadow-2xs">
-    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Review Session</span>
-    <span id="fcTracker" class="text-xs font-mono font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg">0/0 Kartu</span>
-  </div>
-
-  <div class="group perspective h-72 cursor-pointer" onclick="flipCard()">
-    <div id="fCard" class="relative w-full h-full duration-500 transform-style-3d shadow-xs rounded-3xl border border-slate-200/80 transition-all">
-      
-      <div class="absolute inset-0 w-full h-full bg-white rounded-3xl backface-hidden flex flex-col items-center justify-center p-6 space-y-4">
-        <h2 id="fcFrontWord" class="text-3xl font-black tracking-tight text-slate-800 text-center">🎉 Selesai!</h2>
-        <span class="text-xs text-slate-400 font-semibold uppercase tracking-widest flex items-center gap-1"><i class="fa-solid fa-rotate"></i> Klik untuk Membalik</span>
-      </div>
-
-      <div class="absolute inset-0 w-full h-full bg-gradient-to-br from-indigo-600 to-violet-600 text-white rounded-3xl rotate-y-180 backface-hidden flex flex-col items-center justify-center p-6 space-y-3 shadow-md shadow-indigo-100">
-        <span class="text-[10px] bg-white/20 font-bold px-2 py-0.5 rounded-md uppercase tracking-wider">Arti / Makna</span>
-        <p id="fcBackMeaning" class="text-xl font-bold text-center leading-relaxed">Semua kosakata telah dikuasai.</p>
-      </div>
-
-    </div>
-  </div>
-
-  <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-2xs space-y-4">
-    <div class="flex flex-col sm:flex-row items-center justify-between gap-3 border-b border-slate-100 pb-3">
-      <button id="btnSpeak" onclick="speakCurrentWord(event)" class="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs rounded-xl transition-all">
-        <i class="fa-solid fa-volume-high text-sm"></i> Dengarkan Audio
-      </button>
-      <div class="flex items-center gap-1.5 w-full sm:w-auto justify-end">
-        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mr-1">Speed:</span>
-        <button onclick="setSpeed(0.5, this)" class="speed-btn px-2.5 py-1 text-[10px] font-bold bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200">0.5x</button>
-        <button onclick="setSpeed(0.7, this)" class="speed-btn active px-2.5 py-1 text-[10px] font-bold bg-indigo-600 text-white rounded-lg">0.7x</button>
-        <button onclick="setSpeed(1.0, this)" class="speed-btn px-2.5 py-1 text-[10px] font-bold bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200">1.0x</button>
-      </div>
-    </div>
-
-    <div class="grid grid-cols-2 gap-3">
-      <button onclick="nextCard(event)" class="flex items-center justify-center gap-2 py-3 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200/50 font-bold text-xs rounded-xl transition-all shadow-2xs cursor-pointer">
-        <i class="fa-solid fa-xmark text-sm"></i> Lupa / Lewati
-      </button>
-      <button onclick="markAsMasteredFromCard(event)" class="flex items-center justify-center gap-2 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl transition-all shadow-sm shadow-emerald-100 cursor-pointer">
-        <i class="fa-solid fa-check text-sm"></i> Ingat / Kuasai!
-      </button>
-    </div>
-  </div>
-
-  <div id="speechStatus" class="text-center font-mono text-[11px] font-bold text-indigo-500 animate-pulse"></div>
-
-</div>
+          <div class="flex justify-between items-center bg-white px-5 py-3 rounded-2xl border border-slate-200/80 shadow-2xs">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Review Session</span>
+            <span id="fcTracker" class="text-xs font-mono font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg">0/0 Kartu</span>
+          </div>
+        
+          <div class="group perspective h-72 cursor-pointer" onclick="flipCard()">
+            <div id="fCard" class="relative w-full h-full duration-500 transform-style-3d shadow-xs rounded-3xl border border-slate-200/80 transition-all">
+              
+              <div class="absolute inset-0 w-full h-full bg-white rounded-3xl backface-hidden flex flex-col items-center justify-center p-6 space-y-4">
+                <h2 id="fcFrontWord" class="text-3xl font-black tracking-tight text-slate-800 text-center">🎉 Selesai!</h2>
+                <span class="text-xs text-slate-400 font-semibold uppercase tracking-widest flex items-center gap-1"><i class="fa-solid fa-rotate"></i> Klik untuk Membalik</span>
+              </div>
+        
+              <div class="absolute inset-0 w-full h-full bg-gradient-to-br from-indigo-600 to-violet-600 text-white rounded-3xl rotate-y-180 backface-hidden flex flex-col items-center justify-center p-6 space-y-3 shadow-md shadow-indigo-100">
+                <span class="text-[10px] bg-white/20 font-bold px-2 py-0.5 rounded-md uppercase tracking-wider">Arti / Makna</span>
+                <p id="fcBackMeaning" class="text-xl font-bold text-center leading-relaxed">Semua kosakata telah dikuasai.</p>
+              </div>
+        
+            </div>
+          </div>
+        
+          <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-2xs space-y-4">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-3 border-b border-slate-100 pb-3">
+              <button id="btnSpeak" onclick="speakCurrentWord(event)" class="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs rounded-xl transition-all">
+                <i class="fa-solid fa-volume-high text-sm"></i> Dengarkan Audio
+              </button>
+              <div class="flex items-center gap-1.5 w-full sm:w-auto justify-end">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mr-1">Speed:</span>
+                <button onclick="setSpeed(0.5, this)" class="speed-btn px-2.5 py-1 text-[10px] font-bold bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200">0.5x</button>
+                <button onclick="setSpeed(0.7, this)" class="speed-btn active px-2.5 py-1 text-[10px] font-bold bg-indigo-600 text-white rounded-lg">0.7x</button>
+                <button onclick="setSpeed(1.0, this)" class="speed-btn px-2.5 py-1 text-[10px] font-bold bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200">1.0x</button>
+              </div>
+            </div>
+        
+            <div class="grid grid-cols-2 gap-3">
+              <button onclick="nextCard(event)" class="flex items-center justify-center gap-2 py-3 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200/50 font-bold text-xs rounded-xl transition-all shadow-2xs cursor-pointer">
+                <i class="fa-solid fa-xmark text-sm"></i> Lupa / Lewati
+              </button>
+              <button onclick="markAsMasteredFromCard(event)" class="flex items-center justify-center gap-2 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl transition-all shadow-sm shadow-emerald-100 cursor-pointer">
+                <i class="fa-solid fa-check text-sm"></i> Ingat / Kuasai!
+              </button>
+            </div>
+          </div>
+        
+          <div id="speechStatus" class="text-center font-mono text-[11px] font-bold text-indigo-500 animate-pulse"></div>
+        
+        </div>
 
           <!-- ================= TAB 3: LIST VOCABULARIES ================= -->
           <div id="vocab-list" class="section space-y-6" style="display: none;">
+            
             <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 bg-white p-4 rounded-2xl border border-slate-200/80 shadow-2xs">
               <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Database Real-time Feed</h3>
               <div class="bg-indigo-50 text-indigo-700 font-bold text-xs px-4 py-1.5 rounded-full border border-indigo-100" id="floatingCounter">0 Kata Terkuasai</div>
             </div>
-
-            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs space-y-6">
-              <!-- Kategori Grid Wrapper -->
-              <div class="space-y-4">
-                <div><div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Kategori 1 (CAT1)</div><div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs" id="cat1"></div></div>
-                <div><div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Kategori 2 (CAT2)</div><div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs" id="cat2"></div></div>
-                <div><div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Kategori 3 (CAT3)</div><div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs" id="cat3"></div></div>
-                <div><div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Kategori 4 (CAT4)</div><div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs" id="cat4"></div></div>
-                <div><div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Kategori 5 (CAT5)</div><div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs" id="cat5"></div></div>
-                <div><div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Kategori 6 (CAT6)</div><div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs" id="cat6"></div></div>
-                <div><div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Kategori 7 (CAT7)</div><div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs" id="cat7"></div></div>
+          
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              
+              <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs flex flex-col justify-between">
+                <div>
+                  <div class="flex items-center justify-between mb-4">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg font-bold shadow-2xs">
+                      <i class="fa-solid fa-baby"></i>
+                    </div>
+                    <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100 uppercase tracking-wider">Level 1</span>
+                  </div>
+                  <h3 class="text-sm font-bold text-slate-800 mb-2">Preschool Vocabularies</h3>
+                  
+                  <div class="space-y-4 my-3 max-h-[250px] overflow-y-auto pr-1">
+                    <div>
+                      <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Kategori 1 (CAT1)</div>
+                      <div class="grid grid-cols-2 gap-1.5 text-xs" id="cat1"></div>
+                    </div>
+                    <div>
+                      <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Kategori 2 (CAT2)</div>
+                      <div class="grid grid-cols-2 gap-1.5 text-xs" id="cat2"></div>
+                    </div>
+                  </div>
+                </div>
+                <button onclick="pindahTab('premium-content-section'); setTimeout(() => { if(window.pindahSubTab) window.pindahSubTab('preschool'); }, 300);" class="w-full mt-4 py-2 text-center bg-slate-50 hover:bg-indigo-50 text-slate-700 hover:text-indigo-600 font-bold text-xs rounded-xl border border-slate-200 hover:border-indigo-200 transition-all cursor-pointer">
+                  Buka Modul &rarr;
+                </button>
               </div>
+          
+              <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs flex flex-col justify-between">
+                <div>
+                  <div class="flex items-center justify-between mb-4">
+                    <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg font-bold shadow-2xs">
+                      <i class="fa-solid fa-graduation-cap"></i>
+                    </div>
+                    <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-100 uppercase tracking-wider">Level 2</span>
+                  </div>
+                  <h3 class="text-sm font-bold text-slate-800 mb-2">Elementary Vocabularies</h3>
+                  
+                  <div class="space-y-4 my-3 max-h-[250px] overflow-y-auto pr-1">
+                    <div>
+                      <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Kategori 3 (CAT3)</div>
+                      <div class="grid grid-cols-2 gap-1.5 text-xs" id="cat3"></div>
+                    </div>
+                    <div>
+                      <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Kategori 4 (CAT4)</div>
+                      <div class="grid grid-cols-2 gap-1.5 text-xs" id="cat4"></div>
+                    </div>
+                    <div>
+                      <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Kategori 5 (CAT5)</div>
+                      <div class="grid grid-cols-2 gap-1.5 text-xs" id="cat5"></div>
+                    </div>
+                  </div>
+                </div>
+                <button onclick="pindahTab('premium-content-section'); setTimeout(() => { if(window.pindahSubTab) window.pindahSubTab('elementary'); }, 300);" class="w-full mt-4 py-2 text-center bg-slate-50 hover:bg-indigo-50 text-slate-700 hover:text-indigo-600 font-bold text-xs rounded-xl border border-slate-200 hover:border-indigo-200 transition-all cursor-pointer">
+                  Buka Modul &rarr;
+                </button>
+              </div>
+          
+              <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs flex flex-col justify-between">
+                <div>
+                  <div class="flex items-center justify-between mb-4">
+                    <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg font-bold shadow-2xs">
+                      <i class="fa-solid fa-pen-nib"></i>
+                    </div>
+                    <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-100 uppercase tracking-wider">Level 3</span>
+                  </div>
+                  <h3 class="text-sm font-bold text-slate-800 mb-2">Writing Framework</h3>
+                  
+                  <div class="space-y-4 my-3 max-h-[250px] overflow-y-auto pr-1">
+                    <div>
+                      <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Kategori 6 (CAT6)</div>
+                      <div class="grid grid-cols-2 gap-1.5 text-xs" id="cat6"></div>
+                    </div>
+                    <div>
+                      <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Kategori 7 (CAT7)</div>
+                      <div class="grid grid-cols-2 gap-1.5 text-xs" id="cat7"></div>
+                    </div>
+                  </div>
+                </div>
+                <button onclick="pindahTab('premium-content-section'); setTimeout(() => { if(window.pindahSubTab) window.pindahSubTab('writing'); }, 300);" class="w-full mt-4 py-2 text-center bg-slate-50 hover:bg-indigo-50 text-slate-700 hover:text-indigo-600 font-bold text-xs rounded-xl border border-slate-200 hover:border-indigo-200 transition-all cursor-pointer">
+                  Buka Modul &rarr;
+                </button>
+              </div>
+          
             </div>
           </div>
-
           <!-- ================= TAB 4: SPEAKING LAB (GITHUB CONFIG) ================= -->
           <div id="speaking-lab" class="section space-y-6" style="display: none;">
 
