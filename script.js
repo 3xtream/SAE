@@ -557,9 +557,9 @@ async function loadSpeakingLabIframe() {
               }, 
               new URL(GITHUB_SPEAKING_LAB_URL).origin
             );
-          } catch(e) {
-            console.error("Gagal postMessage:", e);
-          }
+          } } catch(e) { 
+              showIframeError('Gagal koneksi: ' + e.message); 
+            }
         }, 800);
       };
       
