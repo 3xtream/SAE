@@ -459,8 +459,6 @@
   <!-- CORE COMPATIBILITY INTERACTIVE LOGIC SCRIPT -->
   <script src="script.js"></script>
   <script>
-    // Pindahkan fungsi ke bawah script.js agar berhasil meng-override fungsi aslinya
-
     function setActiveNav(element) {
       // 1. Reset semua tombol navigasi ke gaya default
       document.querySelectorAll('.nav-btn').forEach(btn => {
@@ -473,8 +471,8 @@
       element.classList.add('bg-indigo-50', 'text-indigo-700', 'active');
     }
 
-    // OVERRIDE FUNGSI SHOW UNTUK MENANGANI DISPLAY TAILWIND V4
-    function show(sectionId) {
+    // FUNGSI NAVIGASI BARU—AMAN DARI BENTROKAN SCRIPT.JS
+    function pindahTab(sectionId) {
       // 1. Sembunyikan SEMUA elemen yang memiliki class 'section'
       document.querySelectorAll('.section').forEach(sec => {
         sec.style.setProperty('display', 'none', 'important');
@@ -487,14 +485,27 @@
         activeSection.style.setProperty('display', 'block', 'important');
         activeSection.classList.add('active');
       }
+
+      // 3. Trigger fungsi internal bawaan jika tab spesifik diakses
+      if (sectionId === 'flashcard-tab' && typeof initFlashcards === 'function') {
+        initFlashcards();
+      }
+      if (sectionId === 'speaking-lab' && typeof loadSpeakingLabIframe === 'function') {
+        loadSpeakingLabIframe();
+      }
     }
 
-    function flipCard() {
-  const card = document.getElementById('fCard');
-  if (card) {
-    card.classList.toggle('flipped');
-  }
-}
+    // Mengalihkan fungsi inisialisasi navigasi awal agar sinkron saat login berhasil
+    window.addEventListener('load', () => {
+      // Pastikan dashboard utama langsung terbuka saat pertama kali aplikasi aktif
+      const checkActiveSession = setInterval(() => {
+        const app = document.getElementById('mainApp');
+        if (app && app.style.display === 'block') {
+          pindahTab('dashboard');
+          clearInterval(checkActiveSession);
+        }
+      }, 500);
+    });
   </script>
 </body>
 </html>
