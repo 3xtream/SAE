@@ -526,37 +526,49 @@ async function loadSpeakingLabIframe() {
   
   const GITHUB_SPEAKING_LAB_URL = 'https://3xtream.github.io/english/speaking-lab.html';
 
-  document.getElementById('spIframeLoader').style.display = 'flex';
-  document.getElementById('spIframeErr').style.display    = 'none';
-  document.getElementById('spLabIframe').style.display    = 'none';
-  document.getElementById('spIframeWrap').style.display   = '';
+  // Ambil elemen dengan aman untuk menghindari error 'null'
+  const loader = document.getElementById('spIframeLoader');
+  const errBox = document.getElementById('spIframeErr');
+  const iframe = document.getElementById('spLabIframe');
+  const wrap   = document.getElementById('spIframeWrap');
+  const openBtn = document.getElementById('spOpenTabBtn');
+
+  // Atur display hanya jika elemennya benar-benar ditemukan di HTML
+  if (loader) loader.style.setProperty('display', 'flex', 'important');
+  if (errBox) errBox.style.setProperty('display', 'none', 'important');
+  if (iframe) iframe.style.setProperty('display', 'none', 'important');
+  if (wrap)   wrap.style.setProperty('display', 'flex', 'important');
   
   try {
-    // BYPASS: Langsung tembak ke URL tujuan tanpa meminta verifikasi token sesi ke Google Apps Script
     const ssoUrl = GITHUB_SPEAKING_LAB_URL;
-    document.getElementById('spOpenTabBtn').href = ssoUrl;
+    if (openBtn) openBtn.href = ssoUrl;
     
-    const iframe = document.getElementById('spLabIframe');
-    iframe.onload = function() {
-      document.getElementById('spIframeLoader').style.display = 'none';
-      iframe.style.display = '';
-      setTimeout(function() {
-        try {
-          iframe.contentWindow.postMessage(
-            { 
-              type: 'SPEAKING_LAB_SESSION', 
-              payload: { token: currentUser.token, email: currentUser.email, fullName: currentUser.fullName } 
-            }, 
-            new URL(GITHUB_SPEAKING_LAB_URL).origin
-          );
-        } catch(e) {
-          console.error("Gagal postMessage:", e);
-        }
-      }, 800);
-    };
-    
-    iframe.onerror = function() { showIframeError('Iframe gagal dimuat. Pastikan URL GitHub Pages benar.'); };
-    iframe.src = ssoUrl;
+    if (iframe) {
+      iframe.onload = function() {
+        if (loader) loader.style.setProperty('display', 'none', 'important');
+        iframe.style.setProperty('display', 'block', 'important');
+        
+        setTimeout(function() {
+          try {
+            iframe.contentWindow.postMessage(
+              { 
+                type: 'SPEAKING_LAB_SESSION', 
+                payload: { token: currentUser.token, email: currentUser.email, fullName: currentUser.fullName } 
+              }, 
+              new URL(GITHUB_SPEAKING_LAB_URL).origin
+            );
+          } catch(e) {
+            console.error("Gagal postMessage:", e);
+          }
+        }, 800);
+      };
+      
+      iframe.onerror = function() { 
+        showIframeError('Iframe gagal dimuat. Pastikan URL GitHub Pages benar.'); 
+      };
+      
+      iframe.src = ssoUrl;
+    }
   } catch(e) { 
     showIframeError('Gagal koneksi: ' + e.message); 
   }
