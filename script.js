@@ -839,3 +839,118 @@ function showIframeError(msg) {
   if (errBox) errBox.style.setProperty('display', 'flex', 'important');
   if (errMsg) errMsg.textContent = msg;
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  KODE FITUR BARU: LATIHAN SOAL CORE INTERACTION LOGIC
+// ═══════════════════════════════════════════════════════════════════════════
+async function muatLatihanSoal() {
+  const skeleton = document.getElementById('soal-skeleton');
+  const container = document.getElementById('soal-container');
+  const resultBox = document.getElementById('soal-result');
+  const renderArea = document.getElementById('daftar-soal-render');
+
+  if(!skeleton || !container || !renderArea) return;
+
+  skeleton.classList.remove('hidden');
+  container.classList.add('hidden');
+  if(resultBox) resultBox.classList.add('hidden');
+  renderArea.innerHTML = '';
+
+  try {
+    const result = await callAPI('getLatihanSoal', {
+      email: currentUser?.email,
+      token: currentUser?.token
+    });
+
+    if (!result.success) {
+      throw new Error(result.message || 'Gagal mengambil data soal.');
+    }
+
+    masterDataSoal = result.data;
+    
+    if (masterDataSoal.length === 0) {
+      renderArea.innerHTML = `<p class="text-slate-500 text-xs p-4 text-center">Belum ada soal evaluasi yang tersedia saat ini.</p>`;
+    } else {
+      renderDataSoalKeUi(masterDataSoal);
+    }
+
+    skeleton.classList.add('hidden');
+    container.classList.remove('hidden');
+  } catch (error) {
+    if(skeleton) skeleton.classList.add('hidden');
+    console.error('Error muat soal:', error);
+    showBanner('Gagal memuat soal: ' + error.message, 'error');
+  }
+}
+
+function renderDataSoalKeUi(daftarSoal) {
+  const renderArea = document.getElementById('daftar-soal-render');
+  if(!renderArea) return;
+
+  let htmlContent = '';
+  daftarSoal.forEach((soal, index) => {
+    htmlContent += `
+      <div class="space-y-3 p-4 rounded-xl border border-slate-100 bg-slate-50/50 block-soal" id="card-${soal.idSoal}">
+        <p class="text-sm font-semibold text-slate-800 leading-relaxed">${index + 1}. ${soal.pertanyaan}</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs font-medium">
+          ${Object.entries(soal.opsi).map(([kunci, teks]) => {
+            if(!teks) return ''; 
+            return `
+              <label class="flex items-center gap-3 p-3 bg-white border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-all text-slate-700 label-opsi">
+                <input type="radio" name="kuis-${soal.idSoal}" value="${kunci}" class="w-4 h-4 accent-indigo-600 shrink-0 input-opsi">
+                <span><strong class="text-slate-400 mr-1">${kunci}.</strong> ${teks}</span>
+              </label>
+            `;
+          }).join('')}
+        </div>
+        <div id="pembahasan-${soal.idSoal}" class="hidden p-3 bg-indigo-50 border border-indigo-100 text-slate-700 text-xs rounded-xl mt-2 leading-relaxed">
+          <p class="font-bold text-indigo-900 mb-1"><i class="fa-solid fa-circle-info mr-1"></i> Penjelasan:</p>
+          <p><strong>Kunci Jawaban: ${soal.jawabanBenar}</strong> — ${soal.penjelasan || "Tidak ada pembahasan untuk soal ini."}</p>
+        </div>
+      </div>
+    `;
+  });
+  renderArea.innerHTML = htmlContent;
+}
+
+function hitungSkorKuis() {
+  if (masterDataSoal.length === 0) return;
+
+  let jumlahBenar = 0;
+  let sudahTerisiSemua = true;
+
+  masterDataSoal.forEach(soal => {
+    const pilihanUser = document.querySelector(`input[name="kuis-${soal.idSoal}"]:checked`);
+    const cardSoal = document.getElementById(`card-${soal.idSoal}`);
+    const boxPembahasan = document.getElementById(`pembahasan-${soal.idSoal}`);
+    
+    if (!pilihanUser) sudahTerisiSemua = false;
+    if (boxPembahasan) boxPembahasan.classList.remove('hidden'); 
+
+    if (cardSoal) {
+      const jawabanSih = pilihanUser ? pilihanUser.value : "";
+      if (jawabanSih.trim().toUpperCase() === soal.jawabanBenar.trim().toUpperCase()) {
+        jumlahBenar++;
+        cardSoal.className = "space-y-3 p-4 rounded-xl border bg-green-50/30 border-green-200 block-soal";
+      } else {
+        cardSoal.className = "space-y-3 p-4 rounded-xl border bg-rose-50/30 border-rose-200 block-soal";
+      }
+      // Nonaktifkan input agar tidak bisa diubah setelah submit
+      cardSoal.querySelectorAll('.input-opsi').forEach(input => input.disabled = true);
+    }
+  });
+
+  const txtSkor = document.getElementById('txt-skor');
+  const resultBox = document.getElementById('soal-result');
+  
+  if (txtSkor && resultBox) {
+    txtSkor.textContent = `Skor Anda: ${jumlahBenar} / ${masterDataSoal.length} Benar`;
+    resultBox.classList.remove('hidden');
+    resultBox.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  showBanner(`Kuis Selesai! Skor: ${jumlahBenar}/${masterDataSoal.length}`, 'success');
+}
+
+// ARSITEKTUR RUNTIME RUN CHECKLIST TRIGGER UTAMA AUTOMATION INITIALIZER
+window.addEventListener('load', checkActiveSession);
