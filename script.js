@@ -973,3 +973,142 @@ function evaluasiJawaban(event) {
     resultBox.scrollIntoView({ behavior: 'smooth' });
   }
 }
+
+// ==========================================
+// LOGIKA MODUL LATIHAN SOAL (MENGGUNAKAN callAPI)
+// ==========================================
+let masterDataSoal = []; 
+
+async function muatLatihanSoal() {
+  const skeleton = document.getElementById('soal-skeleton');
+  const container = document.getElementById('soal-container');
+  const resultBox = document.getElementById('soal-result');
+  const renderArea = document.getElementById('daftar-soal-render');
+
+  if(!skeleton || !container || !renderArea) return;
+
+  // Reset Tampilan ke State Loading
+  skeleton.classList.remove('hidden');
+  container.classList.add('hidden');
+  if(resultBox) resultBox.classList.add('hidden');
+  renderArea.innerHTML = '';
+
+  try {
+    // MEMANFAATKAN FUNGSI UTALITAS callAPI ANDA
+    // Mengirim action "getLatihanSoal" ke backend
+    const result = await callAPI('getLatihanSoal');
+
+    if (!result.success) {
+      throw new Error(result.message || 'Gagal mengambil data soal.');
+    }
+
+    masterDataSoal = result.data;
+    
+    if (masterDataSoal.length === 0) {
+      renderArea.innerHTML = `<p class="text-slate-500 text-sm">Belum ada soal yang tersedia saat ini.</p>`;
+    } else {
+      renderDataSoalKeUi(masterDataSoal);
+    }
+
+    // Tampilkan Konten Soal
+    skeleton.classList.add('hidden');
+    container.classList.remove('hidden');
+  } catch (error) {
+    if(skeleton) skeleton.classList.add('hidden');
+    console.error('Error muat soal:', error);
+    if(typeof showBanner === 'function') {
+      showBanner('Gagal memuat soal: ' + error.message, 'error');
+    }
+  }
+}
+
+function renderDataSoalKeUi(soalArray) {
+  const renderArea = document.getElementById('daftar-soal-render');
+  
+  let htmlContent = '';
+  soalArray.forEach((soal, index) => {
+    htmlContent += `
+      <div class="bg-slate-50 p-5 rounded-xl border border-slate-100 transition-all card-soal" id="card-${soal.idSoal}">
+        <p class="font-semibold text-slate-800 text-sm mb-3">
+          ${index + 1}. ${soal.pertanyaan}
+        </p>
+        <div class="space-y-2">
+          ${Object.entries(soal.opsi).map(([kunci, teks]) => {
+            if(!teks) return ''; // Lewati opsi jika kosong di Google Sheet
+            return `
+              <label class="flex items-center gap-3 p-2.5 bg-white border border-slate-200 rounded-lg cursor-pointer hover:bg-indigo-50/50 transition text-sm text-slate-700 label-opsi">
+                <input type="radio" name="soal_${soal.idSoal}" value="${kunci}" required class="w-4 h-4 text-indigo-600 accent-indigo-600 input-opsi">
+                <span><strong class="text-slate-400 mr-1">${kunci}.</strong> ${teks}</span>
+              </label>
+            `;
+          }).join('')}
+        </div>
+
+        <div id="penjelasan-${soal.idSoal}" class="hidden mt-4 p-3 bg-indigo-50 border border-indigo-100 rounded-lg text-xs text-slate-700">
+          <p class="font-bold text-indigo-900 mb-1"><i class="fa-solid fa-circle-info mr-1"></i> Penjelasan:</p>
+          <p>${soal.penjelasan || 'Tidak ada penjelasan untuk soal ini.'}</p>
+        </div>
+      </div>
+    `;
+  });
+  
+  renderArea.innerHTML = htmlContent;
+}
+
+function evaluasiJawaban(event) {
+  event.preventDefault();
+  
+  const form = document.getElementById('form-latihan-soal');
+  const formData = new FormData(form);
+  
+  let jumlahBenar = 0;
+  let totalSoal = masterDataSoal.length;
+
+  masterDataSoal.forEach(soal => {
+    const jawabanUser = formData.get(`soal_${soal.idSoal}`);
+    const cardSoal = document.getElementById(`card-${soal.idSoal}`);
+    const boxPenjelasan = document.getElementById(`penjelasan-${soal.idSoal}`);
+    
+    if(boxPenjelasan) boxPenjelasan.classList.remove('hidden');
+
+    if(cardSoal) {
+      if (jawabanUser === Array.from(soal.jawabanBenar)[0]) { // Antisipasi whitespace otomatis
+        jumlahBenar++;
+        cardSoal.className = "p-5 rounded-xl border bg-green-50/30 border-green-200 transition-all card-soal";
+      } else {
+        cardSoal.className = "p-5 rounded-xl border bg-rose-50/30 border-rose-200 transition-all card-soal";
+      }
+
+      const inputs = cardSoal.querySelectorAll('.input-opsi');
+      inputs.forEach(input => input.disabled = true);
+    }
+  });
+
+  const nilaiAkhir = Math.round((jumlahBenar / totalSoal) * 100);
+  const resultBox = document.getElementById('soal-result');
+  
+  if(resultBox) {
+    const skorText = resultBox.querySelector('.id-skor-text');
+    const pesanText = resultBox.querySelector('.id-pesan-text');
+
+    resultBox.classList.remove('hidden');
+    if(skorText) skorText.textContent = `Skor Anda: ${nilaiAkhir} (${jumlahBenar}/${totalSoal} Benar)`;
+    
+    if(pesanText) {
+      if (nilaiAkhir >= 75) {
+        resultBox.className = "mt-6 p-4 rounded-xl text-center bg-green-50 text-green-800 border border-green-100";
+        pesanText.textContent = "Luar biasa! Pembahasan untuk tiap soal telah dibuka di bawah.";
+      } else {
+        resultBox.className = "mt-6 p-4 rounded-xl text-center bg-amber-50 text-amber-800 border border-amber-100";
+        pesanText.textContent = "Jangan berkecil hati, pelajari penjelasan tiap soal di bawah untuk evaluasi.";
+      }
+    }
+
+    resultBox.scrollIntoView({ behavior: 'smooth' });
+  }
+}
+
+
+
+
+
