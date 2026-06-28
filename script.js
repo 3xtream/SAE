@@ -302,6 +302,7 @@ function displayCard() {
   if (ap && ap.checked) setTimeout(() => speakWord(item.word), 300);
 }
 
+function flipCard() { const c = document.getElementById('fCard'); if (c) c.classList.toggle('flipped'); }
 function nextCard(e) { if (e) e.stopPropagation(); if (!flashcardList.length) return; currentCardIndex = (currentCardIndex+1) % flashcardList.length; displayCard(); }
 function prevCard(e) { if (e) e.stopPropagation(); if (!flashcardList.length) return; currentCardIndex = (currentCardIndex-1+flashcardList.length) % flashcardList.length; displayCard(); }
 
@@ -526,121 +527,44 @@ function setSpUrlStatus(type, html) {
 }
 
 async function loadSpeakingLabIframe() {
-  const loader    = document.getElementById('spIframeLoader');
-  const errBox    = document.getElementById('spIframeErr');
-  const errMsg    = document.getElementById('spIframeErrMsg');
-  const inlineCt  = document.getElementById('spInlineContent');
-  const wrap      = document.getElementById('spIframeWrap');
+  const loader   = document.getElementById('spIframeLoader');
+  const errBox   = document.getElementById('spIframeErr');
+  const errMsg   = document.getElementById('spIframeErrMsg');
+  const iframe   = document.getElementById('spLabIframe');
+  const wrap     = document.getElementById('spIframeWrap');
 
   const SPEAKING_LAB_URL = 'https://3xtream.github.io/english/speaking-lab.html';
 
-  // Reset state: tampilkan loader, sembunyikan lainnya
-  if (loader)   loader.style.setProperty('display', 'flex', 'important');
-  if (errBox)   errBox.style.setProperty('display', 'none', 'important');
-  if (inlineCt) inlineCt.style.setProperty('display', 'none', 'important');
-  if (wrap)     wrap.style.setProperty('display', 'block', 'important');
+  // Reset: tampilkan loader
+  if (loader) loader.style.setProperty('display', 'flex', 'important');
+  if (errBox) errBox.style.setProperty('display', 'none', 'important');
+  if (iframe) iframe.style.setProperty('display', 'none', 'important');
+  if (wrap)   wrap.style.setProperty('display', 'block', 'important');
 
-  // Jika sudah pernah dimuat sebelumnya, tampilkan langsung tanpa fetch ulang
-  if (inlineCt && inlineCt.dataset.loaded === '1') {
-    if (loader)   loader.style.setProperty('display', 'none', 'important');
-    if (inlineCt) inlineCt.style.setProperty('display', 'block', 'important');
+  // Jika sudah pernah dimuat, tampilkan langsung
+  if (iframe && iframe.dataset.loaded === '1') {
+    if (loader) loader.style.setProperty('display', 'none', 'important');
+    if (iframe) iframe.style.setProperty('display', 'block', 'important');
     return;
   }
 
   try {
-    // Fetch HTML speaking-lab langsung dari GitHub Pages
     const res = await fetch(SPEAKING_LAB_URL, { cache: 'no-store' });
-    if (!res.ok) throw new Error(`HTTP ${res.status} — tidak bisa mengambil konten.`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const html = await res.text();
 
-    if (!inlineCt) throw new Error('Container #spInlineContent tidak ditemukan.');
+    if (!iframe) throw new Error('Element #spLabIframe tidak ditemukan.');
 
-    // ─── SHADOW DOM: isolasi CSS total agar tidak bocor ke halaman utama ───
-    // Hapus shadow lama jika ada (misal: saat reload tab)
-    if (inlineCt._shadowAttached) {
-      // Shadow DOM tidak bisa di-detach; cukup kosongkan isinya
-      const existingShadow = inlineCt.shadowRoot;
-      if (existingShadow) {
-        existingShadow.innerHTML = '';
-      }
-    }
+    // srcdoc: konten di-set langsung ke iframe — tidak ada X-Frame-Options,
+    // CSS/JS speaking-lab terisolasi penuh di dalam iframe context
+    iframe.srcdoc = html;
+    iframe.dataset.loaded = '1';
 
-    const shadow = inlineCt.shadowRoot || inlineCt.attachShadow({ mode: 'open' });
-    inlineCt._shadowAttached = true;
-
-    // Parse HTML speaking-lab
-    const parser = new DOMParser();
-    const doc    = parser.parseFromString(html, 'text/html');
-
-    // 1. Inject semua <style> dan <link rel="stylesheet"> dari <head> ke dalam shadow
-    const stylePromises = [];
-    doc.querySelectorAll('head style, head link[rel="stylesheet"]').forEach(el => {
-      const clone = el.cloneNode(true);
-      shadow.appendChild(clone);
-      if (clone.tagName === 'LINK') {
-        stylePromises.push(new Promise(r => { clone.onload = r; clone.onerror = r; }));
-      }
-    });
-
-    // 2. Inject isi <body> ke dalam shadow DOM
-    const bodyWrapper = document.createElement('div');
-    bodyWrapper.style.cssText = 'display:block; width:100%;';
-    bodyWrapper.innerHTML = doc.body ? doc.body.innerHTML : html;
-
-    // Hapus elemen overlay/loading bawaan speaking-lab agar tidak bertumpuk
-    bodyWrapper.querySelectorAll('#loading, .loading-overlay').forEach(el => el.remove());
-
-    shadow.appendChild(bodyWrapper);
-
-    // 3. Tunggu stylesheet selesai dimuat
-    if (stylePromises.length) await Promise.allSettled(stylePromises);
-
-    // 4. Eksekusi semua <script> dari body speaking-lab secara berurutan
-    //    Script berjalan di scope window, tapi querySelector diarahkan ke shadow DOM
-    const scripts = doc.body ? Array.from(doc.body.querySelectorAll('script')) : [];
-    for (const origScript of scripts) {
-      const s = document.createElement('script');
-      if (origScript.src) {
-        // Script eksternal (CDN dll): load & tunggu selesai
-        s.src   = origScript.src;
-        s.async = false;
-        await new Promise(resolve => {
-          s.onload  = resolve;
-          s.onerror = () => { console.warn('[SpeakingLab] Script gagal load:', origScript.src); resolve(); };
-          document.head.appendChild(s);
-        });
-      } else if (origScript.textContent.trim()) {
-        // Script inline: wrap agar document.querySelector mengarah ke shadow DOM
-        // sehingga manipulasi DOM speaking-lab terjadi di dalam shadow, bukan di halaman utama
-        s.textContent = `(function(){
-  var __shadowRoot = document.getElementById('spInlineContent') && document.getElementById('spInlineContent').shadowRoot;
-  if (__shadowRoot) {
-    var __origGetById = document.getElementById.bind(document);
-    var __origQS  = document.querySelector.bind(document);
-    var __origQSA = document.querySelectorAll.bind(document);
-    document.getElementById      = function(id)  { return __shadowRoot.getElementById ? __shadowRoot.getElementById(id) : (__shadowRoot.querySelector('#'+id) || __origGetById(id)); };
-    document.querySelector       = function(sel) { return __shadowRoot.querySelector(sel) || __origQS(sel); };
-    document.querySelectorAll    = function(sel) { var r = Array.from(__shadowRoot.querySelectorAll(sel)); return r.length ? r : __origQSA(sel); };
-  }
-  try {
-    ${origScript.textContent}
-  } finally {
-    if (__shadowRoot) {
-      document.getElementById   = __origGetById;
-      document.querySelector    = __origQS;
-      document.querySelectorAll = __origQSA;
-    }
-  }
-})();`;
-        document.head.appendChild(s);
-      }
-    }
-
-    // Tandai sudah dimuat
-    inlineCt.dataset.loaded = '1';
-
-    if (loader)   loader.style.setProperty('display', 'none', 'important');
-    if (inlineCt) inlineCt.style.setProperty('display', 'block', 'important');
+    // Tunggu iframe selesai render
+    iframe.onload = () => {
+      if (loader) loader.style.setProperty('display', 'none', 'important');
+      if (iframe) iframe.style.setProperty('display', 'block', 'important');
+    };
 
   } catch (err) {
     console.error('Speaking Lab fetch error:', err);
