@@ -144,10 +144,6 @@
                   id="btn-premium-content-section" onclick="setActiveNav(this); pindahTab('premium-content-section'); loadAndShowPremiumContent()">
             <i class="fa-solid fa-lock text-sm w-4 text-center text-amber-500"></i>Premium Content
           </button>
-          <button onclick="pindahTab('latihan-soal-tab'); ubahAktifNav(this);" class="nav-btn flex items-center gap-3 px-4 py-2.5 w-full text-left font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-800 rounded-xl transition text-sm">
-            <i class="fa-solid fa-graduation-cap text-base"></i>
-            <span>Latihan Soal</span>
-          </button>
         </nav>
 
         <!-- ===== MAIN CONTENT ===== -->
@@ -595,51 +591,6 @@
           </div>
           <!-- /TAB 6 -->
 
-          <!--latihan soal-->
-
-          <div id="latihan-soal-tab" class="section space-y-6" style="display: none !important;">
-          <div class="p-6 bg-white rounded-xl shadow-xs">
-            <div class="flex justify-between items-center mb-6 border-b border-slate-100 pb-4">
-              <div>
-                <h2 class="text-xl font-bold text-slate-800">Latihan Soal</h2>
-                <p class="text-xs text-slate-500">Uji kemampuan bahasa Inggris Anda hari ini</p>
-              </div>
-              <button onclick="muatLatihanSoal()" class="px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-lg text-sm font-semibold hover:bg-indigo-100 transition">
-                <i class="fa-solid fa-rotate-right mr-1"></i> Refresh Soal
-              </button>
-            </div>
-        
-            <div id="soal-skeleton" class="space-y-4">
-              <div class="h-5 bg-slate-200 rounded-sm w-3/4 animate-pulse"></div>
-              <div class="space-y-2">
-                <div class="h-10 bg-slate-100 rounded-lg animate-pulse"></div>
-                <div class="h-10 bg-slate-100 rounded-lg animate-pulse"></div>
-                <div class="h-10 bg-slate-100 rounded-lg animate-pulse"></div>
-              </div>
-            </div>
-        
-            <div id="soal-container" class="hidden space-y-6">
-              <form id="form-latihan-soal" onsubmit="evaluasiJawaban(event)">
-                <div id="daftar-soal-render" class="space-y-6">
-                  </div>
-                
-                <div class="mt-6 pt-4 border-t border-slate-100">
-                  <button type="submit" class="w-full sm:w-auto px-6 py-2.5 bg-indigo-600 text-white font-semibold rounded-xl shadow-xs hover:bg-indigo-700 transition">
-                    Kirim & Periksa Jawaban
-                  </button>
-                </div>
-              </form>
-            </div>
-        
-            <div id="soal-result" class="hidden mt-6 p-4 rounded-xl text-center">
-              <h3 class="text-lg font-bold id-skor-text"></h3>
-              <p class="text-sm mt-1 id-pesan-text"></p>
-            </div>
-          </div>
-        </div>
-
-        <!--/latihan soal-->
-
         </div>
         <!-- /MAIN CONTENT -->
       </div>
@@ -673,13 +624,7 @@
         activeSection.style.setProperty('display', 'block', 'important');
         activeSection.classList.add('active');
       }
-      
-      // === LOGIKA TAMBAHAN UNTUK LATIHAN SOAL ===
-      if (sectionId === 'latihan-soal-tab' && typeof muatLatihanSoal === 'function') {
-        muatLatihanSoal();
-      }
-      // =========================================
-      
+      // Trigger fungsi spesifik saat tab tertentu dibuka
       if (sectionId === 'flashcard-tab' && typeof initFlashcards === 'function') initFlashcards();
       if (sectionId === 'speaking-lab'  && typeof loadSpeakingLabIframe === 'function') loadSpeakingLabIframe();
     }
