@@ -94,8 +94,8 @@ window.addEventListener('DOMContentLoaded', () => {
 
 async function handleLogin() {
   const email = document.getElementById('loginEmail').value.trim();
-  const token = document.getElementById('loginToken').value.trim();
-  if (!email || !token) { alert('Harap isi email dan token.'); return; }
+  const password = document.getElementById('loginToken').value.trim();
+  if (!email || !password) { alert('Harap isi email dan token.'); return; }
   
   setSystemLoading(true, 'Memverifikasi Akses Member...');
   try {
