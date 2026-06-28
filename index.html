@@ -35,12 +35,12 @@
         <p class="text-xs text-slate-500 font-medium">Sistem Akuisisi Bahasa Inggris 1 Tahun</p>
       </div>
 
-      <div class="space-y-4 pt-2">
+      <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4 pt-2">
         <div class="space-y-1">
           <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider pl-1">Email Terdaftar</label>
           <div class="relative">
             <i class="fa-solid fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-            <input type="email" id="loginEmail" placeholder="nama@email.com" class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-hidden focus:border-indigo-500 focus:bg-white transition-all font-medium placeholder:text-slate-400">
+            <input type="email" id="loginEmail" required placeholder="nama@email.com" class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-hidden focus:border-indigo-500 focus:bg-white transition-all font-medium placeholder:text-slate-400">
           </div>
         </div>
 
@@ -48,14 +48,14 @@
           <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider pl-1">Token Akses Premium</label>
           <div class="relative">
             <i class="fa-solid fa-key absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-            <input type="password" id="loginToken" placeholder="••••••••••••" class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-hidden focus:border-indigo-500 focus:bg-white transition-all font-mono placeholder:text-slate-300">
+            <input type="password" id="loginToken" required placeholder="••••••••••••" class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-hidden focus:border-indigo-500 focus:bg-white transition-all font-mono placeholder:text-slate-300">
           </div>
         </div>
         
-        <button onclick="handleLogin()" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl transition-all shadow-md shadow-indigo-100 cursor-pointer flex items-center justify-center gap-2">
+        <button type="submit" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl transition-all shadow-md shadow-indigo-100 cursor-pointer flex items-center justify-center gap-2">
           Masuk Ke Dashboard <i class="fa-solid fa-arrow-right text-xs"></i>
         </button>
-      </div>
+      </form>
 
       <div class="border-t border-slate-100 pt-4 flex items-center justify-between text-[11px] font-semibold text-slate-400 px-1">
         <span>Mentari Group Partner</span>
