@@ -260,11 +260,62 @@ function processDatabaseRender(data) {
 // ═══════════════════════════════════════════════════════
 async function initFlashcards() {
   try {
-    const d = await callAPI('getFlashcards', { email: currentUser.email });
+    if (!currentUser || !currentUser.token) return;
+    // Mengirimkan email dan token agar lolos verifikasi doPost Apps Script yang baru
+    const d = await callAPI('getFlashcards', { 
+      email: currentUser.email, 
+      token: currentUser.token 
+    });
     flashcardList = Array.isArray(d) ? d : [];
     currentCardIndex = 0;
     displayCard();
-  } catch(e) { console.error('Flashcard error:', e); }
+  } catch(e) { 
+    console.error('Flashcard error:', e); 
+  }
+}
+
+function displayCard() {
+  const c = document.getElementById('fCard'); 
+  if (c) c.classList.remove('flipped'); // Reset kartu ke posisi depan
+  
+  const t = document.getElementById('fcTracker');
+  const frontWord = document.getElementById('fcFrontWord');
+  const backMeaning = document.getElementById('fcBackMeaning');
+  
+  // Jika data kosong atau semua kartu sudah dikuasai
+  if (!flashcardList || flashcardList.length === 0) {
+    if (frontWord) frontWord.textContent = '🎉 Selesai!';
+    if (backMeaning) backMeaning.textContent = 'Semua kosakata telah dikuasai.';
+    if (t) t.textContent = '0/0 Kartu';
+    return;
+  }
+  
+  // Batasi indeks agar tidak out of bounds
+  if (currentCardIndex >= flashcardList.length) currentCardIndex = 0;
+  if (currentCardIndex < 0) currentCardIndex = flashcardList.length - 1;
+
+  if (t) t.textContent = `Kartu ke ${currentCardIndex + 1} dari ${flashcardList.length}`;
+  
+  const item = flashcardList[currentCardIndex];
+  if (frontWord) frontWord.textContent = item.word;
+  if (backMeaning) backMeaning.textContent = item.meaning;
+  
+  // Fitur Auto Play Suara jika diaktifkan oleh user
+  const ap = document.getElementById('autoPlayToggle');
+  if (ap && ap.checked) {
+    setTimeout(() => speakWord(item.word), 300);
+  }
+  
+  updateFlashcardProgress();
+}
+
+function updateFlashcardProgress() {
+  const progressBar = document.getElementById('flashcardProgress');
+  if (!progressBar || flashcardList.length === 0) return;
+  
+  // Hitung persentase posisi kartu saat ini
+  const percentage = ((currentCardIndex + 1) / flashcardList.length) * 100;
+  progressBar.style.width = percentage + '%';
 }
 
 function speakWord(word) {
