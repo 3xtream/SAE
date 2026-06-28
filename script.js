@@ -6,9 +6,6 @@ const LS_SESSION_KEY = 'memberSession_v47';
 
 // MASUKKAN URL DEPLOYMENT GAS ANDA DI SINI
 let GAS_API_URL = 'https://script.google.com/macros/s/AKfycbyNd61rOZ1XwcmzsN3f5PoALkFxtuz8jr2ePCstaTeryAlT3PCt8Hogsqkn0hJf7SA4/exec'; 
-// URL UNTUK SPEAKING LAB
-const GITHUB_SPEAKING_LAB_URL = 'https://3xtream.github.io/english/speaking-lab.html';
-
 let currentUser = null;
 let flashcardList = [];
 let currentCardIndex = 0;
@@ -64,6 +61,7 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 function startApp() {
+  // Langsung cek session login karena URL API sudah hardcoded dan pasti ada
   let raw = null;
   try { raw = localStorage.getItem(LS_SESSION_KEY); } catch(e) {}
   if (raw) {
@@ -101,7 +99,7 @@ function switchAuth(t) {
 function showAuthPage() {
   document.getElementById('authSection').style.display = 'block'; 
   document.getElementById('mainApp').style.display = 'none';
-  switchAuth('login');
+  switchAuth('login'); // Memastikan tab login yang aktif dan terbuka
 }
 
 // ═══════════════════════════════════════════════════════
@@ -151,6 +149,7 @@ function activateApp() {
   document.getElementById('appTitle').innerHTML = `<span class="w-2 h-6 bg-indigo-600 rounded-full inline-block"></span> Sistem Tracker · 🧑‍💻 ${currentUser.fullName}`;
   refreshDataFromDatabase();
   
+  // Penanganan aman menggunakan pengecekan eksistensi elemen HTML v4
   const setupCard = document.getElementById('spSetupCard');
   const iframeWrap = document.getElementById('spIframeWrap');
   if (setupCard) setupCard.style.setProperty('display', 'none', 'important');
@@ -240,10 +239,13 @@ function processDatabaseRender(data) {
     });
     updateVocabStatusMilestone(cc);
     [1,2,3,4].forEach(p => {
+      const cks = document.querySelectorAll(`.p${p}-chk`);
       const pct = 0;
+      // dashboard
       const pt = document.getElementById(`phase${p}Progress`), pb = document.getElementById(`phase${p}Bar`);
       if (pt) pt.textContent = pct + '%';
       if (pb) pb.style.width = pct + '%';
+      // teori & fase tab
       const ptTh = document.getElementById(`phase${p}Progress-th`), pbTh = document.getElementById(`phase${p}Bar-th`);
       if (ptTh) ptTh.textContent = pct + '%';
       if (pbTh) pbTh.style.width = pct + '%';
@@ -271,55 +273,106 @@ function speakWord(word) {
   window.speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(word);
   u.lang = 'en-US'; u.rate = speechRate; u.pitch = 1; u.volume = 1;
+  const vs = window.speechSynthesis.getVoices();
+  const ev = vs.find(v => v.lang.startsWith('en') && v.localService) || vs.find(v => v.lang.startsWith('en'));
+  if (ev) u.voice = ev;
+  const btn = document.getElementById('btnSpeak'), st = document.getElementById('speechStatus');
+  u.onstart = () => { if (btn) btn.classList.add('speaking'); if (st) st.textContent = `🔊 "${word}"`; };
+  u.onend   = () => { if (btn) btn.classList.remove('speaking'); if (st) st.textContent = ''; };
+  u.onerror = () => { if (btn) btn.classList.remove('speaking'); };
   window.speechSynthesis.speak(u);
 }
 
-function speakCurrentWord(e) {
-  if (e) e.stopPropagation();
-  if (flashcardList.length) speakWord(flashcardList[currentCardIndex].word);
-}
-
-function setSpeed(r, el) {
-  speechRate = r;
-  document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
-  if (el) el.classList.add('active');
-}
+function speakCurrentWord(e) { if (e) e.stopPropagation(); if (flashcardList.length) speakWord(flashcardList[currentCardIndex].word); }
+function setSpeed(r, el) { speechRate = r; document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active')); if (el) el.classList.add('active'); }
 
 function displayCard() {
-  const c = document.getElementById('fCard');
-  if (c) c.classList.remove('flipped');
+  const c = document.getElementById('fCard'); if (c) c.classList.remove('flipped');
   const t = document.getElementById('fcTracker');
   if (!flashcardList || flashcardList.length === 0) {
     document.getElementById('fcFrontWord').textContent = '🎉 Selesai!';
     document.getElementById('fcBackMeaning').textContent = 'Semua kosakata telah dikuasai.';
-    if (t) t.textContent = '0/0 Kartu';
-    return;
+    if (t) t.textContent = '0/0 Kartu'; return;
   }
   if (t) t.textContent = `Kartu ke ${currentCardIndex+1} dari ${flashcardList.length}`;
   const item = flashcardList[currentCardIndex];
   document.getElementById('fcFrontWord').textContent = item.word;
   document.getElementById('fcBackMeaning').textContent = item.meaning;
+  const ap = document.getElementById('autoPlayToggle');
+  if (ap && ap.checked) setTimeout(() => speakWord(item.word), 300);
 }
 
-function nextCard(e) {
-  if (e) e.stopPropagation();
-  if (!flashcardList.length) return;
-  currentCardIndex = (currentCardIndex+1) % flashcardList.length;
-  displayCard();
-}
-
-function prevCard(e) {
-  if (e) e.stopPropagation();
-  if (!flashcardList.length) return;
-  currentCardIndex = (currentCardIndex-1+flashcardList.length) % flashcardList.length;
-  displayCard();
-}
+function nextCard(e) { if (e) e.stopPropagation(); if (!flashcardList.length) return; currentCardIndex = (currentCardIndex+1) % flashcardList.length; displayCard(); }
+function prevCard(e) { if (e) e.stopPropagation(); if (!flashcardList.length) return; currentCardIndex = (currentCardIndex-1+flashcardList.length) % flashcardList.length; displayCard(); }
 
 async function markAsMasteredFromCard(e) {
   if (e) e.stopPropagation();
   if (!flashcardList.length) return;
   const item = flashcardList[currentCardIndex];
   await syncVocabPoints({ checked: true }, item.id);
+  flashcardList.splice(currentCardIndex, 1);
+  if (currentCardIndex >= flashcardList.length && currentCardIndex > 0) currentCardIndex--;
+  displayCard();
+}
+
+// ═══════════════════════════════════════════════════════
+//  NAVIGATION & DYNAMIC CONTENT
+// ═══════════════════════════════════════════════════════
+function show(id) {
+  // FIXED: Mengubah selector agar mencakup seluruh elemen .section di dalam #mainApp tanpa batasan kedalaman hirarki (menghapus tanda '>')
+  document.querySelectorAll('#mainApp .section').forEach(s => { 
+    s.classList.remove('active'); 
+    s.style.setProperty('display', 'none', 'important'); 
+  });
+  document.querySelectorAll('#premium-dynamic-placeholder .section').forEach(s => { 
+    s.classList.remove('active'); 
+    s.style.setProperty('display', 'none', 'important'); 
+  });
+  
+  if (id === 'preschool' || id === 'elementary' || id === 'writing') {
+    const pc = document.getElementById('premium-content-section'); 
+    if (pc) { 
+      pc.classList.add('active'); 
+      pc.style.setProperty('display', 'block', 'important'); 
+    }
+    const tl = document.getElementById(id); 
+    if (tl) { 
+      tl.classList.add('active'); 
+      tl.style.setProperty('display', 'block', 'important'); 
+    }
+  } else {
+    const tp = document.getElementById(id); 
+    if (tp) { 
+      tp.classList.add('active'); 
+      tp.style.setProperty('display', 'block', 'important'); 
+    }
+  }
+  
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  const tb = document.getElementById('btn-' + id); 
+  if (tb) tb.classList.add('active');
+  
+  if (id === 'flashcard-tab') initFlashcards();
+  if (id === 'speaking-lab') {
+    const setupCard = document.getElementById('spSetupCard');
+    if (setupCard) setupCard.style.display = 'none';
+    
+    // PAKSA MUAT ULANG IFRAME SETIAP KALI TAB DIKLIK
+    const iframeLoaderEl = document.getElementById('spIframeLoader');
+    if (iframeLoaderEl) iframeLoaderEl.style.display = 'flex';
+    loadSpeakingLabIframe();
+  }
+}
+
+async function loadAndShowPremiumContent() {
+  show('premium-content-section');
+  document.getElementById('premium-dynamic-placeholder').innerHTML = '<div style="text-align:center;padding:2rem;color:var(--color-primary);font-weight:bold">🔄 Mengunduh konten...</div>';
+  try {
+    const r = await callAPI('loadContentPage');
+    document.getElementById('premium-dynamic-placeholder').innerHTML = r.html || '<p>Konten kosong.</p>';
+  } catch(e) {
+    document.getElementById('premium-dynamic-placeholder').innerHTML = '<p style="color:#791F1F;padding:1rem">❌ ' + e.message + '</p>';
+  }
 }
 
 // ═══════════════════════════════════════════════════════
@@ -329,17 +382,15 @@ async function logDailyActivity() {
   if (!currentUser || !currentUser.token) return;
   showLoader(true);
   try {
-    const r = await callAPI('saveDailyLog', { 
-      email: currentUser.email, 
-      token: currentUser.token, 
-      duration: parseInt(document.getElementById('inputDuration').value) || 0, 
-      passage: parseInt(document.getElementById('passagesRead').value) || 0, 
-      wpm: parseInt(document.getElementById('currentWpmInput').value) || 0 
+    const r = await callAPI('saveDailyLog', {
+      email:    currentUser.email,
+      token:    currentUser.token,
+      duration: parseInt(document.getElementById('inputDuration').value) || 0,
+      passage:  parseInt(document.getElementById('passagesRead').value) || 0,
+      wpm:      parseInt(document.getElementById('currentWpmInput').value) || 0
     });
-    if (r.success) {
-      alert('✓ Log disimpan!');
-      refreshDataFromDatabase();
-    } else alert(r.message);
+    if (r.success) { alert('✓ Log disimpan!'); refreshDataFromDatabase(); }
+    else alert(r.message);
   } catch(e) { alert('Error: ' + e.message); }
   finally { showLoader(false); }
 }
@@ -368,7 +419,47 @@ async function syncVocabPoints(el, wordId) {
 }
 
 async function syncPhaseChecklist(p, idx, el) {
-  // Ditangani secara lokal atau disesuaikan dengan kebutuhan Anda
+  try {
+    await callAPI('updatePhaseChecklist', { email: currentUser.email, phaseNum: p, checklistIndex: idx, isChecked: el.checked });
+    const cks = document.querySelectorAll(`.p${p}-chk`);
+    let n = 0; cks.forEach(c => { if (c.checked) n++; });
+    const pct = Math.round((n / cks.length) * 100);
+    // update progress bar di dashboard
+    const pt = document.getElementById(`phase${p}Progress`), pb = document.getElementById(`phase${p}Bar`);
+    if (pt) pt.textContent = pct + '%';
+    if (pb) pb.style.width = pct + '%';
+    // update progress bar di tab Teori & Fase
+    const ptTh = document.getElementById(`phase${p}Progress-th`), pbTh = document.getElementById(`phase${p}Bar-th`);
+    if (ptTh) ptTh.textContent = pct + '%';
+    if (pbTh) pbTh.style.width = pct + '%';
+    calculateOverallGlobalProgress();
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+// ═══════════════════════════════════════════════════════
+//  WPM CALCULATION & STATUS METRICS
+// ═══════════════════════════════════════════════════════
+async function handleWpmChange() {
+  if (!currentUser || !currentUser.token) return;
+  showLoader(true);
+  try {
+    await callAPI('saveDailyLog', {
+      email: currentUser.email, token: currentUser.token,
+      duration: 0, passage: 0,
+      wpm: parseInt(document.getElementById('currentWpmInput').value) || 0
+    });
+    updateWPMStatus();
+  } catch(e) { alert('Error: ' + e.message); }
+  finally { showLoader(false); }
+}
+
+function updateWPMStatus() {
+  const v = parseInt(document.getElementById('currentWpmInput').value) || 0;
+  [{k:'P1',t:100},{k:'P2',t:130},{k:'P3',t:160}].forEach(({k,t}) => {
+    const b = document.getElementById(`wpm${k}bar`), s = document.getElementById(`wpm${k}status`);
+    if (b) b.style.width = Math.min(100, (v/t)*100) + '%';
+    if (s) s.innerHTML = v >= t ? '<span class="badge b-ok">✓ Lulus</span>' : '<span class="badge b-warn">~ Progress</span>';
+  });
 }
 
 function runWpmCalc() {
@@ -380,23 +471,113 @@ function runWpmCalc() {
 function applyCalcToInput() {
   const v = parseInt((document.getElementById('calcResult').textContent||'0'))||0;
   document.getElementById('currentWpmInput').value = v;
+  handleWpmChange();
+}
+
+function updateVocabStatusMilestone(v) {
+  [{k:'P1',min:300},{k:'P2',min:800},{k:'P3',min:1200},{k:'P4',min:1800}].forEach(({k,min}) => {
+    const e = document.getElementById(`vocab${k}status`);
+    if (e) e.innerHTML = v >= min ? '<span class="badge b-ok">✓ Lulus</span>' : '<span class="badge b-no">❌ Belum</span>';
+  });
+}
+
+function calculateOverallGlobalProgress() {
+  const all = document.querySelectorAll('.p1-chk,.p2-chk,.p3-chk,.p4-chk');
+  let n = 0; all.forEach(c => { if (c.checked) n++; });
+  const g = document.getElementById('totalProgress');
+  if (g) g.textContent = (all.length>0 ? Math.round((n/all.length)*100) : 0) + '%';
+}
+
+function renderDailyGraph(logs) {
+  const gc = document.getElementById('trackingGraph'), lc = document.getElementById('graphLabels');
+  if (!gc || !lc) return;
+  gc.innerHTML = ''; lc.innerHTML = '';
+  let fl = []; for (let i=0;i<7;i++) fl.push(logs&&logs[i]?logs[i]:{date:'-',duration:0});
+  fl.forEach((log, i) => {
+    const isT = i===6, bh = Math.min(100,(log.duration/60)*100), b = document.createElement('div');
+    b.className = 'graph-bar'; b.style.height = `${Math.max(bh,2)}%`;
+    const tip = document.createElement('span'); tip.className = 'tooltip';
+    let dl = log.date;
+    if (dl && dl !== '-') { try { const p = dl.split('-'); if (p.length>=3) dl = p[1]+'/'+p[2]; } catch(e){} }
+    tip.textContent = `${dl}: ${log.duration}m`; b.appendChild(tip); gc.appendChild(b);
+    const ls = document.createElement('span'); ls.className = 'graph-label'; ls.textContent = isT ? 'Hari Ini' : dl;
+    if (isT) ls.style.color = 'var(--color-primary)'; lc.appendChild(ls);
+  });
 }
 
 // ═══════════════════════════════════════════════════════
-//  FUNCTIONS FOR SPEAKING LAB RENDERING
+//  SPEAKING LAB INTEGRATION
 // ═══════════════════════════════════════════════════════
-function loadSpeakingLabIframe() {
-  const launchBtn = document.getElementById('spLaunchBtn');
-  if (launchBtn) {
+function saveSpLabUrl() {
+  const v = document.getElementById('spLabUrl').value.trim();
+  if (!v || !v.startsWith('http')) { setSpUrlStatus('warn','<i class="fa-solid fa-triangle-exclamation"></i> Masukkan URL yang valid.'); return; }
+  try { localStorage.setItem('splab_github_url', v); } catch(e) {}
+  setSpUrlStatus('ok','<i class="fa-solid fa-circle-check"></i> URL tersimpan! Memuat Speaking Lab...');
+  const wrapEl = document.getElementById('spIframeWrap');
+  if (wrapEl) wrapEl.style.display = '';
+  const loaderEl = document.getElementById('spIframeLoader');
+  if (loaderEl) loaderEl.style.display = 'flex';
+  loadSpeakingLabIframe();
+}
+
+function setSpUrlStatus(type, html) {
+  const el = document.getElementById('spUrlStatus');
+  if (el) { el.innerHTML = html; el.style.color = type==='ok'?'#166534':type==='warn'?'#92400E':'#6B7280'; }
+}
+
+async function loadSpeakingLabIframe() {
+  const loader = document.getElementById('spIframeLoader');
+  const errBox = document.getElementById('spIframeErr');
+  const iframe = document.getElementById('spLabIframe');
+  const wrap   = document.getElementById('spIframeWrap');
+  const openBtn = document.getElementById('spOpenTabBtn');
+
+  // 1. Amankan display agar container langsung merender UI peluncur tab mandiri
+  if (loader) loader.style.setProperty('display', 'none', 'important');
+  if (iframe) iframe.style.setProperty('display', 'none', 'important');
+  if (wrap)   wrap.style.setProperty('display', 'flex', 'important');
+  if (errBox) errBox.style.setProperty('display', 'flex', 'important');
+
+  const GITHUB_SPEAKING_LAB_URL = 'https://3xtream.github.io/english/speaking-lab.html';
+  if (openBtn) openBtn.href = GITHUB_SPEAKING_LAB_URL;
+
+  if (errBox) {
+    errBox.className = "absolute inset-0 bg-indigo-50/50 flex flex-col items-center justify-center p-8 text-center z-10";
+    
+    // Fallback protektif jika variabel currentUser belum teresolusi sempurna dari server GAS
+    const userName = (typeof currentUser !== 'undefined' && currentUser && currentUser.fullName) 
+                     ? currentUser.fullName 
+                     : 'Member Terautentikasi';
+
+    const errMsg = document.getElementById('spIframeErrMsg');
+    if (errMsg) {
+      errMsg.className = "text-xs text-slate-600 max-w-sm mt-2 p-4 bg-white rounded-2xl border border-slate-200 shadow-2xs text-left leading-relaxed";
+      errMsg.innerHTML = `
+        <span class="block font-bold text-indigo-700 mb-1">🚀 Siap Meluncur ke AI Laboratory</span>
+        Untuk mematuhi kebijakan enkripsi keamanan enkapsulasi browser (X-Frame-Options), modul interaktif Speaking Lab akan dijalankan secara mandiri via jendela tab baru.
+        <div class="mt-3 pt-2 border-t border-slate-100 flex flex-col gap-1 text-[11px] text-slate-400 font-mono">
+          <span>User: ${userName}</span>
+          <span>Status: Sesi Terautentikasi ✓</span>
+        </div>
+      `;
+    }
+
+    // Pastikan tombol utama di bagian tengah halaman peluncur terbuat dan mengarah ke tab baru
+    let launchBtn = document.getElementById('spLaunchBtn');
+    if (!launchBtn) {
+      launchBtn = document.createElement('a');
+      launchBtn.id = 'spLaunchBtn';
+      launchBtn.target = '_blank';
+      launchBtn.rel = 'noopener noreferrer';
+      launchBtn.className = "mt-5 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl transition-all shadow-md shadow-indigo-100 flex items-center gap-2 cursor-pointer";
+      launchBtn.innerHTML = `<i class="fa-solid fa-rocket text-sm"></i> Mulai Speaking Lab Sekarang`;
+      errBox.appendChild(launchBtn);
+    }
     launchBtn.href = GITHUB_SPEAKING_LAB_URL;
   }
-  
-  const iframe = document.getElementById('spLabIframe');
-  if (iframe) {
-    iframe.src = GITHUB_SPEAKING_LAB_URL;
-  }
 }
 
+// Perbaikan fungsi error agar tidak bentrok
 function showIframeError(msg) {
   const loader = document.getElementById('spIframeLoader');
   const iframe = document.getElementById('spLabIframe');
@@ -405,31 +586,6 @@ function showIframeError(msg) {
   
   if (loader) loader.style.setProperty('display', 'none', 'important');
   if (iframe) iframe.style.setProperty('display', 'none', 'important');
-  if (errBox) {
-    errBox.className = "absolute inset-0 bg-indigo-50/50 flex flex-col items-center justify-center p-8 text-center z-10";
-    const userName = (typeof currentUser !== 'undefined' && currentUser && currentUser.fullName) ? currentUser.fullName : 'Member Terautentikasi';
-    if (errMsg) {
-      errMsg.className = "text-xs text-slate-600 max-w-sm mt-2 p-4 bg-white rounded-xl border border-slate-200 text-left leading-relaxed";
-      errMsg.innerHTML = `
-        <p class="font-bold text-rose-600 mb-1">⚠️ Terjadi Kendala Pembuatan Sesi</p>
-        <p class="text-[11px] text-slate-500">${msg}</p>
-        <div class="mt-3 pt-2 border-t border-slate-100 flex flex-col gap-1 text-[11px] text-slate-400 font-mono">
-          <span>User: ${userName}</span>
-          <span>Status: Sesi Terautentikasi ✓</span>
-        </div>
-      `;
-    }
-
-    let launchBtn = document.getElementById('spLaunchBtn');
-    if (!launchBtn) {
-      launchBtn = document.createElement('a');
-      launchBtn.id = 'spLaunchBtn';
-      launchBtn.target = '_blank';
-      launchBtn.rel = 'noopener noreferrer';
-      launchBtn.className = "mt-5 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl transition-all shadow-md shadow-indigo-100 flex items-center gap-2 cursor-pointer";
-      launchBtn.innerHTML = `<i class=\"fa-solid fa-rocket text-sm\"></i> Mulai Speaking Lab Sekarang`;
-      errBox.appendChild(launchBtn);
-    }
-    launchBtn.href = GITHUB_SPEAKING_LAB_URL;
-  }
+  if (errBox) errBox.style.setProperty('display', 'flex', 'important');
+  if (errMsg) errMsg.textContent = msg;
 }
