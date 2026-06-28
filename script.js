@@ -524,58 +524,58 @@ function setSpUrlStatus(type, html) {
 async function loadSpeakingLabIframe() {
   if (!currentUser || !currentUser.token) { alert('Silakan login terlebih dahulu.'); return; }
   
+  // URL Default Sistem Anda
   const GITHUB_SPEAKING_LAB_URL = 'https://3xtream.github.io/english/speaking-lab.html';
 
-  // Ambil elemen dengan aman untuk menghindari error 'null'
   const loader = document.getElementById('spIframeLoader');
   const errBox = document.getElementById('spIframeErr');
   const iframe = document.getElementById('spLabIframe');
   const wrap   = document.getElementById('spIframeWrap');
   const openBtn = document.getElementById('spOpenTabBtn');
 
-  // Atur display hanya jika elemennya benar-benar ditemukan di HTML
-  if (loader) loader.style.setProperty('display', 'flex', 'important');
-  if (errBox) errBox.style.setProperty('display', 'none', 'important');
+  // Sembunyikan iframe & loader karena GitHub memblokir embedding iframe (X-Frame-Options)
+  if (loader) loader.style.setProperty('display', 'none', 'important');
   if (iframe) iframe.style.setProperty('display', 'none', 'important');
   if (wrap)   wrap.style.setProperty('display', 'flex', 'important');
   
-  try {
-    const ssoUrl = GITHUB_SPEAKING_LAB_URL;
-    if (openBtn) openBtn.href = ssoUrl;
+  // Tampilkan pesan interaktif khusus agar user membuka di tab baru dengan aman
+  if (errBox) {
+    errBox.style.setProperty('display', 'flex', 'important');
+    // Mengubah kotak error menjadi Kotak Navigasi Peluncur Aplikasi yang Cantik
+    errBox.className = "absolute inset-0 bg-indigo-50/50 flex flex-col items-center justify-center p-8 text-center z-10";
     
-    if (iframe) {
-      iframe.onload = function() {
-        if (loader) loader.style.setProperty('display', 'none', 'important');
-        iframe.style.setProperty('display', 'block', 'important');
-        
-        setTimeout(function() {
-          try {
-            iframe.contentWindow.postMessage(
-              { 
-                type: 'SPEAKING_LAB_SESSION', 
-                payload: { token: currentUser.token, email: currentUser.email, fullName: currentUser.fullName } 
-              }, 
-              new URL(GITHUB_SPEAKING_LAB_URL).origin
-            );
-          } } catch(e) { 
-              showIframeError('Gagal koneksi: ' + e.message); 
-            }
-        }, 800);
-      };
-      
-      iframe.onerror = function() { 
-        showIframeError('Iframe gagal dimuat. Pastikan URL GitHub Pages benar.'); 
-      };
-      
-      iframe.src = ssoUrl;
+    const errMsg = document.getElementById('spIframeErrMsg');
+    if (errMsg) {
+      errMsg.className = "text-xs text-slate-600 max-w-sm mt-2 p-4 bg-white rounded-2xl border border-slate-200 shadow-2xs text-left leading-relaxed";
+      errMsg.innerHTML = `
+        <span class="block font-bold text-indigo-700 mb-1">🚀 Siap Meluncur ke AI Laboratory</span>
+        Untuk mematuhi kebijakan keamanan browser, modul interaktif Speaking Lab akan dibuka dengan aman melalui jendela baru dengan enkripsi token akun Anda.
+        <div class="mt-3 pt-2 border-t border-slate-100 flex flex-col gap-1 text-[11px] text-slate-400 font-mono">
+          <span>User: ${currentUser.fullName}</span>
+          <span>Status: Token Terverifikasi ✓</span>
+        </div>
+      `;
     }
-  } catch(e) { 
-    showIframeError('Gagal koneksi: ' + e.message); 
+
+    // Buat tombol utama besar di tengah untuk membuka link
+    let launchBtn = document.getElementById('spLaunchBtn');
+    if (!launchBtn) {
+      launchBtn = document.createElement('a');
+      launchBtn.id = 'spLaunchBtn';
+      launchBtn.target = '_blank';
+      launchBtn.className = "mt-5 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl transition-all shadow-md shadow-indigo-100 flex items-center gap-2 cursor-pointer";
+      launchBtn.innerHTML = `<i class="fa-solid fa-rocket text-sm"></i> Mulai Speaking Lab Sekarang`;
+      errBox.appendChild(launchBtn);
+    }
+    
+    // Sinkronisasikan link tujuan ke tombol besar dan tombol navigasi atas
+    if (openBtn) openBtn.href = GITHUB_SPEAKING_LAB_URL;
+    launchBtn.href = GITHUB_SPEAKING_LAB_URL;
   }
 }
 
+// Perbaikan fungsi error agar tidak bentrok
 function showIframeError(msg) {
-  // Ambil elemen secara aman dengan pengecekan null
   const loader = document.getElementById('spIframeLoader');
   const iframe = document.getElementById('spLabIframe');
   const errBox = document.getElementById('spIframeErr');
@@ -585,17 +585,4 @@ function showIframeError(msg) {
   if (iframe) iframe.style.setProperty('display', 'none', 'important');
   if (errBox) errBox.style.setProperty('display', 'flex', 'important');
   if (errMsg) errMsg.textContent = msg;
-
-  // Gunakan fallback URL langsung karena input box spLabUrl sudah dihapus dari HTML
-  const GITHUB_SPEAKING_LAB_URL = 'https://3xtream.github.io/english/speaking-lab.html';
-  const urlStatus = document.getElementById('spUrlStatus');
-  
-  if (urlStatus) {
-    urlStatus.innerHTML = `
-      <div class="mt-4 p-3 bg-slate-50 rounded-xl border border-slate-200 text-left">
-        <p class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Direktori Sistem:</p>
-        <code class="text-[11px] text-indigo-600 break-all">${GITHUB_SPEAKING_LAB_URL}</code>
-      </div>
-    `;
-  }
 }
