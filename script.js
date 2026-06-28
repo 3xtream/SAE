@@ -57,12 +57,16 @@ function flipCard() {
 // ═══════════════════════════════════════════════════════
 async function callAPI(action, params = {}) {
   if (!GAS_API_URL) throw new Error('URL API belum dikonfigurasi.');
+  
   const body = JSON.stringify({ action, ...params });
-  const res  = await fetch(GAS_API_URL, {
-    method:  'POST',
+  
+  // Kirim data sebagai text/plain, yang secara aturan CORS tidak memerlukan preflight check dari server
+  const res = await fetch(GAS_API_URL, {
+    method: 'POST',
     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body
+    body: body
   });
+  
   if (!res.ok) throw new Error('HTTP ' + res.status);
   return await res.json();
 }
