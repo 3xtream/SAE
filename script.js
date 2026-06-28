@@ -318,16 +318,39 @@ async function markAsMasteredFromCard(e) {
 //  NAVIGATION & DYNAMIC CONTENT
 // ═══════════════════════════════════════════════════════
 function show(id) {
-  document.querySelectorAll('#mainApp > .section').forEach(s => { s.classList.remove('active'); s.style.display = 'none'; });
-  document.querySelectorAll('#premium-dynamic-placeholder .section').forEach(s => { s.classList.remove('active'); s.style.display = 'none'; });
+  // FIXED: Mengubah selector agar mencakup seluruh elemen .section di dalam #mainApp tanpa batasan kedalaman hirarki (menghapus tanda '>')
+  document.querySelectorAll('#mainApp .section').forEach(s => { 
+    s.classList.remove('active'); 
+    s.style.setProperty('display', 'none', 'important'); 
+  });
+  document.querySelectorAll('#premium-dynamic-placeholder .section').forEach(s => { 
+    s.classList.remove('active'); 
+    s.style.setProperty('display', 'none', 'important'); 
+  });
+  
   if (id === 'preschool' || id === 'elementary' || id === 'writing') {
-    const pc = document.getElementById('premium-content-section'); if (pc) { pc.classList.add('active'); pc.style.display = 'block'; }
-    const tl = document.getElementById(id); if (tl) { tl.classList.add('active'); tl.style.display = 'block'; }
+    const pc = document.getElementById('premium-content-section'); 
+    if (pc) { 
+      pc.classList.add('active'); 
+      pc.style.setProperty('display', 'block', 'important'); 
+    }
+    const tl = document.getElementById(id); 
+    if (tl) { 
+      tl.classList.add('active'); 
+      tl.style.setProperty('display', 'block', 'important'); 
+    }
   } else {
-    const tp = document.getElementById(id); if (tp) { tp.classList.add('active'); tp.style.display = 'block'; }
+    const tp = document.getElementById(id); 
+    if (tp) { 
+      tp.classList.add('active'); 
+      tp.style.setProperty('display', 'block', 'important'); 
+    }
   }
+  
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  const tb = document.getElementById('btn-' + id); if (tb) tb.classList.add('active');
+  const tb = document.getElementById('btn-' + id); 
+  if (tb) tb.classList.add('active');
+  
   if (id === 'flashcard-tab') initFlashcards();
   if (id === 'speaking-lab') {
     const iframeEl = document.getElementById('spLabIframe');
