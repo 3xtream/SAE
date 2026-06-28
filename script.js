@@ -575,8 +575,27 @@ async function loadSpeakingLabIframe() {
 }
 
 function showIframeError(msg) {
-  document.getElementById('spIframeLoader').style.display = 'none';
-  document.getElementById('spLabIframe').style.display    = 'none';
-  document.getElementById('spIframeErr').style.display    = '';
-  document.getElementById('spIframeErrMsg').textContent   = msg;
+  // Ambil elemen secara aman dengan pengecekan null
+  const loader = document.getElementById('spIframeLoader');
+  const iframe = document.getElementById('spLabIframe');
+  const errBox = document.getElementById('spIframeErr');
+  const errMsg = document.getElementById('spIframeErrMsg');
+  
+  if (loader) loader.style.setProperty('display', 'none', 'important');
+  if (iframe) iframe.style.setProperty('display', 'none', 'important');
+  if (errBox) errBox.style.setProperty('display', 'flex', 'important');
+  if (errMsg) errMsg.textContent = msg;
+
+  // Gunakan fallback URL langsung karena input box spLabUrl sudah dihapus dari HTML
+  const GITHUB_SPEAKING_LAB_URL = 'https://3xtream.github.io/english/speaking-lab.html';
+  const urlStatus = document.getElementById('spUrlStatus');
+  
+  if (urlStatus) {
+    urlStatus.innerHTML = `
+      <div class="mt-4 p-3 bg-slate-50 rounded-xl border border-slate-200 text-left">
+        <p class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Direktori Sistem:</p>
+        <code class="text-[11px] text-indigo-600 break-all">${GITHUB_SPEAKING_LAB_URL}</code>
+      </div>
+    `;
+  }
 }
