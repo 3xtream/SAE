@@ -193,7 +193,7 @@ async function refreshDataFromDatabase() {
     });
   } catch(e) {
     alert('Gagal memuat data: ' + e.message);
-  } finaly {
+  } finally {
     showLoader(false);
   }
 }
