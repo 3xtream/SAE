@@ -719,44 +719,5 @@
 
   <!-- CORE SCRIPT — semua logika ada di script.js -->
   <script src="script.js"></script>
-
-  <script>
-    // ─── Fungsi navigasi tab (dipisah dari script.js agar tidak ada circular dependency) ───
-
-    function setActiveNav(element) {
-      document.querySelectorAll('.nav-btn').forEach(btn => {
-        btn.classList.remove('bg-indigo-50', 'text-indigo-700', 'active');
-        btn.classList.add('text-slate-500', 'hover:bg-slate-50', 'hover:text-slate-800');
-      });
-      element.classList.remove('text-slate-500', 'hover:bg-slate-50', 'hover:text-slate-800');
-      element.classList.add('bg-indigo-50', 'text-indigo-700', 'active');
-    }
-
-    function pindahTab(sectionId) {
-      document.querySelectorAll('.section').forEach(sec => {
-        sec.style.setProperty('display', 'none', 'important');
-        sec.classList.remove('active');
-      });
-      const activeSection = document.getElementById(sectionId);
-      if (activeSection) {
-        activeSection.style.setProperty('display', 'block', 'important');
-        activeSection.classList.add('active');
-      }
-      // Trigger fungsi spesifik saat tab tertentu dibuka
-      if (sectionId === 'flashcard-tab' && typeof initFlashcards === 'function') initFlashcards();
-      if (sectionId === 'speaking-lab'  && typeof loadSpeakingLabIframe === 'function') loadSpeakingLabIframe();
-    }
-
-    // Pastikan dashboard langsung terbuka saat app aktif
-    window.addEventListener('load', () => {
-      const checkActiveSession = setInterval(() => {
-        const app = document.getElementById('mainApp');
-        if (app && app.style.display === 'block') {
-          pindahTab('dashboard');
-          clearInterval(checkActiveSession);
-        }
-      }, 300);
-    });
-  </script>
 </body>
 </html>
