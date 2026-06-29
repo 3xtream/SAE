@@ -1,34 +1,39 @@
 // ═══════════════════════════════════════════════════════════════════════════
-//  SISTEM AKUISISI ENGLISH v4.7.2 — script.js (FIXED & CONSOLIDATED)
-//  Changelog:
-//    - FIX: displayCard() duplikat dihapus, versi final digabung
-//    - FIX: processDatabaseRender() sekarang restore Phase Checklist dari server
-//    - FIX: handleWpmChange() pakai endpoint "updateWpmOnly", tidak mengotori Daily_Logs
-//    - FIX: Semua alert() diganti notifikasi banner inline non-blocking
-//    - FIX: Kode mati (saveApiUrl, showApiSetup) dibersihkan
-//    - IMPROVEMENT: Grafik harian ditingkatkan dengan label nilai & tooltip informatif
-//    - IMPROVEMENT: Skeleton loader saat data pertama kali dimuat
+//  SISTEM AKUISISI ENGLISH v4.7.3 — script.js (FIXED & CONSOLIDATED)
+//
+//  Changelog v4.7.3:
+//    FIX: selectedAnswer dideklarasikan secara eksplisit (tidak lagi implicit global)
+//    FIX: Seluruh alert() pada modul Quiz diganti showBanner() (non-blocking)
+//    FIX: Fungsi show() (dead code) dihapus; navigasi terpusat di pindahTab()
+//    FIX: loadAndShowPremiumContent() kini menggunakan pindahTab()
+//    FIX: SPEAKING_LAB_URL dikonsolidasi menjadi satu konstanta di atas file
+//    FIX: setActiveNav() & pindahTab() dipindahkan ke file ini (tidak lagi split)
+//    IMPROVEMENT: Navigasi onload dashboard tidak lagi bergantung polling interval
 // ═══════════════════════════════════════════════════════════════════════════
 
-const LS_SESSION_KEY = 'memberSession_v47';
+// ─── KONSTANTA GLOBAL ────────────────────────────────────────────────────────
 
-// URL API hardcoded — ganti jika redeploy GAS
-const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbyNd61rOZ1XwcmzsN3f5PoALkFxtuz8jr2ePCstaTeryAlT3PCt8Hogsqkn0hJf7SA4/exec';
+const LS_SESSION_KEY   = 'memberSession_v47';
+const GAS_API_URL      = 'https://script.google.com/macros/s/AKfycbyNd61rOZ1XwcmzsN3f5PoALkFxtuz8jr2ePCstaTeryAlT3PCt8Hogsqkn0hJf7SA4/exec';
+const SPEAKING_LAB_URL = 'https://3xtream.github.io/english/speaking-lab.html';
+
+// ─── STATE APLIKASI ───────────────────────────────────────────────────────────
 
 let currentUser      = null;
 let flashcardList    = [];
 let currentCardIndex = 0;
 let speechRate       = 0.7;
-// =====================================
-// QUIZ
-// =====================================
-let quizQuestions = [];
-let currentQuestion = 0;
-let score = 0;
-let userAnswers = [];
+
+// State Quiz
+let quizQuestions    = [];
+let currentQuestion  = 0;
+let score            = 0;
+let userAnswers      = [];
+let selectedAnswer   = null;   // FIX: dideklarasikan eksplisit, tidak lagi implicit global
+
 
 // ═══════════════════════════════════════════════════════════════════════════
-//  NOTIFIKASI BANNER INLINE (Menggantikan alert() yang memblokir UI)
+//  NOTIFIKASI BANNER INLINE (menggantikan seluruh alert() di aplikasi)
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
@@ -43,11 +48,11 @@ function showBanner(message, type = 'error', duration = 5000) {
     banner = document.createElement('div');
     banner.id = 'globalBanner';
     banner.style.cssText = `
-      position: fixed; top: 72px; left: 50%; transform: translateX(-50%);
-      z-index: 9999; min-width: 320px; max-width: 90vw;
-      padding: 12px 18px; border-radius: 12px; font-size: 13px; font-weight: 600;
-      display: flex; align-items: center; gap: 10px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.12); transition: opacity 0.3s;
+      position:fixed; top:72px; left:50%; transform:translateX(-50%);
+      z-index:9999; min-width:320px; max-width:90vw;
+      padding:12px 18px; border-radius:12px; font-size:13px; font-weight:600;
+      display:flex; align-items:center; gap:10px;
+      box-shadow:0 4px 20px rgba(0,0,0,.12); transition:opacity .3s;
     `;
     document.body.appendChild(banner);
   }
@@ -55,19 +60,19 @@ function showBanner(message, type = 'error', duration = 5000) {
   const styles = {
     error:   { bg: '#fef2f2', border: '#fca5a5', color: '#991b1b', icon: '✕' },
     success: { bg: '#f0fdf4', border: '#86efac', color: '#166534', icon: '✓' },
-    info:    { bg: '#eff6ff', border: '#93c5fd', color: '#1e40af', icon: 'ℹ' }
+    info:    { bg: '#eff6ff', border: '#93c5fd', color: '#1e40af', icon: 'ℹ' },
   };
   const s = styles[type] || styles.info;
 
-  banner.style.background   = s.bg;
-  banner.style.border       = `1px solid ${s.border}`;
-  banner.style.color        = s.color;
-  banner.style.opacity      = '1';
+  banner.style.background    = s.bg;
+  banner.style.border        = `1px solid ${s.border}`;
+  banner.style.color         = s.color;
+  banner.style.opacity       = '1';
   banner.style.pointerEvents = 'auto';
   banner.innerHTML = `
     <span style="font-size:16px;line-height:1">${s.icon}</span>
     <span style="flex:1">${message}</span>
-    <span onclick="hideBanner()" style="cursor:pointer;opacity:0.6;font-size:16px;line-height:1;margin-left:4px">✕</span>
+    <span onclick="hideBanner()" style="cursor:pointer;opacity:.6;font-size:16px;line-height:1;margin-left:4px">✕</span>
   `;
 
   if (banner._hideTimer) clearTimeout(banner._hideTimer);
@@ -79,10 +84,11 @@ function showBanner(message, type = 'error', duration = 5000) {
 function hideBanner() {
   const banner = document.getElementById('globalBanner');
   if (banner) {
-    banner.style.opacity = '0';
+    banner.style.opacity       = '0';
     banner.style.pointerEvents = 'none';
   }
 }
+
 
 // ═══════════════════════════════════════════════════════════════════════════
 //  SKELETON LOADER
@@ -92,10 +98,44 @@ function showSkeletons() {
   ['totalProgress', 'totalDays', 'vocabCount'].forEach(id => {
     const el = document.getElementById(id);
     if (el) {
-      el.innerHTML = '<span style="display:inline-block;width:48px;height:20px;background:linear-gradient(90deg,#e2e8f0 25%,#f1f5f9 50%,#e2e8f0 75%);background-size:200% 100%;animation:skeletonShimmer 1.2s infinite;border-radius:4px"></span>';
+      el.innerHTML = `<span style="display:inline-block;width:48px;height:20px;
+        background:linear-gradient(90deg,#e2e8f0 25%,#f1f5f9 50%,#e2e8f0 75%);
+        background-size:200% 100%;animation:skeletonShimmer 1.2s infinite;
+        border-radius:4px"></span>`;
     }
   });
 }
+
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  NAVIGASI TAB  (FIX: dipindahkan ke sini — tidak lagi split antara
+//                 script.js dan inline <script> di HTML)
+// ═══════════════════════════════════════════════════════════════════════════
+
+function setActiveNav(element) {
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.classList.remove('bg-indigo-50', 'text-indigo-700', 'active');
+    btn.classList.add('text-slate-500', 'hover:bg-slate-50', 'hover:text-slate-800');
+  });
+  element.classList.remove('text-slate-500', 'hover:bg-slate-50', 'hover:text-slate-800');
+  element.classList.add('bg-indigo-50', 'text-indigo-700', 'active');
+}
+
+function pindahTab(sectionId) {
+  document.querySelectorAll('.section').forEach(sec => {
+    sec.style.setProperty('display', 'none', 'important');
+    sec.classList.remove('active');
+  });
+  const activeSection = document.getElementById(sectionId);
+  if (activeSection) {
+    activeSection.style.setProperty('display', 'block', 'important');
+    activeSection.classList.add('active');
+  }
+  // Trigger fungsi spesifik saat tab tertentu dibuka
+  if (sectionId === 'flashcard-tab' && typeof initFlashcards === 'function') initFlashcards();
+  if (sectionId === 'speaking-lab'  && typeof loadSpeakingLabIframe === 'function') loadSpeakingLabIframe();
+}
+
 
 // ═══════════════════════════════════════════════════════════════════════════
 //  API HELPER
@@ -107,14 +147,15 @@ async function callAPI(action, params = {}) {
   const res  = await fetch(GAS_API_URL, {
     method:  'POST',
     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body
+    body,
   });
   if (!res.ok) throw new Error('HTTP ' + res.status);
-  return await res.json();
+  return res.json();
 }
 
+
 // ═══════════════════════════════════════════════════════════════════════════
-//  INIT
+//  INISIALISASI & GLOBAL STYLES
 // ═══════════════════════════════════════════════════════════════════════════
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -132,52 +173,59 @@ function _injectGlobalStyles() {
       0%   { background-position: 200% 0; }
       100% { background-position: -200% 0; }
     }
-    .graph-bar-wrap { display: flex; flex-direction: column; align-items: center; flex: 1; gap: 4px; min-width: 0; }
+    .graph-bar-wrap {
+      display:flex; flex-direction:column; align-items:center;
+      flex:1; gap:4px; min-width:0;
+    }
     .graph-bar-inner {
-      width: 100%; border-radius: 6px 6px 0 0;
-      background: linear-gradient(to top, #6366f1, #818cf8);
-      position: relative; cursor: default; transition: opacity 0.2s;
-      min-height: 4px;
+      width:100%; border-radius:6px 6px 0 0;
+      background:linear-gradient(to top,#6366f1,#818cf8);
+      position:relative; cursor:default; transition:opacity .2s;
+      min-height:4px;
     }
-    .graph-bar-inner:hover { opacity: 0.8; }
+    .graph-bar-inner:hover { opacity:.8; }
     .graph-bar-inner .g-tooltip {
-      display: none; position: absolute; bottom: calc(100% + 6px); left: 50%;
-      transform: translateX(-50%);
-      background: #1e293b; color: #fff; font-size: 11px; font-weight: 600;
-      padding: 4px 8px; border-radius: 6px; white-space: nowrap; z-index: 10;
-      pointer-events: none;
+      display:none; position:absolute; bottom:calc(100% + 6px); left:50%;
+      transform:translateX(-50%);
+      background:#1e293b; color:#fff; font-size:11px; font-weight:600;
+      padding:4px 8px; border-radius:6px; white-space:nowrap;
+      z-index:10; pointer-events:none;
     }
-    .graph-bar-inner:hover .g-tooltip { display: block; }
+    .graph-bar-inner:hover .g-tooltip { display:block; }
     .graph-bar-inner .g-tooltip::after {
-      content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
-      border: 5px solid transparent; border-top-color: #1e293b;
+      content:''; position:absolute; top:100%; left:50%; transform:translateX(-50%);
+      border:5px solid transparent; border-top-color:#1e293b;
     }
-    .graph-val-label { font-size: 10px; font-weight: 700; color: #6366f1; }
-    .graph-date-label { font-size: 9px; color: #94a3b8; font-family: monospace; text-align: center; }
-    .graph-bar-inner.today-bar { background: linear-gradient(to top, #4f46e5, #6366f1); }
-    .speaking { animation: pulse 1s infinite; }
-    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
-    .vocab-item { display:flex; align-items:center; background:#f9f9f9; padding:6px 10px; border:1px solid #eee; border-radius:4px; font-size:13px; user-select:none; cursor:pointer; }
+    .graph-val-label  { font-size:10px; font-weight:700; color:#6366f1; }
+    .graph-date-label { font-size:9px; color:#94a3b8; font-family:monospace; text-align:center; }
+    .graph-bar-inner.today-bar { background:linear-gradient(to top,#4f46e5,#6366f1); }
+    .speaking { animation:pulse 1s infinite; }
+    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.6; } }
+    .vocab-item {
+      display:flex; align-items:center; background:#f9f9f9;
+      padding:6px 10px; border:1px solid #eee; border-radius:4px;
+      font-size:13px; user-select:none; cursor:pointer;
+    }
     .vocab-item input { margin-right:8px; cursor:pointer; }
-    .vocab-item span { color:#666; font-size:11px; margin-left:4px; }
-    .section { display: none; }
-    .section.active { display: block; animation: fadeIn 0.25s ease-in-out; }
-    .perspective { perspective: 1000px; }
-    .transform-style-3d { transform-style: preserve-3d; }
-    .backface-hidden { backface-visibility: hidden; }
-    .rotate-y-180 { transform: rotateY(180deg); }
-    #fCard.flipped { transform: rotateY(180deg); }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
-    .badge.b-ok  { background:#dcfce7; color:#166534; padding:2px 7px; border-radius:4px; font-size:11px; font-weight:700; }
+    .vocab-item span  { color:#666; font-size:11px; margin-left:4px; }
+    .section         { display:none; }
+    .section.active  { display:block; animation:fadeIn .25s ease-in-out; }
+    .perspective        { perspective:1000px; }
+    .transform-style-3d { transform-style:preserve-3d; }
+    .backface-hidden    { backface-visibility:hidden; }
+    .rotate-y-180       { transform:rotateY(180deg); }
+    #fCard.flipped      { transform:rotateY(180deg); }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:translateY(0); } }
+    .badge.b-ok   { background:#dcfce7; color:#166534; padding:2px 7px; border-radius:4px; font-size:11px; font-weight:700; }
     .badge.b-warn { background:#fef9c3; color:#854d0e; padding:2px 7px; border-radius:4px; font-size:11px; font-weight:700; }
-    .badge.b-no  { background:#fee2e2; color:#991b1b; padding:2px 7px; border-radius:4px; font-size:11px; font-weight:700; }
+    .badge.b-no   { background:#fee2e2; color:#991b1b; padding:2px 7px; border-radius:4px; font-size:11px; font-weight:700; }
   `;
   document.head.appendChild(style);
 }
 
 function startApp() {
   let raw = null;
-  try { raw = localStorage.getItem(LS_SESSION_KEY); } catch(e) {}
+  try { raw = localStorage.getItem(LS_SESSION_KEY); } catch (e) {}
   if (raw) {
     try {
       const s = JSON.parse(raw);
@@ -186,8 +234,10 @@ function startApp() {
         activateApp();
         return;
       }
-      try { localStorage.removeItem(LS_SESSION_KEY); } catch(e) {}
-    } catch(e) { try { localStorage.removeItem(LS_SESSION_KEY); } catch(e2) {} }
+      try { localStorage.removeItem(LS_SESSION_KEY); } catch (e) {}
+    } catch (e) {
+      try { localStorage.removeItem(LS_SESSION_KEY); } catch (e2) {}
+    }
   }
   showAuthPage();
 }
@@ -202,15 +252,25 @@ function setDefaultDate() {
   if (d) d.value = new Date().toISOString().substring(0, 10);
 }
 
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  AUTH — HALAMAN & FORM
+// ═══════════════════════════════════════════════════════════════════════════
+
 function switchAuth(t) {
   const isLogin = t === 'login';
+
   const tabLogin    = document.getElementById('tabLogin');
   const tabRegister = document.getElementById('tabRegister');
   const loginBox    = document.getElementById('loginBox');
   const registerBox = document.getElementById('registerBox');
 
-  if (tabLogin)    tabLogin.className    = isLogin ? 'flex-1 py-2.5 text-center rounded-lg cursor-pointer transition-all bg-white text-slate-900 shadow-2xs' : 'flex-1 py-2.5 text-center rounded-lg cursor-pointer transition-all hover:text-slate-900 text-slate-500';
-  if (tabRegister) tabRegister.className = !isLogin ? 'flex-1 py-2.5 text-center rounded-lg cursor-pointer transition-all bg-white text-slate-900 shadow-2xs' : 'flex-1 py-2.5 text-center rounded-lg cursor-pointer transition-all hover:text-slate-900 text-slate-500';
+  if (tabLogin)    tabLogin.className    = isLogin
+    ? 'flex-1 py-2.5 text-center rounded-lg cursor-pointer transition-all bg-white text-slate-900 shadow-2xs'
+    : 'flex-1 py-2.5 text-center rounded-lg cursor-pointer transition-all hover:text-slate-900 text-slate-500';
+  if (tabRegister) tabRegister.className = !isLogin
+    ? 'flex-1 py-2.5 text-center rounded-lg cursor-pointer transition-all bg-white text-slate-900 shadow-2xs'
+    : 'flex-1 py-2.5 text-center rounded-lg cursor-pointer transition-all hover:text-slate-900 text-slate-500';
   if (loginBox)    loginBox.style.display    = isLogin ? 'block' : 'none';
   if (registerBox) registerBox.style.display = !isLogin ? 'block' : 'none';
 }
@@ -221,16 +281,12 @@ function showAuthPage() {
   switchAuth('login');
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-//  AUTH
-// ═══════════════════════════════════════════════════════════════════════════
-
 async function handleRegister() {
   const name  = document.getElementById('regName').value.trim();
   const email = document.getElementById('regEmail').value.trim();
   const pass  = document.getElementById('regPassword').value;
   if (!name || !email || !pass) { showBanner('Lengkapi semua field terlebih dahulu.', 'error'); return; }
-  if (pass.length < 6) { showBanner('Password minimal 6 karakter.', 'error'); return; }
+  if (pass.length < 6)          { showBanner('Password minimal 6 karakter.', 'error'); return; }
   showLoader(true);
   try {
     const r = await callAPI('registerUser', { email, password: pass, fullName: name });
@@ -240,10 +296,13 @@ async function handleRegister() {
       document.getElementById('regEmail').value    = '';
       document.getElementById('regPassword').value = '';
       switchAuth('login');
-      document.getElementById('loginEmail').value = email;
+      document.getElementById('loginEmail').value  = email;
     }
-  } catch(e) { showBanner('Error koneksi: ' + e.message, 'error'); }
-  finally { showLoader(false); }
+  } catch (e) {
+    showBanner('Error koneksi: ' + e.message, 'error');
+  } finally {
+    showLoader(false);
+  }
 }
 
 async function handleLogin() {
@@ -255,13 +314,21 @@ async function handleLogin() {
     const r = await callAPI('loginUser', { email, password: pass });
     if (r.success) {
       currentUser = { email: r.user.email, fullName: r.user.fullName, token: r.token };
-      try { localStorage.setItem(LS_SESSION_KEY, JSON.stringify({ ...currentUser, expiresAt: Date.now() + 7*24*60*60*1000 })); } catch(e) {}
+      try {
+        localStorage.setItem(LS_SESSION_KEY, JSON.stringify({
+          ...currentUser,
+          expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000,
+        }));
+      } catch (e) {}
       activateApp();
     } else {
       showBanner(r.message, 'error');
     }
-  } catch(e) { showBanner('Error koneksi: ' + e.message, 'error'); }
-  finally { showLoader(false); }
+  } catch (e) {
+    showBanner('Error koneksi: ' + e.message, 'error');
+  } finally {
+    showLoader(false);
+  }
 }
 
 function activateApp() {
@@ -277,20 +344,26 @@ function activateApp() {
   if (setupCard)  setupCard.style.setProperty('display', 'none', 'important');
   if (iframeWrap) iframeWrap.style.setProperty('display', 'flex', 'important');
 
+  // FIX: Langsung buka dashboard tanpa polling interval
+  pindahTab('dashboard');
+  const btnDashboard = document.getElementById('btn-dashboard');
+  if (btnDashboard) setActiveNav(btnDashboard);
+
   showSkeletons();
   refreshDataFromDatabase();
 }
 
 function handleLogout() {
-  try { localStorage.removeItem(LS_SESSION_KEY); } catch(e) {}
-  currentUser = null;
-  flashcardList = [];
+  try { localStorage.removeItem(LS_SESSION_KEY); } catch (e) {}
+  currentUser      = null;
+  flashcardList    = [];
   currentCardIndex = 0;
   document.getElementById('loginEmail').value    = '';
   document.getElementById('loginPassword').value = '';
   switchAuth('login');
   showAuthPage();
 }
+
 
 // ═══════════════════════════════════════════════════════════════════════════
 //  DATA REFRESH & RENDER
@@ -302,7 +375,7 @@ async function refreshDataFromDatabase() {
   try {
     const [vb, dd] = await Promise.all([
       callAPI('getVocabBank',     { email: currentUser.email, token: currentUser.token }),
-      callAPI('getDashboardData', { email: currentUser.email, token: currentUser.token })
+      callAPI('getDashboardData', { email: currentUser.email, token: currentUser.token }),
     ]);
 
     if (vb && vb.success === false) throw new Error(vb.message);
@@ -311,14 +384,14 @@ async function refreshDataFromDatabase() {
     const masteredList = (Array.isArray(vb) ? vb : []).filter(v => v.mastered).map(v => v.id);
 
     processDatabaseRender({
-      vocabBank:     Array.isArray(vb) ? vb : [],
-      last7Logs:     dd.logs          || [],
-      totalMinutes:  dd.totalMinutes  || 0,
-      latestWpm:     dd.latestWpm     || 0,
+      vocabBank:      Array.isArray(vb) ? vb : [],
+      last7Logs:      dd.logs          || [],
+      totalMinutes:   dd.totalMinutes  || 0,
+      latestWpm:      dd.latestWpm     || 0,
       masteredVocabs: masteredList,
-      checkedPhases:  dd.checkedPhases || { 1:[], 2:[], 3:[], 4:[] }
+      checkedPhases:  dd.checkedPhases || { 1: [], 2: [], 3: [], 4: [] },
     });
-  } catch(e) {
+  } catch (e) {
     showBanner('Gagal memuat data: ' + e.message, 'error', 0);
   } finally {
     showLoader(false);
@@ -327,7 +400,10 @@ async function refreshDataFromDatabase() {
 
 function renderVocabHTML(vb) {
   if (!vb) return;
-  for (let i = 1; i <= 7; i++) { const e = document.getElementById(`cat${i}`); if (e) e.innerHTML = ''; }
+  for (let i = 1; i <= 7; i++) {
+    const e = document.getElementById(`cat${i}`);
+    if (e) e.innerHTML = '';
+  }
   vb.forEach(item => {
     if (!item.id) return;
     const catId = item.id.split('-')[0].toLowerCase();
@@ -343,11 +419,8 @@ function renderVocabHTML(vb) {
 
 function processDatabaseRender(data) {
   try {
-    // Render vocab list
-    if (data.vocabBank) renderVocabHTML(data.vocabBank);
-
-    // Render grafik
-    if (data.last7Logs) renderDailyGraph(data.last7Logs);
+    if (data.vocabBank)  renderVocabHTML(data.vocabBank);
+    if (data.last7Logs)  renderDailyGraph(data.last7Logs);
 
     // Streak days
     const streakDays = data.last7Logs ? data.last7Logs.filter(l => l.duration > 0).length : 0;
@@ -378,8 +451,8 @@ function processDatabaseRender(data) {
     });
     updateVocabStatusMilestone(cc);
 
-    // FIX: Restore Phase Checklist dari data server
-    const cp = data.checkedPhases || { 1:[], 2:[], 3:[], 4:[] };
+    // Restore Phase Checklist dari data server
+    const cp = data.checkedPhases || { 1: [], 2: [], 3: [], 4: [] };
     [1, 2, 3, 4].forEach(p => {
       const checkedIndices = cp[p] || [];
       const cks = document.querySelectorAll(`.p${p}-chk`);
@@ -403,11 +476,14 @@ function processDatabaseRender(data) {
 
     calculateOverallGlobalProgress();
     initFlashcards();
-  } catch(err) { console.error('processDatabaseRender error:', err); }
+  } catch (err) {
+    console.error('processDatabaseRender error:', err);
+  }
 }
 
+
 // ═══════════════════════════════════════════════════════════════════════════
-//  FLASHCARD SYSTEM (displayCard didefinisikan SEKALI di sini)
+//  FLASHCARD SYSTEM
 // ═══════════════════════════════════════════════════════════════════════════
 
 async function initFlashcards() {
@@ -417,20 +493,18 @@ async function initFlashcards() {
     flashcardList    = Array.isArray(d) ? d : [];
     currentCardIndex = 0;
     displayCard();
-  } catch(e) {
+  } catch (e) {
     console.error('Flashcard init error:', e);
   }
 }
 
-/** FIX: Satu definisi tunggal — menggabungkan fitur progress bar dari versi pertama
- *       dengan null-check ketat dari versi kedua. */
 function displayCard() {
   const fCard = document.getElementById('fCard');
   if (fCard) fCard.classList.remove('flipped');
 
-  const tracker    = document.getElementById('fcTracker');
-  const frontWord  = document.getElementById('fcFrontWord');
-  const backMeaning = document.getElementById('fcBackMeaning');
+  const tracker      = document.getElementById('fcTracker');
+  const frontWord    = document.getElementById('fcFrontWord');
+  const backMeaning  = document.getElementById('fcBackMeaning');
 
   if (!flashcardList || flashcardList.length === 0) {
     if (frontWord)   frontWord.textContent  = '🎉 Selesai!';
@@ -490,6 +564,7 @@ async function markAsMasteredFromCard(e) {
   displayCard();
 }
 
+
 // ═══════════════════════════════════════════════════════════════════════════
 //  AUDIO — SPEECH SYNTHESIS
 // ═══════════════════════════════════════════════════════════════════════════
@@ -498,10 +573,10 @@ function speakWord(word) {
   if (!word || word === '-' || word === '🎉 Selesai!') return;
   if (!('speechSynthesis' in window)) return;
   window.speechSynthesis.cancel();
-  const u  = new SpeechSynthesisUtterance(word);
-  u.lang   = 'en-US'; u.rate = speechRate; u.pitch = 1; u.volume = 1;
-  const vs = window.speechSynthesis.getVoices();
-  const ev = vs.find(v => v.lang.startsWith('en') && v.localService) || vs.find(v => v.lang.startsWith('en'));
+  const u   = new SpeechSynthesisUtterance(word);
+  u.lang    = 'en-US'; u.rate = speechRate; u.pitch = 1; u.volume = 1;
+  const vs  = window.speechSynthesis.getVoices();
+  const ev  = vs.find(v => v.lang.startsWith('en') && v.localService) || vs.find(v => v.lang.startsWith('en'));
   if (ev) u.voice = ev;
   const btn = document.getElementById('btnSpeak');
   const st  = document.getElementById('speechStatus');
@@ -524,51 +599,24 @@ function setSpeed(r, el) {
   if (el) el.className = 'speed-btn active px-2.5 py-1 text-[10px] font-bold bg-indigo-600 text-white rounded-lg';
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-//  NAVIGASI & KONTEN DINAMIS
-// ═══════════════════════════════════════════════════════════════════════════
 
-function show(id) {
-  document.querySelectorAll('#mainApp .section').forEach(s => {
-    s.classList.remove('active');
-    s.style.setProperty('display', 'none', 'important');
-  });
-  document.querySelectorAll('#premium-dynamic-placeholder .section').forEach(s => {
-    s.classList.remove('active');
-    s.style.setProperty('display', 'none', 'important');
-  });
-  if (id === 'preschool' || id === 'elementary' || id === 'writing') {
-    const pc = document.getElementById('premium-content-section');
-    if (pc) { pc.classList.add('active'); pc.style.setProperty('display', 'block', 'important'); }
-    const tl = document.getElementById(id);
-    if (tl) { tl.classList.add('active'); tl.style.setProperty('display', 'block', 'important'); }
-  } else {
-    const tp = document.getElementById(id);
-    if (tp) { tp.classList.add('active'); tp.style.setProperty('display', 'block', 'important'); }
-  }
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  const tb = document.getElementById('btn-' + id);
-  if (tb) tb.classList.add('active');
-  if (id === 'flashcard-tab') initFlashcards();
-  if (id === 'speaking-lab') {
-    const loaderEl = document.getElementById('spIframeLoader');
-    if (loaderEl) loaderEl.style.display = 'flex';
-    loadSpeakingLabIframe();
-  }
-}
+// ═══════════════════════════════════════════════════════════════════════════
+//  KONTEN PREMIUM  (FIX: gunakan pindahTab() bukan show() yang sudah dihapus)
+// ═══════════════════════════════════════════════════════════════════════════
 
 async function loadAndShowPremiumContent() {
-  show('premium-content-section');
+  pindahTab('premium-content-section');   // FIX: was show() — dead code
   document.getElementById('premium-dynamic-placeholder').innerHTML =
     '<div style="text-align:center;padding:2rem;color:#4f46e5;font-weight:bold">🔄 Mengunduh konten premium...</div>';
   try {
     const r = await callAPI('loadContentPage');
     document.getElementById('premium-dynamic-placeholder').innerHTML = r.html || '<p>Konten kosong.</p>';
-  } catch(e) {
+  } catch (e) {
     document.getElementById('premium-dynamic-placeholder').innerHTML =
       `<div style="padding:1rem;color:#991b1b;background:#fef2f2;border-radius:8px">❌ ${e.message}</div>`;
   }
 }
+
 
 // ═══════════════════════════════════════════════════════════════════════════
 //  DATA SYNC — LOGS, VOCAB, CHECKLIST
@@ -586,9 +634,9 @@ async function logDailyActivity() {
   showLoader(true);
   try {
     const r = await callAPI('saveDailyLog', {
-      email:    currentUser.email,
-      token:    currentUser.token,
-      duration, passage, wpm
+      email: currentUser.email,
+      token: currentUser.token,
+      duration, passage, wpm,
     });
     if (r.success) {
       showBanner('Log harian berhasil disimpan!', 'success');
@@ -596,8 +644,11 @@ async function logDailyActivity() {
     } else {
       showBanner(r.message, 'error');
     }
-  } catch(e) { showBanner('Error: ' + e.message, 'error'); }
-  finally { showLoader(false); }
+  } catch (e) {
+    showBanner('Error: ' + e.message, 'error');
+  } finally {
+    showLoader(false);
+  }
 }
 
 async function syncVocabPoints(el, wordId) {
@@ -608,7 +659,7 @@ async function syncVocabPoints(el, wordId) {
   try {
     await callAPI('updateVocabProgress', {
       email: currentUser.email, token: currentUser.token,
-      wordId, isMastered: checked
+      wordId, isMastered: checked,
     });
     const n = document.querySelectorAll('.vocab-chk:checked').length;
     ['currentVocabInput', 'vocabCount', 'floatingCounter'].forEach(id => {
@@ -620,7 +671,7 @@ async function syncVocabPoints(el, wordId) {
       }
     });
     updateVocabStatusMilestone(n);
-  } catch(e) {
+  } catch (e) {
     if (chk) chk.checked = !checked;
     showBanner('Gagal sinkronisasi vocab: ' + e.message, 'error');
   }
@@ -630,7 +681,7 @@ async function syncPhaseChecklist(p, idx, el) {
   try {
     await callAPI('updatePhaseChecklist', {
       email: currentUser.email, token: currentUser.token,
-      phaseNum: p, checklistIndex: idx, isChecked: el.checked
+      phaseNum: p, checklistIndex: idx, isChecked: el.checked,
     });
     const cks = document.querySelectorAll(`.p${p}-chk`);
     let n = 0;
@@ -647,20 +698,17 @@ async function syncPhaseChecklist(p, idx, el) {
     if (ptTh) ptTh.textContent = pct + '%';
     if (pbTh) pbTh.style.width  = pct + '%';
     calculateOverallGlobalProgress();
-  } catch(e) {
-    el.checked = !el.checked; // rollback
+  } catch (e) {
+    el.checked = !el.checked;   // rollback
     showBanner('Gagal simpan checklist: ' + e.message, 'error');
   }
 }
+
 
 // ═══════════════════════════════════════════════════════════════════════════
 //  WPM — KALKULASI & STATUS
 // ═══════════════════════════════════════════════════════════════════════════
 
-/**
- * FIX: Gunakan endpoint "updateWpmOnly" yang khusus untuk WPM,
- *      bukan saveDailyLog agar Daily_Logs tidak diisi entri dengan duration=0.
- */
 async function handleWpmChange() {
   if (!currentUser || !currentUser.token) return;
   const wpm = parseInt(document.getElementById('currentWpmInput').value) || 0;
@@ -669,8 +717,11 @@ async function handleWpmChange() {
   try {
     await callAPI('updateWpmOnly', { email: currentUser.email, token: currentUser.token, wpm });
     updateWPMStatus();
-  } catch(e) { showBanner('Gagal simpan WPM: ' + e.message, 'error'); }
-  finally { showLoader(false); }
+  } catch (e) {
+    showBanner('Gagal simpan WPM: ' + e.message, 'error');
+  } finally {
+    showLoader(false);
+  }
 }
 
 function updateWPMStatus() {
@@ -715,64 +766,58 @@ function calculateOverallGlobalProgress() {
   if (g) g.textContent = (all.length > 0 ? Math.round((n / all.length) * 100) : 0) + '%';
 }
 
+
 // ═══════════════════════════════════════════════════════════════════════════
-//  GRAFIK AKTIVITAS HARIAN (DITINGKATKAN)
+//  GRAFIK AKTIVITAS HARIAN
 // ═══════════════════════════════════════════════════════════════════════════
 
 function renderDailyGraph(logs) {
   const gc = document.getElementById('trackingGraph');
-  const lc = document.getElementById('graphLabels');
-  if (!gc || !lc) return;
+  if (!gc) return;
   gc.innerHTML = '';
-  lc.innerHTML = '';
 
   // Pastikan selalu 7 slot
   const slots = [];
-  for (let i = 0; i < 7; i++) slots.push(logs && logs[i] ? logs[i] : { date: '-', duration: 0, wpm: 0, passage: 0 });
+  for (let i = 0; i < 7; i++) {
+    slots.push(logs && logs[i] ? logs[i] : { date: '-', duration: 0, wpm: 0, passage: 0 });
+  }
 
   const maxDur = Math.max(...slots.map(s => s.duration), 1);
 
   slots.forEach((log, i) => {
-    const isToday    = i === 6;
-    const heightPct  = Math.max((log.duration / maxDur) * 100, log.duration > 0 ? 6 : 2);
+    const isToday   = i === 6;
+    const heightPct = Math.max((log.duration / maxDur) * 100, log.duration > 0 ? 6 : 2);
 
-    // Format label tanggal
     let dateLabel = log.date;
     if (dateLabel && dateLabel !== '-') {
       try {
         const p = dateLabel.split('-');
         if (p.length >= 3) dateLabel = p[1] + '/' + p[2];
-      } catch(e) {}
+      } catch (e) {}
     }
 
-    // Tooltip informatif
     const tooltipLines = log.duration > 0
       ? `${dateLabel} · ${log.duration} menit${log.wpm > 0 ? ' · ' + log.wpm + ' WPM' : ''}${log.passage > 0 ? ' · ' + log.passage + ' passage' : ''}`
       : `${dateLabel} · Tidak ada log`;
 
-    // Wrapper kolom
-    const wrap = document.createElement('div');
+    const wrap     = document.createElement('div');
     wrap.className = 'graph-bar-wrap';
 
-    // Label nilai di atas bar
-    const valLabel = document.createElement('div');
-    valLabel.className = 'graph-val-label';
+    const valLabel       = document.createElement('div');
+    valLabel.className   = 'graph-val-label';
     valLabel.textContent = log.duration > 0 ? log.duration + 'm' : '';
 
-    // Bar
-    const bar = document.createElement('div');
-    bar.className = 'graph-bar-inner' + (isToday ? ' today-bar' : '');
+    const bar      = document.createElement('div');
+    bar.className  = 'graph-bar-inner' + (isToday ? ' today-bar' : '');
     bar.style.height = heightPct + '%';
 
-    // Tooltip
-    const tooltip = document.createElement('div');
-    tooltip.className = 'g-tooltip';
+    const tooltip       = document.createElement('div');
+    tooltip.className   = 'g-tooltip';
     tooltip.textContent = tooltipLines;
     bar.appendChild(tooltip);
 
-    // Label tanggal di bawah
-    const dateEl = document.createElement('div');
-    dateEl.className  = 'graph-date-label';
+    const dateEl       = document.createElement('div');
+    dateEl.className   = 'graph-date-label';
     dateEl.textContent = isToday ? 'Hari ini' : dateLabel;
     if (isToday) dateEl.style.color = '#6366f1';
 
@@ -782,6 +827,7 @@ function renderDailyGraph(logs) {
     gc.appendChild(wrap);
   });
 }
+
 
 // ═══════════════════════════════════════════════════════════════════════════
 //  SPEAKING LAB INTEGRATION
@@ -794,23 +840,20 @@ async function loadSpeakingLabIframe() {
   const iframe = document.getElementById('spLabIframe');
   const wrap   = document.getElementById('spIframeWrap');
 
-  const SPEAKING_LAB_URL = 'https://3xtream.github.io/english/speaking-lab.html';
-
-  if (loader) loader.style.setProperty('display', 'flex', 'important');
-  if (errBox) errBox.style.setProperty('display', 'none', 'important');
-  if (iframe) iframe.style.setProperty('display', 'none', 'important');
-  if (wrap)   wrap.style.setProperty('display', 'block', 'important');
+  if (loader) loader.style.setProperty('display', 'flex',  'important');
+  if (errBox) errBox.style.setProperty('display', 'none',  'important');
+  if (iframe) iframe.style.setProperty('display', 'none',  'important');
+  if (wrap)   wrap.style.setProperty('display',   'block', 'important');
 
   // Jika sudah pernah dimuat, tampilkan langsung tanpa fetch ulang
   if (iframe && iframe.dataset.loaded === '1') {
-    if (loader) loader.style.setProperty('display', 'none', 'important');
+    if (loader) loader.style.setProperty('display', 'none',  'important');
     if (iframe) iframe.style.setProperty('display', 'block', 'important');
     return;
   }
 
-  // Timeout 12 detik jika GitHub Pages tidak merespons
-  const controller  = new AbortController();
-  const timeoutId   = setTimeout(() => controller.abort(), 12000);
+  const controller = new AbortController();
+  const timeoutId  = setTimeout(() => controller.abort(), 12000);
 
   try {
     const res = await fetch(SPEAKING_LAB_URL, { cache: 'no-store', signal: controller.signal });
@@ -818,10 +861,10 @@ async function loadSpeakingLabIframe() {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const html = await res.text();
     if (!iframe) throw new Error('Element #spLabIframe tidak ditemukan.');
-    iframe.srcdoc       = html;
+    iframe.srcdoc         = html;
     iframe.dataset.loaded = '1';
     iframe.onload = () => {
-      if (loader) loader.style.setProperty('display', 'none', 'important');
+      if (loader) loader.style.setProperty('display', 'none',  'important');
       if (iframe) iframe.style.setProperty('display', 'block', 'important');
     };
   } catch (err) {
@@ -847,284 +890,148 @@ function showIframeError(msg) {
   if (errMsg) errMsg.textContent = msg;
 }
 
+
 // ═══════════════════════════════════════════════════════════════════════════
-//  QUIZ
+//  LATIHAN SOAL (QUIZ)
+//  FIX: Seluruh alert() diganti showBanner(); selectedAnswer dideklarasikan
+//       di atas file sehingga tidak lagi implicit global.
 // ═══════════════════════════════════════════════════════════════════════════
 
+async function startQuiz() {
+  if (!currentUser || !currentUser.token) return;
+  const level   = document.getElementById('quiz-level').value;
+  const limit   = Number(document.getElementById('quiz-limit').value);
+  const shuffle = document.getElementById('quiz-shuffle').checked;
 
-async function startQuiz(){
+  showLoader(true);
+  try {
+    const result = await callAPI('getQuestions', {
+      email: currentUser.email,
+      token: currentUser.token,
+      level, limit, shuffle,
+    });
 
-    try{
-
-        const level =
-            document.getElementById("quiz-level").value;
-
-        const limit =
-            Number(document.getElementById("quiz-limit").value);
-
-        const shuffle =
-            document.getElementById("quiz-shuffle").checked;
-
-        const result = await callAPI(
-            "getQuestions",
-            {
-                email: currentUser.email,
-                token: currentUser.token,
-                level: level,
-                limit: limit,
-                shuffle: shuffle
-            }
-        );
-
-        if(!result.success){
-
-            alert(result.message);
-
-            return;
-
-        }
-
-        quizQuestions = result.questions;
-
-        currentQuestion = 0;
-
-        score = 0;
-
-        userAnswers = [];
-
-        console.log(quizQuestions);
-
-        // Tampilkan area quiz
-        document.getElementById("quiz-container").style.display = "block";
-        
-        // Tampilkan soal pertama
-        renderQuestion();
-
+    if (!result.success) {
+      showBanner(result.message || 'Gagal memuat soal.', 'error');   // FIX: was alert()
+      return;
+    }
+    if (!result.questions || result.questions.length === 0) {
+      showBanner('Tidak ada soal tersedia untuk level yang dipilih.', 'info');
+      return;
     }
 
-    catch(err){
+    quizQuestions   = result.questions;
+    currentQuestion = 0;
+    score           = 0;
+    userAnswers     = [];
+    selectedAnswer  = null;
 
-        alert(err.message);
-
-    }
-
+    document.getElementById('quiz-result').style.display    = 'none';
+    document.getElementById('quiz-container').style.display = 'block';
+    renderQuestion();
+  } catch (err) {
+    showBanner('Error koneksi: ' + err.message, 'error');   // FIX: was alert()
+  } finally {
+    showLoader(false);
+  }
 }
 
 function renderQuestion() {
+  selectedAnswer = null;
 
-    selectedAnswer = null;
+  const q = quizQuestions[currentQuestion];
 
-    const q = quizQuestions[currentQuestion];
+  document.getElementById('quiz-number').textContent =
+    `Soal ${currentQuestion + 1} / ${quizQuestions.length}`;
 
-    // Nomor soal
-    document.getElementById("quiz-number").textContent =
-        `Soal ${currentQuestion + 1} / ${quizQuestions.length}`;
+  // Update skor realtime
+  const scoreEl = document.getElementById('quiz-score');
+  if (scoreEl) scoreEl.textContent = `Skor : ${score}`;
 
-    // Progress
-    document.getElementById("quiz-progress").style.width =
-        ((currentQuestion + 1) / quizQuestions.length * 100) + "%";
+  document.getElementById('quiz-progress').style.width =
+    ((currentQuestion + 1) / quizQuestions.length * 100) + '%';
 
-    // Pertanyaan
-    document.getElementById("quiz-question").textContent =
-        q.pertanyaan;
+  document.getElementById('quiz-question').textContent = q.pertanyaan;
 
-    // Pilihan jawaban
-    const options = [
-        q.opsi_a,
-        q.opsi_b,
-        q.opsi_c,
-        q.opsi_d,
-        q.opsi_e
-    ];
+  const options = [q.opsi_a, q.opsi_b, q.opsi_c, q.opsi_d, q.opsi_e];
+  let html = '';
+  options.forEach((option, index) => {
+    if (!option) return;
+    const letter = String.fromCharCode(65 + index);
+    html += `
+      <label class="block border rounded-xl p-3 cursor-pointer hover:bg-indigo-50 mb-2">
+        <input type="radio" name="quizOption" value="${letter}"
+               onchange="selectedAnswer='${letter}'">
+        <strong>${letter}.</strong> ${option}
+      </label>`;
+  });
+  document.getElementById('quiz-options').innerHTML = html;
 
-    let html = "";
-
-    options.forEach((option, index) => {
-
-        if (!option) return;
-
-        const letter = String.fromCharCode(65 + index);
-
-        html += `
-            <label class="block border rounded-xl p-3 cursor-pointer hover:bg-indigo-50 mb-2">
-
-                <input
-                    type="radio"
-                    name="quizOption"
-                    value="${letter}"
-                    onchange="selectedAnswer='${letter}'">
-
-                <strong>${letter}.</strong> ${option}
-
-            </label>
-        `;
-
-    });
-
-    document.getElementById("quiz-options").innerHTML = html;
-
+  // Sembunyikan feedback dari soal sebelumnya
+  const fb = document.getElementById('quiz-feedback');
+  if (fb) fb.style.display = 'none';
 }
 
-function checkAnswer(){
+function checkAnswer() {
+  if (selectedAnswer === null) {
+    showBanner('Pilih jawaban terlebih dahulu.', 'info');   // FIX: was alert()
+    return;
+  }
 
-    if(selectedAnswer==null){
+  const q     = quizQuestions[currentQuestion];
+  const benar = String(q.jawaban_benar).trim().toUpperCase();
 
-        alert("Silakan pilih jawaban terlebih dahulu.");
+  userAnswers.push({ question: q, selected: selectedAnswer, correct: benar });
+  if (selectedAnswer === benar) score++;
 
-        return;
-
-    }
-
-    const q = quizQuestions[currentQuestion];
-
-    const benar =
-        String(q.jawaban_benar).trim().toUpperCase();
-
-    userAnswers.push({
-
-        question:q,
-
-        selected:selectedAnswer,
-
-        correct:benar
-
-    });
-
-    if(selectedAnswer===benar){
-
-        score++;
-
-    }
-
-    showAnswerResult(
-        selectedAnswer===benar,
-        benar,
-        q.penjelasan
-    );
-
+  showAnswerResult(selectedAnswer === benar, benar, q.penjelasan);
 }
 
-function showAnswerResult(isCorrect,correctAnswer,explanation){
-
-    const div =
-        document.getElementById("quiz-feedback");
-
-    div.style.display="block";
-
-    div.innerHTML=`
-
-        <div class="rounded-xl p-5 border
-        ${isCorrect
-            ?'bg-green-50 border-green-400'
-            :'bg-red-50 border-red-400'}">
-
-            <h3 class="font-bold text-xl mb-3">
-
-                ${isCorrect
-                    ?'✅ Jawaban Benar'
-                    :'❌ Jawaban Salah'}
-
-            </h3>
-
-            <p class="mb-3">
-
-                Jawaban benar :
-
-                <strong>${correctAnswer}</strong>
-
-            </p>
-
-            <p>
-
-                ${explanation}
-
-            </p>
-
-            <button
-                class="mt-5 bg-indigo-600 text-white px-4 py-2 rounded-xl"
-
-                onclick="nextQuestion()">
-
-                Soal Berikutnya
-
-            </button>
-
-        </div>
-
-    `;
-
+function showAnswerResult(isCorrect, correctAnswer, explanation) {
+  const div = document.getElementById('quiz-feedback');
+  div.style.display = 'block';
+  div.innerHTML = `
+    <div class="rounded-xl p-5 border ${isCorrect ? 'bg-green-50 border-green-400' : 'bg-red-50 border-red-400'}">
+      <h3 class="font-bold text-xl mb-3">${isCorrect ? '✅ Jawaban Benar' : '❌ Jawaban Salah'}</h3>
+      <p class="mb-3">Jawaban benar: <strong>${correctAnswer}</strong></p>
+      <p>${explanation || ''}</p>
+      <button class="mt-5 bg-indigo-600 text-white px-4 py-2 rounded-xl hover:bg-indigo-700"
+              onclick="nextQuestion()">
+        ${currentQuestion + 1 < quizQuestions.length ? 'Soal Berikutnya' : 'Lihat Hasil'}
+      </button>
+    </div>`;
 }
 
-function nextQuestion(){
-
-    document.getElementById("quiz-feedback").style.display="none";
-
-    currentQuestion++;
-
-    if(currentQuestion>=quizQuestions.length){
-
-        finishQuiz();
-
-        return;
-
-    }
-
-    renderQuestion();
-
+function nextQuestion() {
+  currentQuestion++;
+  if (currentQuestion >= quizQuestions.length) {
+    finishQuiz();
+    return;
+  }
+  renderQuestion();
 }
 
+function finishQuiz() {
+  const nilai = Math.round(score / quizQuestions.length * 100);
 
-function finishQuiz(){
+  document.getElementById('quiz-container').style.display = 'none';
+  document.getElementById('quiz-feedback').style.display  = 'none';
 
-    const nilai = Math.round(score / quizQuestions.length * 100);
-
-    document.getElementById("quiz-container").style.display = "none";
-
-    const result = document.getElementById("quiz-result");
-
-    result.style.display = "block";
-
-    result.innerHTML = `
-
-        <div class="bg-white rounded-xl shadow p-6 text-center">
-
-            <h2 class="text-3xl font-bold text-indigo-600">
-                🎉 Latihan Selesai
-            </h2>
-
-            <p class="mt-4 text-xl">
-                Nilai : <strong>${nilai}</strong>
-            </p>
-
-            <p>Benar : ${score}</p>
-
-            <p>Salah : ${quizQuestions.length-score}</p>
-
-            <button
-                onclick="restartQuiz()"
-                class="mt-5 bg-indigo-600 text-white px-5 py-3 rounded-xl">
-
-                🔄 Ulangi Latihan
-
-            </button>
-
-        </div>
-
-    `;
-
+  const result = document.getElementById('quiz-result');
+  result.style.display = 'block';
+  result.innerHTML = `
+    <div class="bg-white rounded-xl shadow p-6 text-center">
+      <h2 class="text-3xl font-bold text-indigo-600">🎉 Latihan Selesai</h2>
+      <p class="mt-4 text-xl">Nilai : <strong>${nilai}</strong></p>
+      <p>Benar : ${score} &nbsp;|&nbsp; Salah : ${quizQuestions.length - score}</p>
+      <button onclick="restartQuiz()"
+              class="mt-5 bg-indigo-600 text-white px-5 py-3 rounded-xl hover:bg-indigo-700">
+        🔄 Ulangi Latihan
+      </button>
+    </div>`;
 }
 
-function restartQuiz(){
-
-    document.getElementById("quiz-result").style.display = "none";
-
-    document.getElementById("quiz-container").style.display = "block";
-
-    startQuiz();
-
+function restartQuiz() {
+  document.getElementById('quiz-result').style.display = 'none';
+  startQuiz();
 }
-
-
-
-
-
