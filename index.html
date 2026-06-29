@@ -605,118 +605,102 @@
           <!-- ===================================== -->
           <!-- QUIZ SECTION -->
           <!-- ===================================== -->
-          
-          <div
-            id="quiz-section"
-            class="section space-y-6"
-            style="display:none">
-          
+          <div id="quiz-section" class="section space-y-6" style="display:none">
               <div class="max-w-5xl mx-auto">
-          
                   <div class="bg-white rounded-3xl shadow-lg p-8">
-          
-                      <h2 class="text-3xl font-bold text-gray-800 mb-2">
-          
-                          📚 Latihan Soal
-          
-                      </h2>
-          
+                      <h2 class="text-3xl font-bold text-gray-800 mb-2">📚 Latihan Soal</h2>
                       <p class="text-gray-500 mb-8">
-          
                           Pilih level latihan yang ingin Anda kerjakan.
-          
-                      </p>
-          
+                      </p>         
                       <div class="grid md:grid-cols-2 gap-6">
-          
                           <!-- LEVEL -->
-          
                           <div>
-          
-                              <label class="font-semibold">
-          
-                                  Level
-          
-                              </label>
-          
-                              <select
-                                  id="quiz-level"
-                                  class="mt-2 w-full rounded-xl border p-3">
-          
+                              <label class="font-semibold">Level</label>
+                              <select id="quiz-level" class="mt-2 w-full rounded-xl border p-3">
                                   <option value="">Semua Level</option>
-          
                                   <option>Foundation</option>
-          
                                   <option>Expansion</option>
-          
                                   <option>Activation</option>
-          
                                   <option>Mastery</option>
-          
                               </select>
-          
                           </div>
-          
                           <!-- JUMLAH -->
-          
                           <div>
-          
                               <label class="font-semibold">
-          
                                   Jumlah Soal
-          
                               </label>
-          
-                              <select
-                                  id="quiz-limit"
-                                  class="mt-2 w-full rounded-xl border p-3">
-          
+                              <select id="quiz-limit" class="mt-2 w-full rounded-xl border p-3">
                                   <option value="10">10 Soal</option>
-          
                                   <option value="20">20 Soal</option>
-          
                                   <option value="30">30 Soal</option>
-          
                                   <option value="0">Semua Soal</option>
-          
                               </select>
-          
                           </div>
-          
                       </div>
-          
                       <div class="mt-6 flex items-center gap-3">
-          
-                          <input
-                              id="quiz-shuffle"
-                              type="checkbox"
-                              checked>
-          
+                          <input id="quiz-shuffle" type="checkbox" checked> 
                           <label>
-          
                               Acak Soal
-          
                           </label>
-          
                       </div>
-          
-                      <button
-          
-                          id="btn-start-quiz"
-                          onclick="startQuiz()"
-          
-                          class="mt-8 w-full bg-indigo-600 text-white rounded-xl py-4 text-lg font-semibold hover:bg-indigo-700 transition">
-          
+                      <button id="btn-start-quiz" onclick="startQuiz()" class="mt-8 w-full bg-indigo-600 text-white rounded-xl py-4 text-lg font-semibold hover:bg-indigo-700 transition">
                           🚀 Mulai Latihan
-          
                       </button>
-          
+                    <!-- ========================= -->
+                    <!-- QUIZ CONTAINER -->
+                    <!-- ========================= -->
+                    
+                    <div id="quiz-container" style="display:none;margin-top:25px;">
+                    
+                        <div class="bg-white rounded-2xl shadow-md p-6">
+                    
+                            <div class="flex justify-between mb-4">
+                    
+                                <h3 id="quiz-number"
+                                    class="font-bold text-indigo-700">
+                                    Soal 1 / 10
+                                </h3>
+                    
+                                <span id="quiz-score"
+                                      class="font-bold text-green-600">
+                                      Skor : 0
+                                </span>
+                    
+                            </div>
+                    
+                            <div class="w-full bg-gray-200 rounded-full h-3 mb-6">
+                    
+                                <div id="quiz-progress"
+                                     class="bg-indigo-600 h-3 rounded-full"
+                                     style="width:0%">
+                                </div>
+                    
+                            </div>
+                    
+                            <h2 id="quiz-question"
+                                class="text-xl font-semibold mb-5">
+                            </h2>
+                    
+                            <div id="quiz-options"
+                                 class="space-y-3">
+                            </div>
+                    
+                            <button
+                                id="btn-check-answer"
+                                class="mt-6 bg-indigo-600 text-white px-5 py-3 rounded-xl hover:bg-indigo-700">
+                    
+                                Periksa Jawaban
+                    
+                            </button>
+                    
+                        </div>
+                    
+                    </div>
                   </div>
-          
               </div>
-          
           </div>
 
+          
         </div>
         <!-- /MAIN CONTENT -->
       </div>
