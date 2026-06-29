@@ -509,7 +509,7 @@ function displayCard() {
   if (!flashcardList || flashcardList.length === 0) {
     if (frontWord)   frontWord.textContent  = '🎉 Selesai!';
     if (backMeaning) backMeaning.textContent = 'Semua kosakata telah dikuasai.';
-    if (tracker)     tracker.textContent    = '0 / 0 Kartu';
+    if (tracker)     tracker.textContent    = 'Semua kata dikuasai dari total 0';
     updateFlashcardProgress(0, 0);
     return;
   }
@@ -517,13 +517,20 @@ function displayCard() {
   if (currentCardIndex >= flashcardList.length) currentCardIndex = 0;
   if (currentCardIndex < 0) currentCardIndex = flashcardList.length - 1;
 
-  if (tracker) tracker.textContent = `Kartu ke ${currentCardIndex + 1} dari ${flashcardList.length}`;
+  // PERUBAHAN DI SINI:
+  // Mengasumsikan jumlah dikuasai adalah indeks saat ini (misal index 0 berarti belum ada yang dikuasai = 0, atau index 1 berarti 1 kata dikuasai)
+  // Jika ingin menganggap kartu saat ini sudah langsung dihitung dikuasai, gunakan: currentCardIndex + 1
+  const jumlahDikuasai = currentCardIndex; 
+  const totalKosakata  = flashcardList.length;
+
+  if (tracker) tracker.textContent = `${jumlahDikuasai} kata dikuasai dari ${totalKosakata} kosakata`;
 
   const item = flashcardList[currentCardIndex];
   if (frontWord)   frontWord.textContent  = item.word;
   if (backMeaning) backMeaning.textContent = item.meaning;
 
-  updateFlashcardProgress(currentCardIndex + 1, flashcardList.length);
+  // Progress bar disesuaikan dengan parameter baru
+  updateFlashcardProgress(jumlahDikuasai, totalKosakata);
 
   const ap = document.getElementById('autoPlayToggle');
   if (ap && ap.checked) setTimeout(() => speakWord(item.word), 300);
