@@ -517,7 +517,7 @@ function displayCard() {
   if (currentCardIndex >= flashcardList.length) currentCardIndex = 0;
   if (currentCardIndex < 0) currentCardIndex = flashcardList.length - 1;
 
-  if (tracker) tracker.textContent = `Kartu ke ${document.getElementById('vocabCount').textContent} dari ${flashcardList.length}`;
+  if (tracker) tracker.textContent = `Kartu ke ${document.getElementById('vocabCount').textContent} Sisa ${flashcardList.length}`;
 
   const item = flashcardList[currentCardIndex];
   if (frontWord)   frontWord.textContent  = item.word;
