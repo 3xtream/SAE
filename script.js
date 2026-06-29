@@ -965,3 +965,41 @@ function renderQuestion() {
 
 }
 
+function checkAnswer(){
+
+    if(selectedAnswer==null){
+
+        alert("Silakan pilih jawaban terlebih dahulu.");
+
+        return;
+
+    }
+
+    const q = quizQuestions[currentQuestion];
+
+    const benar =
+        String(q.jawaban_benar).trim().toUpperCase();
+
+    userAnswers.push({
+
+        question:q,
+
+        selected:selectedAnswer,
+
+        correct:benar
+
+    });
+
+    if(selectedAnswer===benar){
+
+        score++;
+
+    }
+
+    showAnswerResult(
+        selectedAnswer===benar,
+        benar,
+        q.penjelasan
+    );
+
+}
