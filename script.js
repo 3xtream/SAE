@@ -523,7 +523,7 @@ function displayCard() {
   if (frontWord)   frontWord.textContent  = item.word;
   if (backMeaning) backMeaning.textContent = item.meaning;
 
-  updateFlashcardProgress(currentCardIndex + 1, flashcardList.length);
+  updateFlashcardProgress(document.getElementById('vocabCount').textContent, flashcardList.length);
 
   const ap = document.getElementById('autoPlayToggle');
   if (ap && ap.checked) setTimeout(() => speakWord(item.word), 300);
