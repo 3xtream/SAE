@@ -517,13 +517,13 @@ function displayCard() {
   if (currentCardIndex >= flashcardList.length) currentCardIndex = 0;
   if (currentCardIndex < 0) currentCardIndex = flashcardList.length - 1;
 
-  if (tracker) tracker.textContent = `Kartu ke ${currentCardIndex + 1} dari ${flashcardList.length}`;
+  if (tracker) tracker.textContent = `Kartu ke ${document.getElementById('vocabCount').textContent} dari ${flashcardList.length}`;
 
   const item = flashcardList[currentCardIndex];
   if (frontWord)   frontWord.textContent  = item.word;
   if (backMeaning) backMeaning.textContent = item.meaning;
 
-  updateFlashcardProgress(document.getElementById('vocabCount').textContent, flashcardList.length);
+  updateFlashcardProgress(currentCardIndex + 1, flashcardList.length);
 
   const ap = document.getElementById('autoPlayToggle');
   if (ap && ap.checked) setTimeout(() => speakWord(item.word), 300);
