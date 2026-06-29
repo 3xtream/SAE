@@ -1003,3 +1003,134 @@ function checkAnswer(){
     );
 
 }
+
+function showAnswerResult(isCorrect,correctAnswer,explanation){
+
+    const div =
+        document.getElementById("quiz-feedback");
+
+    div.style.display="block";
+
+    div.innerHTML=`
+
+        <div class="rounded-xl p-5 border
+        ${isCorrect
+            ?'bg-green-50 border-green-400'
+            :'bg-red-50 border-red-400'}">
+
+            <h3 class="font-bold text-xl mb-3">
+
+                ${isCorrect
+                    ?'✅ Jawaban Benar'
+                    :'❌ Jawaban Salah'}
+
+            </h3>
+
+            <p class="mb-3">
+
+                Jawaban benar :
+
+                <strong>${correctAnswer}</strong>
+
+            </p>
+
+            <p>
+
+                ${explanation}
+
+            </p>
+
+            <button
+                class="mt-5 bg-indigo-600 text-white px-4 py-2 rounded-xl"
+
+                onclick="nextQuestion()">
+
+                Soal Berikutnya
+
+            </button>
+
+        </div>
+
+    `;
+
+}
+
+function nextQuestion(){
+
+    document.getElementById("quiz-feedback").style.display="none";
+
+    currentQuestion++;
+
+    if(currentQuestion>=quizQuestions.length){
+
+        finishQuiz();
+
+        return;
+
+    }
+
+    renderQuestion();
+
+}
+
+
+function finishQuiz(){
+
+    const nilai =
+        Math.round(score/quizQuestions.length*100);
+
+    document.getElementById("quiz-container").innerHTML=`
+
+        <div class="text-center">
+
+            <h2 class="text-3xl font-bold text-indigo-700">
+
+                🎉 Latihan Selesai
+
+            </h2>
+
+            <div class="mt-6 text-xl">
+
+                Nilai :
+
+                <strong>${nilai}</strong>
+
+            </div>
+
+            <div class="mt-2">
+
+                Benar :
+
+                ${score}
+
+            </div>
+
+            <div>
+
+                Salah :
+
+                ${quizQuestions.length-score}
+
+            </div>
+
+            <button
+
+                class="mt-6 bg-indigo-600 text-white px-5 py-3 rounded-xl"
+
+                onclick="startQuiz()">
+
+                Ulangi Latihan
+
+            </button>
+
+        </div>
+
+    `;
+
+}
+
+
+
+
+
+
