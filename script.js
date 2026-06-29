@@ -16,6 +16,7 @@
 const LS_SESSION_KEY   = 'memberSession_v47';
 const GAS_API_URL      = 'https://script.google.com/macros/s/AKfycbyNd61rOZ1XwcmzsN3f5PoALkFxtuz8jr2ePCstaTeryAlT3PCt8Hogsqkn0hJf7SA4/exec';
 const SPEAKING_LAB_URL = 'https://3xtream.github.io/english/speaking-lab.html';
+const WRITING_LAB_URL = 'https://3xtream.github.io/english/writing-lab.html';
 
 // ─── STATE APLIKASI ───────────────────────────────────────────────────────────
 
@@ -142,6 +143,7 @@ function pindahTab(sectionId) {
   // Trigger fungsi spesifik saat tab tertentu dibuka
   if (sectionId === 'flashcard-tab' && typeof initFlashcards === 'function') initFlashcards();
   if (sectionId === 'speaking-lab'  && typeof loadSpeakingLabIframe === 'function') loadSpeakingLabIframe();
+  if (sectionId === 'writing-lab'  && typeof loadWritingLabIframe === 'function') loadWritingLabIframe();
 }
 
 
@@ -208,6 +210,7 @@ function _injectGlobalStyles() {
     .graph-date-label { font-size:9px; color:#94a3b8; font-family:monospace; text-align:center; }
     .graph-bar-inner.today-bar { background:linear-gradient(to top,#4f46e5,#6366f1); }
     .speaking { animation:pulse 1s infinite; }
+    .writing { animation:pulse 1s infinite; }
     @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.6; } }
     .vocab-item {
       display:flex; align-items:center; background:#f9f9f9;
@@ -896,6 +899,68 @@ function showIframeError(msg) {
   if (errBox) errBox.style.setProperty('display', 'flex', 'important');
   if (errMsg) errMsg.textContent = msg;
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  WRITING LAB INTEGRATION
+// ═══════════════════════════════════════════════════════════════════════════
+
+async function loadWritingLabIframe() {
+  const loader = document.getElementById('spIframeLoader');
+  const errBox = document.getElementById('spIframeErr');
+  const errMsg = document.getElementById('spIframeErrMsg');
+  const iframe = document.getElementById('spLabIframe');
+  const wrap   = document.getElementById('spIframeWrap');
+
+  if (loader) loader.style.setProperty('display', 'flex',  'important');
+  if (errBox) errBox.style.setProperty('display', 'none',  'important');
+  if (iframe) iframe.style.setProperty('display', 'none',  'important');
+  if (wrap)   wrap.style.setProperty('display',   'block', 'important');
+
+  // Jika sudah pernah dimuat, tampilkan langsung tanpa fetch ulang
+  if (iframe && iframe.dataset.loaded === '1') {
+    if (loader) loader.style.setProperty('display', 'none',  'important');
+    if (iframe) iframe.style.setProperty('display', 'block', 'important');
+    return;
+  }
+
+  const controller = new AbortController();
+  const timeoutId  = setTimeout(() => controller.abort(), 12000);
+
+  try {
+    const res = await fetch(WRITING_LAB_URL, { cache: 'no-store', signal: controller.signal });
+    clearTimeout(timeoutId);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const html = await res.text();
+    if (!iframe) throw new Error('Element #spLabIframe tidak ditemukan.');
+    iframe.srcdoc         = html;
+    iframe.dataset.loaded = '1';
+    iframe.onload = () => {
+      if (loader) loader.style.setProperty('display', 'none',  'important');
+      if (iframe) iframe.style.setProperty('display', 'block', 'important');
+    };
+  } catch (err) {
+    clearTimeout(timeoutId);
+    console.error('Writing Lab fetch error:', err);
+    const isTimeout = err.name === 'AbortError';
+    if (loader) loader.style.setProperty('display', 'none', 'important');
+    if (errBox) errBox.style.setProperty('display', 'flex', 'important');
+    if (errMsg) errMsg.textContent = isTimeout
+      ? 'Koneksi timeout (>12 detik). Gunakan tombol Tab Baru.'
+      : `Gagal memuat konten: ${err.message}. Gunakan tombol Tab Baru.`;
+  }
+}
+
+function showIframeError(msg) {
+  const loader = document.getElementById('spIframeLoader');
+  const iframe = document.getElementById('spLabIframe');
+  const errBox = document.getElementById('spIframeErr');
+  const errMsg = document.getElementById('spIframeErrMsg');
+  if (loader) loader.style.setProperty('display', 'none', 'important');
+  if (iframe) iframe.style.setProperty('display', 'none', 'important');
+  if (errBox) errBox.style.setProperty('display', 'flex', 'important');
+  if (errMsg) errMsg.textContent = msg;
+}
+
 
 
 // ═══════════════════════════════════════════════════════════════════════════
