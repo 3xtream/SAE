@@ -499,42 +499,35 @@ async function initFlashcards() {
 }
 
 function displayCard() {
-  const fCard = document.getElementById('fCard');
-  if (fCard) fCard.classList.remove('flipped');
+  const fCard = document.getElementById('fCard');
+  if (fCard) fCard.classList.remove('flipped');
 
-  const tracker      = document.getElementById('fcTracker');
-  const frontWord    = document.getElementById('fcFrontWord');
-  const backMeaning  = document.getElementById('fcBackMeaning');
+  const tracker      = document.getElementById('fcTracker');
+  const frontWord    = document.getElementById('fcFrontWord');
+  const backMeaning  = document.getElementById('fcBackMeaning');
 
-  // Ambil data riil progres user dari objek currentUser
-  const totalDikuasai = (currentUser && currentUser.vocabMastered) ? currentUser.vocabMastered : 0;
-  const totalKosakata = (currentUser && currentUser.vocabTotal) ? currentUser.vocabTotal : (flashcardList ? flashcardList.length : 0);
+  if (!flashcardList || flashcardList.length === 0) {
+    if (frontWord)   frontWord.textContent  = '🎉 Selesai!';
+    if (backMeaning) backMeaning.textContent = 'Semua kosakata telah dikuasai.';
+    if (tracker)     tracker.textContent    = '0 / 0 Kartu';
+    updateFlashcardProgress(0, 0);
+    return;
+  }
 
-  if (!flashcardList || flashcardList.length === 0) {
-    if (frontWord)   frontWord.textContent  = '🎉 Selesai!';
-    if (backMeaning) backMeaning.textContent = 'Semua kosakata telah dikuasai.';
-    if (tracker)     tracker.textContent    = `${totalDikuasai} / ${totalKosakata} Kartu`;
-    updateFlashcardProgress(totalDikuasai, totalKosakata);
-    return;
-  }
+  if (currentCardIndex >= flashcardList.length) currentCardIndex = 0;
+  if (currentCardIndex < 0) currentCardIndex = flashcardList.length - 1;
 
-  if (currentCardIndex >= flashcardList.length) currentCardIndex = 0;
-  if (currentCardIndex < 0) currentCardIndex = flashcardList.length - 1;
+  if (tracker) tracker.textContent = `Kartu ke ${currentCardIndex + 1} dari ${flashcardList.length}`;
 
-  // Menampilkan format "303 / 2146 Kartu" pada tracker sesuai tampilan gambar
-  if (tracker) tracker.textContent = `${totalDikuasai} / ${totalKosakata} Kartu`;
+  const item = flashcardList[currentCardIndex];
+  if (frontWord)   frontWord.textContent  = item.word;
+  if (backMeaning) backMeaning.textContent = item.meaning;
 
-  const item = flashcardList[currentCardIndex];
-  if (frontWord)   frontWord.textContent  = item.word;
-  if (backMeaning) backMeaning.textContent = item.meaning;
+  updateFlashcardProgress(currentCardIndex + 1, flashcardList.length);
 
-  // Sinkronisasi progress bar dengan angka riil dari server
-  updateFlashcardProgress(totalDikuasai, totalKosakata);
-
-  const ap = document.getElementById('autoPlayToggle');
-  if (ap && ap.checked) setTimeout(() => speakWord(item.word), 300);
+  const ap = document.getElementById('autoPlayToggle');
+  if (ap && ap.checked) setTimeout(() => speakWord(item.word), 300);
 }
-
 function updateFlashcardProgress(current, total) {
   const progressBar = document.getElementById('flashcardProgress');
   if (!progressBar) return;
