@@ -105,6 +105,14 @@ function showSkeletons() {
     }
   });
 }
+// ═══════════════════════════════════════════════════════════════════════════
+//                                API KEY
+// ═══════════════════════════════════════════════════════════════════════════
+function saveApiKey() {
+  apiKey = document.getElementById('apiKeyInput').value.trim();
+  localStorage.setItem('sprint_gemini_key', apiKey);
+  showToast('API Key tersimpan! ✅');
+}
 
 
 // ═══════════════════════════════════════════════════════════════════════════
