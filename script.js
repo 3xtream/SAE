@@ -894,9 +894,11 @@ async function startQuiz(){
 
         console.log(quizQuestions);
 
-        alert("Berhasil mengambil "
-                + quizQuestions.length
-                + " soal.");
+        // Tampilkan area quiz
+        document.getElementById("quiz-container").style.display = "block";
+        
+        // Tampilkan soal pertama
+        renderQuestion();
 
     }
 
@@ -905,6 +907,61 @@ async function startQuiz(){
         alert(err.message);
 
     }
+
+}
+
+function renderQuestion() {
+
+    selectedAnswer = null;
+
+    const q = quizQuestions[currentQuestion];
+
+    // Nomor soal
+    document.getElementById("quiz-number").textContent =
+        `Soal ${currentQuestion + 1} / ${quizQuestions.length}`;
+
+    // Progress
+    document.getElementById("quiz-progress").style.width =
+        ((currentQuestion + 1) / quizQuestions.length * 100) + "%";
+
+    // Pertanyaan
+    document.getElementById("quiz-question").textContent =
+        q.pertanyaan;
+
+    // Pilihan jawaban
+    const options = [
+        q.opsi_a,
+        q.opsi_b,
+        q.opsi_c,
+        q.opsi_d,
+        q.opsi_e
+    ];
+
+    let html = "";
+
+    options.forEach((option, index) => {
+
+        if (!option) return;
+
+        const letter = String.fromCharCode(65 + index);
+
+        html += `
+            <label class="block border rounded-xl p-3 cursor-pointer hover:bg-indigo-50 mb-2">
+
+                <input
+                    type="radio"
+                    name="quizOption"
+                    value="${letter}"
+                    onchange="selectedAnswer='${letter}'">
+
+                <strong>${letter}.</strong> ${option}
+
+            </label>
+        `;
+
+    });
+
+    document.getElementById("quiz-options").innerHTML = html;
 
 }
 
