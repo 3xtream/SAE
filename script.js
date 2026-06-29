@@ -905,11 +905,11 @@ function showIframeError(msg) {
 // ═══════════════════════════════════════════════════════════════════════════
 
 async function loadWritingLabIframe() {
-  const loader = document.getElementById('spIframeLoader');
-  const errBox = document.getElementById('spIframeErr');
-  const errMsg = document.getElementById('spIframeErrMsg');
-  const iframe = document.getElementById('spLabIframe');
-  const wrap   = document.getElementById('spIframeWrap');
+  const loader = document.getElementById('wrIframeLoader');
+  const errBox = document.getElementById('wrIframeErr');
+  const errMsg = document.getElementById('wrIframeErrMsg');
+  const iframe = document.getElementById('wrLabIframe');
+  const wrap   = document.getElementById('wrIframeWrap');
 
   if (loader) loader.style.setProperty('display', 'flex',  'important');
   if (errBox) errBox.style.setProperty('display', 'none',  'important');
@@ -951,10 +951,10 @@ async function loadWritingLabIframe() {
 }
 
 function showIframeError(msg) {
-  const loader = document.getElementById('spIframeLoader');
-  const iframe = document.getElementById('spLabIframe');
-  const errBox = document.getElementById('spIframeErr');
-  const errMsg = document.getElementById('spIframeErrMsg');
+  const loader = document.getElementById('wrIframeLoader');
+  const iframe = document.getElementById('wrLabIframe');
+  const errBox = document.getElementById('wrIframeErr');
+  const errMsg = document.getElementById('wrIframeErrMsg');
   if (loader) loader.style.setProperty('display', 'none', 'important');
   if (iframe) iframe.style.setProperty('display', 'none', 'important');
   if (errBox) errBox.style.setProperty('display', 'flex', 'important');
