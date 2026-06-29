@@ -1076,50 +1076,35 @@ function nextQuestion(){
 
 function finishQuiz(){
 
-    const nilai =
-        Math.round(score/quizQuestions.length*100);
+    const nilai = Math.round(score / quizQuestions.length * 100);
 
-    document.getElementById("quiz-container").innerHTML=`
+    document.getElementById("quiz-container").style.display = "none";
 
-        <div class="text-center">
+    const result = document.getElementById("quiz-result");
 
-            <h2 class="text-3xl font-bold text-indigo-700">
+    result.style.display = "block";
 
+    result.innerHTML = `
+
+        <div class="bg-white rounded-xl shadow p-6 text-center">
+
+            <h2 class="text-3xl font-bold text-indigo-600">
                 🎉 Latihan Selesai
-
             </h2>
 
-            <div class="mt-6 text-xl">
+            <p class="mt-4 text-xl">
+                Nilai : <strong>${nilai}</strong>
+            </p>
 
-                Nilai :
+            <p>Benar : ${score}</p>
 
-                <strong>${nilai}</strong>
-
-            </div>
-
-            <div class="mt-2">
-
-                Benar :
-
-                ${score}
-
-            </div>
-
-            <div>
-
-                Salah :
-
-                ${quizQuestions.length-score}
-
-            </div>
+            <p>Salah : ${quizQuestions.length-score}</p>
 
             <button
+                onclick="restartQuiz()"
+                class="mt-5 bg-indigo-600 text-white px-5 py-3 rounded-xl">
 
-                class="mt-6 bg-indigo-600 text-white px-5 py-3 rounded-xl"
-
-                onclick="startQuiz()">
-
-                Ulangi Latihan
+                🔄 Ulangi Latihan
 
             </button>
 
@@ -1129,6 +1114,15 @@ function finishQuiz(){
 
 }
 
+function restartQuiz(){
+
+    document.getElementById("quiz-result").style.display = "none";
+
+    document.getElementById("quiz-container").style.display = "block";
+
+    startQuiz();
+
+}
 
 
 
