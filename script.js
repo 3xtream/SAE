@@ -198,10 +198,9 @@ function _injectGlobalStyles() {
     }
     .graph-bar-wrap {
       display:flex; flex-direction:column; align-items:center;
-      flex:1; gap:4px; min-width:0;
-      height:100%;                 /* ⬅️ TAMBAHKAN: stretch penuh ke tinggi #trackingGraph */
+      flex:1; gap:4px; min-width:0; height:100%;
     }
-    .graph-bar-track {             /* ⬅️ BARU: pembungkus khusus area bar */
+    .graph-bar-track {
       flex:1; width:100%; display:flex; align-items:flex-end;
       min-height:0;
     }
@@ -210,7 +209,6 @@ function _injectGlobalStyles() {
       background:linear-gradient(to top,#6366f1,#818cf8);
       position:relative; cursor:default; transition:opacity .2s;
       min-height:4px;
-      /* height:%; sekarang dihitung relatif ke .graph-bar-track yang punya tinggi pasti (karena flex:1 di parent berheight) */
     }
     .graph-bar-inner:hover { opacity:.8; }
     .graph-bar-inner .g-tooltip {
@@ -805,28 +803,39 @@ function renderDailyGraph(logs) {
   if (!gc) return;
   gc.innerHTML = '';
 
-  // Pastikan selalu 7 slot
+  // ── Bangun peta log berdasarkan tanggal (YYYY-MM-DD) ──
+  const logMap = {};
+  (logs || []).forEach(l => {
+    if (l && l.date) logMap[l.date] = l;
+  });
+
+  // ── Pastikan selalu 7 slot = 7 HARI KALENDER TERAKHIR (termasuk hari tanpa log) ──
   const slots = [];
-  for (let i = 0; i < 7; i++) {
-    slots.push(logs && logs[i] ? logs[i] : { date: '-', duration: 0, wpm: 0, passage: 0 });
+  const today = new Date();
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    slots.push(logMap[key] || { date: key, duration: 0, wpm: 0, passage: 0 });
   }
 
-  const maxDur = Math.max(...slots.map(s => s.duration), 1);
+  const maxDur = Math.max(...slots.map(s => Number(s.duration) || 0), 1);
 
   slots.forEach((log, i) => {
-    const isToday   = i === 6;
-    const heightPct = Math.max((log.duration / maxDur) * 100, log.duration > 0 ? 6 : 2);
+    const isToday   = i === slots.length - 1;
+    const duration  = Number(log.duration) || 0;
+    const heightPct = duration > 0
+      ? Math.max((duration / maxDur) * 100, 6)
+      : 2;
 
     let dateLabel = log.date;
     if (dateLabel && dateLabel !== '-') {
-      try {
-        const p = dateLabel.split('-');
-        if (p.length >= 3) dateLabel = p[1] + '/' + p[2];
-      } catch (e) {}
+      const p = dateLabel.split('-');
+      if (p.length >= 3) dateLabel = p[1] + '/' + p[2];
     }
 
-    const tooltipLines = log.duration > 0
-      ? `${dateLabel} · ${log.duration} menit${log.wpm > 0 ? ' · ' + log.wpm + ' WPM' : ''}${log.passage > 0 ? ' · ' + log.passage + ' passage' : ''}`
+    const tooltipLines = duration > 0
+      ? `${dateLabel} · ${duration} menit${log.wpm > 0 ? ' · ' + log.wpm + ' WPM' : ''}${log.passage > 0 ? ' · ' + log.passage + ' passage' : ''}`
       : `${dateLabel} · Tidak ada log`;
 
     const wrap     = document.createElement('div');
@@ -834,16 +843,22 @@ function renderDailyGraph(logs) {
 
     const valLabel       = document.createElement('div');
     valLabel.className   = 'graph-val-label';
-    valLabel.textContent = log.duration > 0 ? log.duration + 'm' : '';
+    valLabel.textContent = duration > 0 ? duration + 'm' : '';
 
-    const track = document.createElement('div');
+    // Track pembungkus area bar — punya tinggi pasti (flex:1 dalam wrap berheight 100%),
+    // sehingga height:% pada bar di bawah ini terhitung relatif terhadap tinggi yang valid.
+    const track     = document.createElement('div');
     track.className = 'graph-bar-track';
-    track.appendChild(bar);
+
+    const bar        = document.createElement('div');
+    bar.className    = 'graph-bar-inner' + (isToday ? ' today-bar' : '');
+    bar.style.height = heightPct + '%';
 
     const tooltip       = document.createElement('div');
     tooltip.className   = 'g-tooltip';
     tooltip.textContent = tooltipLines;
     bar.appendChild(tooltip);
+    track.appendChild(bar);
 
     const dateEl       = document.createElement('div');
     dateEl.className   = 'graph-date-label';
