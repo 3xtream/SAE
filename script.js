@@ -199,12 +199,18 @@ function _injectGlobalStyles() {
     .graph-bar-wrap {
       display:flex; flex-direction:column; align-items:center;
       flex:1; gap:4px; min-width:0;
+      height:100%;                 /* ⬅️ TAMBAHKAN: stretch penuh ke tinggi #trackingGraph */
+    }
+    .graph-bar-track {             /* ⬅️ BARU: pembungkus khusus area bar */
+      flex:1; width:100%; display:flex; align-items:flex-end;
+      min-height:0;
     }
     .graph-bar-inner {
       width:100%; border-radius:6px 6px 0 0;
       background:linear-gradient(to top,#6366f1,#818cf8);
       position:relative; cursor:default; transition:opacity .2s;
       min-height:4px;
+      /* height:%; sekarang dihitung relatif ke .graph-bar-track yang punya tinggi pasti (karena flex:1 di parent berheight) */
     }
     .graph-bar-inner:hover { opacity:.8; }
     .graph-bar-inner .g-tooltip {
@@ -830,9 +836,9 @@ function renderDailyGraph(logs) {
     valLabel.className   = 'graph-val-label';
     valLabel.textContent = log.duration > 0 ? log.duration + 'm' : '';
 
-    const bar      = document.createElement('div');
-    bar.className  = 'graph-bar-inner' + (isToday ? ' today-bar' : '');
-    bar.style.height = heightPct + '%';
+    const track = document.createElement('div');
+    track.className = 'graph-bar-track';
+    track.appendChild(bar);
 
     const tooltip       = document.createElement('div');
     tooltip.className   = 'g-tooltip';
@@ -845,7 +851,7 @@ function renderDailyGraph(logs) {
     if (isToday) dateEl.style.color = '#6366f1';
 
     wrap.appendChild(valLabel);
-    wrap.appendChild(bar);
+    wrap.appendChild(track);
     wrap.appendChild(dateEl);
     gc.appendChild(wrap);
   });
