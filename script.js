@@ -179,7 +179,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const savedKey = localStorage.getItem('gemini_api_key'); 
   
   // Cari elemen input box-nya (pastikan ID/Selector-nya sesuai dengan kode HTML Anda)
-  const apiKeyInput = document.querySelector('.api-key-area input') || document.getElementById('your-input-id');
+  const apiKeyInput = document.querySelector('.api-key-area input') || document.getElementById('apiKeyInput');
   
   if (savedKey && apiKeyInput) {
     apiKeyInput.value = savedKey;
