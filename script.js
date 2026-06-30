@@ -111,7 +111,7 @@ function showSkeletons() {
 // ═══════════════════════════════════════════════════════════════════════════
 function saveApiKey() {
   apiKey = document.getElementById('apiKeyInput').value.trim();
-  localStorage.setItem('sprint_gemini_key', apiKey);
+  localStorage.setItem('gemini_api_key', apiKey);
   showToast('API Key tersimpan! ✅');
 }
 
