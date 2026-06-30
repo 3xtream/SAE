@@ -418,6 +418,8 @@ async function refreshDataFromDatabase() {
       latestWpm:      dd.latestWpm     || 0,
       masteredVocabs: masteredList,
       checkedPhases:  dd.checkedPhases || { 1: [], 2: [], 3: [], 4: [] },
+      currentStreak:  dd.currentStreak || 0,
+      longestStreak:  dd.longestStreak || 0,
     });
   } catch (e) {
     showBanner('Gagal memuat data: ' + e.message, 'error', 0);
@@ -450,8 +452,8 @@ function processDatabaseRender(data) {
     if (data.vocabBank)  renderVocabHTML(data.vocabBank);
     if (data.last7Logs)  renderDailyGraph(data.last7Logs);
 
-    // Streak days
-    const streakDays = data.last7Logs ? data.last7Logs.filter(l => l.duration > 0).length : 0;
+    // Streak days (dihitung di backend dari FULL history, dengan grace period)
+    const streakDays = data.currentStreak || 0;
     const tde = document.getElementById('totalDays');
     if (tde) tde.textContent = streakDays;
 
