@@ -16,23 +16,6 @@
 
     /* Graph container — flex dengan gap merata */
     #trackingGraph { display:flex; align-items:flex-end; gap:4px; width:100%; height:140px; }
-    .graph-bar-wrap {
-      display:flex; flex-direction:column; align-items:center;
-      flex:1; gap:4px; min-width:0;
-      height:100%;                 /* ⬅️ TAMBAHKAN: stretch penuh ke tinggi #trackingGraph */
-    }
-    .graph-bar-track {             /* ⬅️ BARU: pembungkus khusus area bar */
-      flex:1; width:100%; display:flex; align-items:flex-end;
-      min-height:0;
-    }
-    .graph-bar-inner {
-      width:100%; border-radius:6px 6px 0 0;
-      background:linear-gradient(to top,#6366f1,#818cf8);
-      position:relative; cursor:default; transition:opacity .2s;
-    min-height:4px;
-      /* height:%; sekarang dihitung relatif ke .graph-bar-track yang punya tinggi pasti (karena flex:1 di parent berheight) */
-    }
-
     /* Flashcard 3D — CSS classes murni tanpa JS */
     .perspective            { perspective: 1000px; }
     .transform-style-3d     { transform-style: preserve-3d; }
